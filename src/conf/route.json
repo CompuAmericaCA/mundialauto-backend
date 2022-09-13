@@ -1,0 +1,422 @@
+[
+    {
+        "name": "Security Route",
+        "router": "../routes/security",
+        "route": "/api/security"
+    },
+    {
+        "name": "Clauses Route",
+        "router": "../routes/clauses",
+        "route": "/api/clauses"
+    },
+    {
+        "name": "Control Route",
+        "router": "../routes/control",
+        "route": "/api/control"
+    },
+    {
+        "name": "Valrep Route",
+        "router": "../routes/valrep",
+        "route": "/api/valrep"
+    },
+    {
+        "name": "User Route",
+        "router": "../routes/user",
+        "route": "/api/user"
+    },
+    {
+        "name": "Country Route",
+        "router": "../routes/country",
+        "route": "/api/country"
+    },
+    {
+        "name": "Company Route",
+        "router": "../routes/company",
+        "route": "/api/company"
+    },
+    {
+        "name": "Department Route",
+        "router": "../routes/department",
+        "route": "/api/department"
+    },
+    {
+        "name": "Group Route",
+        "router": "../routes/group",
+        "route": "/api/group"
+    },
+    {
+        "name": "Club Route",
+        "router": "../routes/club",
+        "route": "/api/club"
+    },
+    {
+        "name": "Role Route",
+        "router": "../routes/role",
+        "route": "/api/role"
+    },
+    {
+        "name": "Accesory Route",
+        "router": "../routes/accesory",
+        "route": "/api/accesory"
+    },
+    {
+        "name": "ArysVial Route",
+        "router": "../routes/arysvial-conditions",
+        "route": "/api/arysvial-conditions"
+    },
+    {
+        "name": "Associate Type Route",
+        "router": "../routes/associate-type",
+        "route": "/api/associate-type"
+    },
+    {
+        "name": "Bank Account Type Route",
+        "router": "../routes/bank-account-type",
+        "route": "/api/bank-account-type"
+    },
+    {
+        "name": "Bank Route",
+        "router": "../routes/bank",
+        "route": "/api/bank"
+    },
+    {
+        "name": "Color Route",
+        "router": "../routes/color",
+        "route": "/api/color"
+    },
+    {
+        "name": "Service Type Route",
+        "router": "../routes/service-type",
+        "route": "/api/service-type"
+    },
+    {
+        "name": "Service Order Route",
+        "router": "../routes/service-order",
+        "route": "/api/service-order" 
+    },   
+    {
+        "name": "Vehicle Type Route",
+        "router": "../routes/v2/tables/vehicle-type",
+        "route": "/api/v2/vehicle-type"
+    },
+    {
+        "name": "Plan Type Route",
+        "router": "../routes/plan-type",
+        "route": "/api/plan-type"
+    },
+    {
+        "name": "Notification Type Route",
+        "router": "../routes/notification-type",
+        "route": "/api/notification-type"
+    },
+    {
+        "name": "Inspection Type Route",
+        "router": "../routes/inspection-type",
+        "route": "/api/inspection-type"
+    },
+    {
+        "name": "State Route",
+        "router": "../routes/state",
+        "route": "/api/state"
+    },
+    {
+        "name": "Payment Type Route",
+        "router": "../routes/payment-type",
+        "route": "/api/payment-type"
+    },
+    {
+        "name": "Process Route",
+        "router": "../routes/process",
+        "route": "/api/process"
+    },
+    {
+        "name": "Transmission Type Route",
+        "router": "../routes/transmission-type",
+        "route": "/api/transmission-type"
+    },
+    {
+        "name": "Business Activity Route",
+        "router": "../routes/business-activity",
+        "route": "/api/business-activity"
+    },
+    {
+        "name": "Cancellation Cause Route",
+        "router": "../routes/cancellation-cause",
+        "route": "/api/cancellation-cause"
+    },
+    {
+        "name": "Civil Status Route",
+        "router": "../routes/civil-status",
+        "route": "/api/civil-status"
+    },
+    {
+        "name": "General Status Route",
+        "router": "../routes/general-status",
+        "route": "/api/general-status"
+    },
+    {
+        "name": "Replacement Type Route",
+        "router": "../routes/replacement-type",
+        "route": "/api/replacement-type"
+    },
+    {
+        "name": "Depreciation Route",
+        "router": "../routes/depreciation",
+        "route": "/api/depreciation"
+    },
+    {
+        "name": "Service Depletion Type Route",
+        "router": "../routes/service-depletion-type",
+        "route": "/api/service-depletion-type"
+    },
+    {
+        "name": "Document Type Route",
+        "router": "../routes/document-type",
+        "route": "/api/document-type"
+    },
+    {
+        "name": "Penalty Route",
+        "router": "../routes/penalty",
+        "route": "/api/penalty"
+    },
+    {
+        "name": "City Route",
+        "router": "../routes/city",
+        "route": "/api/city"
+    },
+    {
+        "name": "Relationship Route",
+        "router": "../routes/relationship",
+        "route": "/api/relationship"
+    },
+    {
+       "name": "Document Route",
+       "router": "../routes/document",
+       "route": "/api/document" 
+    },
+    {
+        "name": "Tax Route",
+        "router": "../routes/tax",
+        "route": "/api/tax"
+    },
+    {
+        "name": "Brand Route",
+        "router": "../routes/brand",
+        "route": "/api/brand"
+    },
+    {
+        "name": "Service Route",
+        "router": "../routes/service",
+        "route": "/api/service"
+    },
+    {
+        "name": "Service Insurer",
+        "router": "../routes/services-insurers",
+        "route": "/api/services-insurers"
+    },
+    {
+        "name": "Model Route",
+        "router": "../routes/model",
+        "route": "/api/model"
+    },
+    {
+        "name": "Version Route",
+        "router": "../routes/version",
+        "route": "/api/version"
+    },
+    {
+        "name": "Replacement Route",
+        "router": "../routes/replacement",
+        "route": "/api/replacement"
+    },
+    {
+        "name": "Associate Route",
+        "router": "../routes/associate",
+        "route": "/api/associate"
+    },
+    {
+        "name": "Broker Route",
+        "router": "../routes/broker",
+        "route": "/api/broker"
+    },
+    {
+        "name": "Enterprise Route",
+        "router": "../routes/enterprise",
+        "route": "/api/enterprise"
+    },
+    {
+        "name": "Coin Route",
+        "router": "../routes/coin",
+        "route": "/api/coin" 
+    },  
+    {
+        "name": "Collections Route",
+        "router": "../routes/collections",
+        "route": "/api/collections"
+    },  
+    {
+        "name": "Client Route",
+        "router": "../routes/v2/clients/client",
+        "route": "/api/v2/client"
+    },
+    {
+        "name": "Coverage Route",
+        "router": "../routes/coverage",
+        "route": "/api/coverage"
+    },
+    {
+        "name": "Coverage Concept Route",
+        "router": "../routes/coverage-concept",
+        "route": "/api/coverage-concept"
+    },
+    {
+        "name": "Extra Coverage Route",
+        "router": "../routes/extra-coverage",
+        "route": "/api/extra-coverage"
+    },
+    {
+        "name": "Road Management Configuration Route",
+        "router": "../routes/road-management-configuration",
+        "route": "/api/road-management-configuration"
+    },
+    {
+        "name": "Fees Register Route",
+        "router": "../routes/fees-register",
+        "route": "/api/fees-register"
+    },
+    {
+        "name": "Quote By Fleet Route",
+        "router": "../routes/quote-by-fleet",
+        "route": "/api/quote-by-fleet"
+    },
+    {
+        "name": "Proficient Route",
+        "router": "../routes/proficient",
+        "route": "/api/proficient"
+    },
+    {
+        "name": "Fleet Contract Management Route",
+        "router": "../routes/fleet-contract-management",
+        "route": "/api/fleet-contract-management"
+    },
+    {
+        "name": "Claim Cause Route",
+        "router": "../routes/claim-cause",
+        "route": "/api/claim-cause"
+    },
+    {
+        "name": "Damage Level Route",
+        "router": "../routes/damage-level",
+        "route": "/api/damage-level"
+    },
+    {
+        "name": "Material Damage Route",
+        "router": "../routes/material-damage",
+        "route": "/api/material-damage"
+    },
+    {
+        "name": "Notification Route",
+        "router": "../routes/notification",
+        "route": "/api/notification"
+    },
+    {
+        "name": "Tracing Type Route",
+        "router": "../routes/tracing-type",
+        "route": "/api/tracing-type"
+    },
+    {
+        "name": "Tracing Motive Route",
+        "router": "../routes/tracing-motive",
+        "route": "/api/tracing-motive"
+    },
+    {
+        "name": "Quote Request Route",
+        "router": "../routes/quote-request",
+        "route": "/api/quote-request"
+    },
+    {
+        "name": "Insurer Route",
+        "router": "../routes/insurer",
+        "route": "/api/insurer"
+    },
+    {
+        "name": "Consumer Route",
+        "router": "../routes/v2/api/consumer",
+        "route": "/api/v2/consumer"
+    },
+    {
+        "name": "Authentication Route",
+        "router": "../routes/v2/security/authentication",
+        "route": "/api/v2/authentication"
+    },
+    {
+        "name": "Plan Route",
+        "router": "../routes/v2/products/plan",
+        "route": "/api/v2/plan"
+    },
+    {
+        "name": "Owner Route",
+        "router": "../routes/v2/thirdparties/owner",
+        "route": "/api/v2/owner"
+    },
+    {
+        "name": "Valrep v2 Route",
+        "router": "../routes/v2/utils/valrep",
+        "route": "/api/v2/valrep"
+    },
+    {
+        "name": "Image Route",
+        "router": "../routes/v2/tables/image",
+        "route": "/api/v2/image"
+    },
+    {
+        "name": "Payment Methodology Route",
+        "router": "../routes/v2/tables/payment-methodology",
+        "route": "/api/v2/payment-methodology"
+    },
+    {
+        "name": "Club Contract Management Route",
+        "router": "../routes/v2/subscription/club-contract-management",
+        "route": "/api/v2/club-contract-management"
+    },
+    {
+        "name": "Provider Route",
+        "router": "../routes/v2/providers/provider",
+        "route": "/api/v2/provider"
+    },
+    {
+        "name": "Service Request Route",
+        "router": "../routes/v2/events/service-request",
+        "route": "/api/v2/service-request"
+    },
+    {
+        "name": "Club Menu Route",
+        "router": "../routes/v2/api/club-menu",
+        "route": "/api/v2/club-menu"
+    },
+    {
+        "name": "Club Role Route",
+        "router": "../routes/v2/api/club-role",
+        "route": "/api/v2/club-role"
+    },
+    {
+        "name": "Permission Route",
+        "router": "../routes/v2/security/permission",
+        "route": "/api/v2/permission"
+    },
+    {
+        "name": "Email Alert Route",
+        "router": "../routes/v2/alerts/email-alert",
+        "route": "/api/v2/email-alert"
+    },
+    {
+        "name": "Tracing Route",
+        "router": "../routes/v2/business/tracing",
+        "route": "/api/v2/tracing"
+    },
+    {
+        "name": "Collection Order Fleet Contract Route",
+        "router": "../routes/v2/administration/collection-order-fleet-contract",
+        "route": "/api/v2/collection-order-fleet-contract"
+    }
+]   
