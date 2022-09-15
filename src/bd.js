@@ -15,9 +15,11 @@ module.exports = {
                 .input('bactivo', sql.Bit, true)
                 .query('select * from VWAUTENTICACIONUSUARIO where XEMAIL = @xemail and BACTIVO = @bactivo');
             //sql.close();
+            console.log(result)
             return { result: result };
         }
         catch(err){
+            console.log(err.message + 'de pana')
             return { error: err.message};
         }
     },
