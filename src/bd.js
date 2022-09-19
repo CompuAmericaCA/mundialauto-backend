@@ -11706,4 +11706,21 @@ module.exports = {
             return { error: err.message };
         }
     },
+    searchCollectionQuery: async(searchData) => {
+        try{
+            let query = `SELECT * FROM VWBUSCARRECIBOSPENDIENTES WHERE CESTATUSGENERAL = @cestatusgeneral AND CCOMPANIA = @ccompania${ searchData.xplaca ? " and XPLACA = @xplaca" : '' } `;
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .input('cestatusgeneral', sql.Int, 13)
+                .input('ccompania', sql.Int, searchData.ccompania ? searchData.ccompania: undefined)
+                .input('xplaca', sql.NVarChar, searchData.xplaca ? searchData.xplaca: undefined)
+                //.input('xclausulas', sql.NVarChar, searchData.xclausulas ? searchData.xclausulas: undefined)
+                .query(query);
+            //sql.close();
+            console.log(result)
+            return { result: result };
+        }catch(err){
+            return { error: err.message };
+        }
+    },
 }
