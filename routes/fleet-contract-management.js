@@ -680,6 +680,7 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
             let xplan = getPlanArysData.result.recordset[0].XPLAN.toLowerCase()
             xplanservicios = xplan.charAt(0).toUpperCase() + xplan.slice(1);
         }
+        console.log(getPlanArysData.result.recordset[0].XPLAN)
         return {
             status: true,
             ccarga: getFleetContractData.result.recordset[0].ccarga,
@@ -708,8 +709,8 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
             femision: getFleetContractData.result.recordset[0].femision,
             cestatusgeneral: getFleetContractData.result.recordset[0].CESTATUSGENERAL,
             ctrabajador: getFleetContractData.result.recordset[0].CTRABAJADOR,
-            ccorredor: getBroker.result.recordset[0].ccorredor,
-            xcorredor: getBroker.result.recordset[0].xcorredor,
+            ccorredor: getBroker.result.recordset[0].CCORREDOR,
+            xcorredor: getBroker.result.recordset[0].XCORREDOR,
 
             /*xnombretrabajador: getFleetContractWorkerData.result.recordset[0].XNOMBRE,
             xtipodocidentidadtrabajador: getFleetContractWorkerData.result.recordset[0].XTIPODOCIDENTIDAD,
@@ -854,8 +855,8 @@ const operationReceiptDetail = async(authHeader, requestBody) => {
             xestadocliente: getReceiptData.result.recordset[0].XESTADO,
             xciudadcliente: getReceiptData.result.recordset[0].XCIUDAD,
             xmetodologiapago: getReceiptData.result.recordset[0].XMETODOLOGIAPAGO,
-            ccorredor: getReceiptData.result.recordset[0].ccorredor,
-            xcorredor: getReceiptData.result.recordset[0].xcorredor,
+            ccorredor: getReceiptData.result.recordset[0].CCORREDOR,
+            xcorredor: getReceiptData.result.recordset[0].XCORREDOR,
             xrif: getReceiptData.result.recordset[0].xrif
     }
 }

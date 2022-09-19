@@ -401,12 +401,14 @@ module.exports = {
         }
     },
     getPlanArys: async(cplan) => {
+        console.log(cplan)
         try{
             let pool = await sql.connect(config);
             let result = await pool.request()
                 .input('cplan', sql.Int, cplan)
                 .query('select * from POPLAN where CPLAN = @cplan');
             //sql.close();
+            console.log(result)
             return { result: result };
         }catch(err){
             return { error: err.message };
