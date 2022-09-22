@@ -506,7 +506,7 @@ router.route('/detail').post((req, res) => {
             }
             res.json({ data: result });
         }).catch((err) => {
-            console.log('error: ' + err.message);
+            console.log(err.message);
             res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationDetailFleetContractManagement' } });
         });
     }
@@ -527,10 +527,10 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
         if(getFleetContractWorkerData.error){ return { status: false, code: 500, message: getFleetContractWorkerData.error }; }
         if(getFleetContractWorkerData.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Fleet Contract Worker not found.' }; }
         */let getFleetContractOwnerData = await bd.getFleetContractOwnerDataQuery(fleetContractData, getFleetContractData.result.recordset[0].CPROPIETARIO).then((res) => res);
-        if(getFleetContractOwnerData.error){ return { status: false, code: 500, message: getFleetContractOwnerData.error }; }
+        if(getFleetContractOwnerData.error){console.log(getFleetContractOwnerData.error); return { status: false, code: 500, message: getFleetContractOwnerData.error }; }
         if(getFleetContractOwnerData.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Fleet Contract Owner not found.' }; }
         let getFleetContractOwnerVehicleData = await bd.getFleetContractOwnerVehicleDataQuery(getFleetContractData.result.recordset[0].CPROPIETARIO, getFleetContractData.result.recordset[0].CVEHICULOPROPIETARIO).then((res) => res);
-        if(getFleetContractOwnerVehicleData.error){ return { status: false, code: 500, message: getFleetContractOwnerVehicleData.error }; }
+        if(getFleetContractOwnerVehicleData.error){ console.log(getFleetContractOwnerVehicleData.error); return { status: false, code: 500, message: getFleetContractOwnerVehicleData.error }; }
         if(getFleetContractOwnerVehicleData.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Fleet Contract Owner Vehicle not found.' }; }
         /*let searchQuoteByFleet = await bd.searchQuoteByFleetQuery(fleetContractData).then((res) => res);
         if(searchQuoteByFleet.error){ return { status: false, code: 500, message: searchQuoteByFleet.error }; }
@@ -583,10 +583,10 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
         let mprimaprorratatotal = 0; 
         let getPlanData = await db.getPlanData(getFleetContractData.result.recordset[0].CPLAN);
         if(getPlanData.error){ return { status: false, code: 500, message: getFleetContractOwnerData.error }; }
-        if(getPlanData.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Fleet Contract Plan not found.' }; }
+        if(getPlanData.result.rowsAffected < 0){ console.log(getPlanData.error); return { status: false, code: 404, message: 'Fleet Contract Plan not found.' }; }
         let realCoverages = [];
         let getPlanCoverages = await db.getPlanCoverages(getFleetContractData.result.recordset[0].CPLAN, getFleetContractData.result.recordset[0].CCONTRATOFLOTA);
-        if(getPlanCoverages.error){ return { status: false, code: 500, message: getFleetContractOwnerData.error }; }
+        if(getPlanCoverages.error){ console.log(getPlanCoverages.error); return { status: false, code: 500, message: getFleetContractOwnerData.error }; }
         if(getPlanCoverages.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Fleet Contract Plan Coverages not found.' }; }
         for (let i = 0; i < getPlanCoverages.result.recordset.length; i++) {
             /*let getCoverageServices = await db.getCoverageServices(getPlanCoverages.result.recordset[i].ccobertura);
@@ -623,7 +623,7 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
         }
         let services = [];
         let getFleetContractServices = await db.getFleetContractServices(getFleetContractData.result.recordset[0].ccarga);
-        if(getFleetContractServices.error){ return { status: false, code: 500, message: getFleetContractServices.error }; }
+        if(getFleetContractServices.error){ console.log(getFleetContractServices.error); return { status: false, code: 500, message: getFleetContractServices.error }; }
         if(getFleetContractServices.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Fleet Contract Service not found.' }; }
         if (getFleetContractServices.result.rowsAffected > 0) {
             for(let i = 0; i < getFleetContractServices.result.recordset.length; i++){
@@ -635,7 +635,7 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
             }
         }
         let getBroker = await bd.getBroker(getFleetContractData.result.recordset[0].ccorredor);
-        if(getBroker.error){ return { status: false, code: 500, message: getBroker.error }; }
+        if(getBroker.error){ console.log(getBroker.error); return { status: false, code: 500, message: getBroker.error }; }
         if(getBroker.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Fleet Contract Service not found.' }; }
         /*let getPlanServicesData = await db.getPlanServicesDataQuery(getFleetContractData.result.recordset[0].CPLAN).then((res) => res);
         if(getPlanServicesData.error){ return { status: false, code: 500, message: getPlanServicesData.error }; }
@@ -672,15 +672,14 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
                 services.push(service);
             }
         }*/
-        let getPlanArysData = await db.getPlanArys(getFleetContractData.result.recordset[0].CPLAN_ARYS);
-        if(getPlanArysData.error){ return { status: false, code: 500, message: getFleetContractOwnerData.error }; }
+        let getPlanArysData = await db.getPlanArys(getFleetContractData.result.recordset[0].CPLAN);
+        if(getPlanArysData.error){ console.log(getPlanArysData.error); return { status: false, code: 500, message: getFleetContractOwnerData.error }; }
         if(getPlanArysData.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Fleet Contract Plan Arys not found.' }; }
         let xplanservicios;
         if (getPlanArysData.result.recordset[0].XPLAN) {
             let xplan = getPlanArysData.result.recordset[0].XPLAN.toLowerCase()
             xplanservicios = xplan.charAt(0).toUpperCase() + xplan.slice(1);
         }
-        console.log(getPlanArysData.result.recordset[0].XPLAN)
         return {
             status: true,
             ccarga: getFleetContractData.result.recordset[0].ccarga,
@@ -756,7 +755,7 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
             xtipomodelovehiculo: getFleetContractOwnerVehicleData.result.recordset[0].XTIPOMODELO,
             ncapacidadcargavehiculo: getFleetContractOwnerVehicleData.result.recordset[0].NCAPACIDADCARGA,
             ncapacidadpasajerosvehiculo: getFleetContractOwnerVehicleData.result.recordset[0].NCAPACIDADPASAJEROS,
-            xplancoberturas: getPlanData.result.recordset[0].XPLAN,
+            xplancoberturas: getPlanData.result.recordset[0].XPLAN_RC,
             xplanservicios: xplanservicios,
             mprimatotal: mprimatotal,
             mprimaprorratatotal: mprimaprorratatotal,
