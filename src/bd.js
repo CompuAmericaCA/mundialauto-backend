@@ -11748,11 +11748,10 @@ module.exports = {
                 .input('xreferencia', sql.NVarChar, collectionDataList[i].xreferencia)
                 .input('fcobro', sql.DateTime, collectionDataList[i].fcobro)
                 .input('mprima_pagada', sql.Numeric(17,2), collectionDataList[i].mprima_pagada)
-                .input('cmoneda_pago', sql.Int, collectionDataList[i].cmoneda_pago)
                 .input('ccompania', sql.Int, collectionDataList[i].ccompania)
                 .input('cpais', sql.Int, collectionDataList[i].cpais)
                 .input('cestatusgeneral', sql.Int, collectionDataList[i].cestatusgeneral)
-                .query('update SURECIBO set XREFERENCIA = @xreferencia, CTIPOPAGO = @ctipopago, CBANCO = @cbanco, FCOBRO = @fcobro, MPRIMA_PAGADA = @mprima_pagada, CMONEDA_PAGO = @cmoneda_pago, CESTATUSGENERAL = @cestatusgeneral where CRECIBO = @crecibo AND CCOMPANIA = @ccompania AND CPAIS = @cpais');
+                .query('update SURECIBO set XREFERENCIA = @xreferencia, CTIPOPAGO = @ctipopago, CBANCO = @cbanco, FCOBRO = @fcobro, MPRIMA_PAGADA = @mprima_pagada, CESTATUSGENERAL = @cestatusgeneral where CRECIBO = @crecibo AND CCOMPANIA = @ccompania AND CPAIS = @cpais');
                 rowsAffected = rowsAffected + update.rowsAffected;
             }
             //sql.close();
@@ -11760,6 +11759,19 @@ module.exports = {
         }
         catch(err){
             console.log(err.message)
+            return { error: err.message };
+        }
+    },
+    plateValrepQuery: async(searchData) => {
+        try{
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .input('cpais', sql.Int, searchData.cpais)
+                .input('ccompania', sql.Int, searchData.ccompania)
+                .query('select * from VWBUSCARRECIBOSPENDIENTES where CPAIS = @cpais AND CCOMPANIA = @ccompania');
+            //sql.close();
+            return { result: result };
+        }catch(err){
             return { error: err.message };
         }
     },

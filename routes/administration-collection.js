@@ -38,7 +38,9 @@ const operationSearchCollection = async(authHeader, requestBody) => {
                 fhasta_pol: searchCollection.result.recordset[i].FHASTA_POL,
                 xnombrepropietario: searchCollection.result.recordset[i].XNOMBREPROPIETARIO,
                 cestatusgeneral: searchCollection.result.recordset[i].CESTATUSGENERAL,
-                xestatusgeneral: searchCollection.result.recordset[i].XESTATUSGENERAL
+                xestatusgeneral: searchCollection.result.recordset[i].XESTATUSGENERAL,
+                mprima_anual: searchCollection.result.recordset[i].MPRIMA_ANUAL,
+                xplaca: searchCollection.result.recordset[i].XPLACA
             });
         }
         return { status: true, list: jsonList };
@@ -120,7 +122,6 @@ const operationUpdateCollection = async(authHeader, requestBody) => {
             fcobro: requestBody.pago[i].fcobro,
             cbanco: requestBody.pago[i].cbanco,
             mprima_pagada: requestBody.pago[i].mprima_pagada,
-            cmoneda_pago: requestBody.pago[i].cmoneda_pago,
             ccompania: requestBody.ccompania,
             cpais: requestBody.cpais,
             cestatusgeneral: 7
