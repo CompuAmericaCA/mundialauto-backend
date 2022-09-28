@@ -1499,6 +1499,34 @@ const operationValrepPlanType = async(authHeader, requestBody) => {
     return { status: true, list: jsonArray }
 }
 
+router.route('/planrcv-type').post((req, res) => {
+    if(!req.header('Authorization')){ 
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
+        return;
+    }else{
+        operationValrepPlanRcvType(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){ 
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationValrepPlanRcvType' } });
+        });
+    }
+});
+
+const operationValrepPlanRcvType = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let query = await bd.planRcvTypeValrepQuery().then((res) => res);
+    if(query.error){ return { status: false, code: 500, message: query.error }; }
+    let jsonArray = [];
+    for(let i = 0; i < query.result.recordset.length; i++){
+        jsonArray.push({ cplan_rc: query.result.recordset[i].CPLAN_RC, xplan_rc: query.result.recordset[i].XPLAN_RC, bactivo: query.result.recordset[i].BACTIVO });
+    }
+    return { status: true, list: jsonArray }
+}
+
 router.route('/client').post((req, res) => {
     if(!req.header('Authorization')){ 
         res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
