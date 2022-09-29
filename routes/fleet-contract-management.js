@@ -1022,6 +1022,53 @@ const operationChargeContracts = async(authHeader, requestBody) => {
     }
 }
 
+
+
+
+router.route('/create/individualContract').post((req, res) => {
+    operationCreateIndividualContract(req.body).then((result) => {
+        if(!result.status){
+            res.status(result.code).json({ data: result });
+            return;
+        }
+        res.json({ data: result });
+    }).catch((err) => {
+        console.log(err.message)
+        res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationContract' } });
+    });
+});
+
+const operationCreateIndividualContract = async(requestBody) => {
+    let userData = {
+        xnombre: requestBody.xnombre.toUpperCase(),
+        xapellido: requestBody.xapellido,
+        cano: requestBody.cano,
+        xcolor: requestBody.xcolor,
+        cmarca: requestBody.cmarca,
+        cmodelo: requestBody.cmodelo,
+        cversion: requestBody.cversion,
+        xrif_cliente: requestBody.xrif_cliente,
+        email: requestBody.email,
+        fnac: requestBody.fnac,
+        xdireccionfiscal: requestBody.xdireccionfiscal,
+        xserialmotor: requestBody.xserialmotor,
+        xserialdecarroceria: requestBody.xserialdecarroceria,
+        xplaca: requestBody.xplaca,
+        xuso: requestBody.xuso,
+        xtelefono_prop: requestBody.xtelefono_prop,
+        cplan: requestBody.cplan,
+        ccorredor: requestBody.ccorredor,
+
+    };
+    let operationCreateIndividualContract = await bd.createIndividualContractQuery(userData).then((res) => res);
+    if(operationCreateIndividualContract.error){ return { status: false, code: 500, message: operationCreateIndividualContract.error }; }
+    if(operationCreateIndividualContract.result.rowsAffected > 0){ return { status: true, id: operationCreateIndividualContract.result.recordset[0].ID }; }
+    else{ return { status: false, code: 500, message: 'Server Internal Error.', hint: 'createContract' }; }
+}
+
+
+
+
 // Funcion para redondear, tomada de: https://developer.mozilla.org/es/docs/Web/JavaScript/Reference/Global_Objects/Math/round
 (function() {
     /**

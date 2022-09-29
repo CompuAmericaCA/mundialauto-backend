@@ -8454,6 +8454,44 @@ module.exports = {
             return { error: err.message };
         }
     },
+
+    createIndividualContractQuery: async(userData) => {
+        try{
+            let rowsAffected = 0;
+            let pool = await sql.connect(config);
+            for(let i = 0; i < userData.length; i++){
+                let insert = await pool.request()
+                    .input('xnombre', sql.NVarChar, userData.xnombre)
+                    .input('xapellido', sql.NVarChar, userData[i].xapellido)
+                    .input('cano', sql.Numeric(11, 2), userData[i].cano)
+                    .input('xcolor', sql.NVarChar, userData.xcolor)
+                    .input('cmarca', sql.NVarChar, userData[i].cmarca)
+                    .input('cmodelo', sql.NVarChar, userData[i].cmodelo)
+                    .input('cversion', sql.NVarChar, userData[i].cversion)
+                    .input('xrif_cliente', sql.Int, userData[i].xrif_cliente)
+                    .input('email', sql.Int, userData[i].email)
+                    .input('fnac', sql.DateTime , userData[i].fnac)
+                    .input('xdireccionfiscal', sql.NVarChar, userData[i].xdireccionfiscal)
+                    .input('xserialmotor', sql.NVarChar, userData[i].xserialmotor)
+                    .input('xserialdecarroceria', sql.NVarChar, userData[i].xserialdecarroceria)
+                    .input('xplaca', sql.NVarChar, userData[i].xplaca)
+                    .input('xuso', sql.NVarChar, userData[i].xuso)
+                    .input('xtelefono_prop', sql.Numeric, userData[i].xtelefono_prop)
+                    .input('cplan', sql.NVarChar, userData[i].cplan)
+                    .input('ccorredor', sql.NVarChar, userData[i].ccorredor)
+                    .input('femision', sql.DateTime, new Date())
+                    .query('insert into TMEMISION_INDIVIDUAL(XNOMBRE, XAPELLIDO, CANO, XCOLOR, CMARCA, CMODELO, CVERSION, XRIF_CLIENTE, EMAIL, FNAC, XDIRECCIONFISCAL, XSERIALMOTOR, XSERIALDECARROCERIA, XPLACA, XUSO, XTELEFONO_PROP, CPLAN, CCORREDOR, FEMISION) values (@xnombre, @xapellido, @cano, @xcolor, @cmarca, @cmodelo, @cversion, @xrif_cliente, @email, @fnac, @xdireccionfiscal, @xserialmotor, @xserialdecarroceria, @xplaca, @xuso, @xtelefono_prop, @cplan, @ccorredor, @femision)')
+                rowsAffected = rowsAffected + insert.rowsAffected;
+            }
+            //sql.close();
+            return { result: { rowsAffected: rowsAffected } };
+        }
+        catch(err){
+            return { error: err.message };
+        }
+    },
+
+
     getReceiptData: async(receiptData) => {
         try{
             let pool = await sql.connect(config);
@@ -11705,3 +11743,5 @@ module.exports = {
         }
     },
 }
+
+
