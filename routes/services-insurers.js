@@ -25,16 +25,20 @@ const operationSearchService = async(authHeader, requestBody) => {
     let searchData = {
         cpais: requestBody.cpais,
         ccompania: requestBody.ccompania,
+        ctiposervicio: requestBody.ctiposervicio,
         xservicio: requestBody.xservicio ? requestBody.xservicio.toUpperCase() : undefined
     }
+    console.log(searchData);
     let searchInsurerService = await bd.searchInsurerServiceQuery(searchData).then((res) => res);
     if(searchInsurerService.error){ return { status: false, code: 500, message: searchService.error }; }
     if(searchInsurerService.result.rowsAffected > 0){
         let jsonList = [];
         for(let i = 0; i < searchInsurerService.result.recordset.length; i++){
             jsonList.push({
-                cservicio: searchInsurerService.result.recordset[i].CSERVICIO,
-                xservicio: searchInsurerService.result.recordset[i].XSERVICIO,
+                cservicio: searchInsurerService.result.recordset[i].CSERVICIO_ASEG,
+                xservicio: searchInsurerService.result.recordset[i].XSERVICIO_ASEG,
+                ctiposervicio: searchInsurerService.result.recordset[i].CTIPOSERVICIO,
+                xtiposervicio: searchInsurerService.result.recordset[i].XTIPOSERVICIO,
                 fcreacion: searchInsurerService.result.recordset[i].FCREACION,
                 bactivo: searchInsurerService.result.recordset[i].BACTIVO
             });
@@ -111,8 +115,10 @@ const operationDetailService = async(authHeader, requestBody) => {
     if(getServiceData.result.rowsAffected > 0){
         return { 
             status: true,
-            cservicio: getServiceData.result.recordset[0].CSERVICIO,
-            xservicio: getServiceData.result.recordset[0].XSERVICIO,
+            cservicio: getServiceData.result.recordset[0].CSERVICIO_ASEG,
+            xservicio: getServiceData.result.recordset[0].XSERVICIO_ASEG,
+            ctiposervicio: getServiceData.result.recordset[0].CTIPOSERVICIO,
+            xtiposervicio: getServiceData.result.recordset[0].XTIPOSERVICIO,   
             bactivo: getServiceData.result.recordset[0].BACTIVO
         }
     }else{ return { status: false, code: 404, message: 'Service not found.' }; }
