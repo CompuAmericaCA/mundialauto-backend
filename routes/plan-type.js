@@ -157,46 +157,4 @@ const operationUpdatePlanType = async(authHeader, requestBody) => {
     }
 }
 
-router.route('/search/planrcv').post((req, res) => {
-    if(!req.header('Authorization')){
-        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } });
-        return;
-    }else{
-        operationSearchPlanRcv(req.header('Authorization'), req.body).then((result) => {
-            if(!result.status){
-                res.status(result.code).json({ data: result });
-                return;
-            }
-            res.json({ data: result });
-        }).catch((err) => {
-            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationSearchPlanRcv' } });
-        });
-    }
-});
-
-const operationSearchPlanRcv = async(authHeader, requestBody) => {
-    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
-    let cplan_rc = requestBody.cplan_rc ? requestBody.cplan_rc : undefined
-    
-    let searchPlanRcv = await bd.searchPlanrRcvQuery(cplan_rc).then((res) => res);
-    if(searchPlanRcv.error){ return  { status: false, code: 500, message: searchPlanRcv.error }; }
-    if(searchPlanRcv.result.rowsAffected > 0){
-        let jsonList = [];
-        for(let i = 0; i < searchPlanRcv.result.recordset.length; i++){
-            jsonList.push({
-                cplan_rc: searchPlanRcv.result.recordset[i].CPLAN_RC,
-                xclase: searchPlanRcv.result.recordset[i].XCLASE,
-                xtipo: searchPlanRcv.result.recordset[i].XTIPO,
-                xgrupo: searchPlanRcv.result.recordset[i].XGRUPO,
-                mut_personas_rc: searchPlanRcv.result.recordset[i].MUT_PERSONAS_RC,
-                mprima_rc: searchPlanRcv.result.recordset[i].MPRIMA_RC,
-                mexceso_limite: searchPlanRcv.result.recordset[i].MEXCESO_LIMITE,
-                msuma_apov_in: searchPlanRcv.result.recordset[i].MSUMA_APOV_IN,
-                mapov_in: searchPlanRcv.result.recordset[i].MAPOV_IN,
-            });
-        }
-        return { status: true, list: jsonList };
-    }else{ return { status: false, code: 404, message: 'Plan Type not found.' }; }
-}
-
 module.exports = router;

@@ -11786,7 +11786,7 @@ module.exports = {
             return { error: err.message };
         }
     },
-    searchPlanrRcvQuery: async(cplan_rc) => {
+    searchPlanRcvQuery: async(cplan_rc) => {
         try{
             let query = `select * from PRPLAN_RC_DETALLE where BACTIVO = @bactivo${cplan_rc ? " and CPLAN_RC = @cplan_rc" : '' }`;
             let pool = await sql.connect(config);
@@ -11798,6 +11798,19 @@ module.exports = {
             return { result: result };
         }catch(err){
             console.log(err.message)
+            return { error: err.message };
+        }
+    },
+    detailPlanRcvQuery: async(searchData) => {
+        try{
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .input('cplan_rc', sql.Int, searchData.cplan_rc)
+                .input('ctarifa', sql.Int, searchData.ctarifa)
+                .query('select * from VWBUSCARPLANESRCV where CPLAN_RC = @cplan_rc AND CTARIFA = @ctarifa');
+            //sql.close();
+            return { result: result };
+        }catch(err){
             return { error: err.message };
         }
     },
