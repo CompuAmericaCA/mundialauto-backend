@@ -1040,7 +1040,7 @@ router.route('/create/individualContract').post((req, res) => {
 
 const operationCreateIndividualContract = async(requestBody) => {
     let userData = {
-        xnombre: requestBody.xnombre.toUpperCase(),
+        xnombre: requestBody.xnombre,
         xapellido: requestBody.xapellido,
         cano: requestBody.cano,
         xcolor: requestBody.xcolor,
@@ -1058,8 +1058,8 @@ const operationCreateIndividualContract = async(requestBody) => {
         xtelefono_prop: requestBody.xtelefono_prop,
         cplan: requestBody.cplan,
         ccorredor: requestBody.ccorredor,
-
     };
+    
     let operationCreateIndividualContract = await bd.createIndividualContractQuery(userData).then((res) => res);
     if(operationCreateIndividualContract.error){ return { status: false, code: 500, message: operationCreateIndividualContract.error }; }
     if(operationCreateIndividualContract.result.rowsAffected > 0){ return { status: true, id: operationCreateIndividualContract.result.recordset[0].ID }; }

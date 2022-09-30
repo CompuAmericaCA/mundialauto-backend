@@ -6190,7 +6190,7 @@ module.exports = {
             let result = await pool.request()
                 .input('cpais', sql.Numeric(4, 0), searchData.cpais)
                 .input('ccompania', sql.Int, searchData.ccompania)
-                .query('select CCORREDOR, XNOMBRE, XAPELLIDO, BACTIVO from TRCORREDOR where CPAIS = @cpais and CCOMPANIA = @ccompania');
+                .query('select CCORREDOR, XCORREDOR, BACTIVO from MACORREDORES where CPAIS = @cpais and CCOMPANIA = @ccompania');
             //sql.close();
             return { result: result };
         }catch(err){
