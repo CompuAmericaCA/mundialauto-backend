@@ -6631,7 +6631,7 @@ module.exports = {
             let pool = await sql.connect(config);
             let result = await pool.request()
                 .input('ccarga', sql.Int, searchData.ccarga)
-                .query('select * from supolizalote where ccarga = @ccarga ');
+                .query('select * from supolizalote where CCARGA = @ccarga ');
             //sql.close();
             return { result: result };
         }catch(err){
@@ -11810,6 +11810,51 @@ module.exports = {
                 .query('select * from VWBUSCARPLANESRCV where CPLAN_RC = @cplan_rc AND CTARIFA = @ctarifa');
             //sql.close();
             return { result: result };
+        }catch(err){
+            return { error: err.message };
+        }
+    },
+    updatePlanRcvQuery: async(dataPlanRcv) => {
+        try{
+            let rowsAffected = 0;
+            let pool = await sql.connect(config);
+            let update = await pool.request()
+                .input('cplan_rc', sql.Int, dataPlanRcv.cplan_rc)
+                .input('ctarifa', sql.Int, dataPlanRcv.ctarifa)
+                .input('xclase', sql.NVarChar, dataPlanRcv.xclase)
+                .input('xtipo', sql.NVarChar, dataPlanRcv.xtipo)
+                .input('xgrupo', sql.NVarChar, dataPlanRcv.xgrupo)
+                .input('msuma_cosas_rc', sql.Numeric(18, 2), dataPlanRcv.msuma_cosas_rc)
+                .input('msuma_personas_rc', sql.Numeric(18, 2), dataPlanRcv.msuma_personas_rc)
+                .input('mprima_rc', sql.Numeric(18, 2), dataPlanRcv.mprima_rc)
+                .input('msuma_defensa_per', sql.Numeric(18, 2), dataPlanRcv.msuma_defensa_per)
+                .input('mprima_defensa_per', sql.Numeric(18, 2), dataPlanRcv.mprima_defensa_per)
+                .input('msuma_limite_ind', sql.Numeric(18, 2), dataPlanRcv.msuma_limite_ind)
+                .input('mprima_limite_ind', sql.Numeric(18, 2), dataPlanRcv.mprima_limite_ind)
+                .input('msuma_apov_mu', sql.Numeric(18, 2), dataPlanRcv.msuma_apov_mu)
+                .input('mapov_mu', sql.Numeric(18, 2), dataPlanRcv.mapov_mu)
+                .input('msuma_apov_in', sql.Numeric(18, 2), dataPlanRcv.msuma_apov_in)
+                .input('mapov_in', sql.Numeric(18, 2), dataPlanRcv.mapov_in)
+                .input('msuma_apov_ga', sql.Numeric(18, 2), dataPlanRcv.msuma_apov_ga)
+                .input('mapov_ga', sql.Numeric(18, 2), dataPlanRcv.mapov_ga)
+                .input('msuma_apov_fu', sql.Numeric(18, 2), dataPlanRcv.msuma_apov_fu)
+                .input('mapov_fu', sql.Numeric(18, 2), dataPlanRcv.mapov_fu)
+                .input('cusuariomodificacion', sql.Int, dataPlanRcv.cusuario)
+                .input('fmodificacion', sql.DateTime, new Date())
+                .query('update PRPLAN_RC_DETALLE set XCLASE = @xclase, XTIPO = @xtipo, XGRUPO = @xgrupo, MSUMA_COSAS_RC = @msuma_cosas_rc, MSUMA_PERSONAS_RC = @msuma_personas_rc, MPRIMA_RC = @mprima_rc, MSUMA_DEFENSA_PER = @msuma_defensa_per, MPRIMA_DEFENSA_PER = @mprima_defensa_per, MSUMA_LIMITE_IND = @msuma_limite_ind, MPRIMA_LIMITE_IND = @mprima_limite_ind, MSUMA_APOV_MU = @msuma_apov_mu, MAPOV_MU = @mapov_mu, MSUMA_APOV_IN = @msuma_apov_in, MAPOV_IN = @mapov_in, MSUMA_APOV_GA = @msuma_apov_ga, MAPOV_GA = @mapov_ga, MSUMA_APOV_FU = @msuma_apov_fu, MAPOV_FU = @mapov_fu, FMODIFICACION = @fmodificacion, CUSUARIOMODIFICACION = @cusuariomodificacion where CPLAN_RC = @cplan_rc AND CTARIFA = @ctarifa');
+                rowsAffected = rowsAffected + update.rowsAffected;
+                if(dataPlanRcv.xplan_rc){
+                    let pool = await sql.connect(config);
+                    let update = await pool.request()
+                    .input('cplan_rc', sql.Int, dataPlanRcv.cplan_rc)
+                    .input('xplan_rc', sql.NVarChar, dataPlanRcv.xplan_rc)
+                    .input('cusuariomodificacion', sql.Int, dataPlanRcv.cusuario)
+                    .input('fmodificacion', sql.DateTime, new Date())
+                    .query('update PRPLAN_RC set XPLAN_RC = @xplan_rc, FMODIFICACION = @fmodificacion, CUSUARIOMODIFICACION = @cusuariomodificacion where CPLAN_RC = @cplan_rc');
+                    rowsAffected = rowsAffected + update.rowsAffected;
+                }
+            //sql.close();
+            return { result: { rowsAffected: rowsAffected } };
         }catch(err){
             return { error: err.message };
         }
