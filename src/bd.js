@@ -6609,7 +6609,6 @@ module.exports = {
             //sql.close();
             return { result: result };
         }catch(err){
-            console.log(err.message);
             return { error: err.message };
         }
     },
@@ -8472,20 +8471,18 @@ module.exports = {
                 .input('fnac', sql.DateTime , userData.fnac)
                 .input('xdireccionfiscal', sql.NVarChar, userData.xdireccionfiscal)
                 .input('xserialmotor', sql.NVarChar, userData.xserialmotor)
-                .input('xserialdecarroceria', sql.NVarChar, userData.xserialdecarroceria)
+                .input('xserialcarroceria', sql.NVarChar, userData.xserialcarroceria)
                 .input('xplaca', sql.NVarChar, userData.xplaca)
                 .input('xuso', sql.NVarChar, userData.xuso)
                 .input('xtelefono_prop', sql.NVarChar, userData.xtelefono_prop)
                 .input('cplan', sql.Numeric(11, 0), userData.cplan)
                 .input('ccorredor', sql.Numeric(11, 0), userData.ccorredor)
-                .input('femision', sql.DateTime, new Date())
-                .query('insert into TMEMISION_INDIVIDUAL(XNOMBRE, XAPELLIDO, CANO, XCOLOR, CMARCA, CMODELO, CVERSION, XRIF_CLIENTE, EMAIL, FNAC, XDIRECCIONFISCAL, XSERIALMOTOR, XSERIALDECARROCERIA, XPLACA, XUSO, XTELEFONO_PROP, CPLAN, CCORREDOR, FEMISION) values (@xnombre, @xapellido, @cano, @xcolor, @cmarca, @cmodelo, @cversion, @xrif_cliente, @email, @fnac, @xdireccionfiscal, @xserialmotor, @xserialdecarroceria, @xplaca, @xuso, @xtelefono_prop, @cplan, @ccorredor, @femision)')
-            rowsAffected = rowsAffected + insert.rowsAffected;
+                .query('insert into TMEMISION_INDIVIDUAL(XNOMBRE, XAPELLIDO, CANO, XCOLOR, CMARCA, CMODELO, CVERSION, XRIF_CLIENTE, EMAIL, FNAC, XDIRECCIONFISCAL, XSERIALMOTOR, XSERIALCARROCERIA, XPLACA, XUSO, XTELEFONO_PROP, CPLAN, CCORREDOR) values (@xnombre, @xapellido, @cano, @xcolor, @cmarca, @cmodelo, @cversion, @xrif_cliente, @email, @fnac, @xdireccionfiscal, @xserialmotor, @xserialcarroceria, @xplaca, @xuso, @xtelefono_prop, @cplan, @ccorredor)')
             //sql.close();
-            return { result: { rowsAffected: rowsAffected } };
+            return { result: { rowsAffected: rowsAffected, status: true } };
         }
         catch(err){
-            console.log(err.mesagge)
+            console.log(err.message)
             return { error: err.message };
         }
     },
@@ -8888,7 +8885,6 @@ module.exports = {
                 return { result: result };
             }
         }catch(err){
-            console.log(err.message);
             return { error: err.message };
         }
     },
@@ -10138,7 +10134,6 @@ module.exports = {
             return { result: { rowsAffected: rowsAffected } };
         }
         catch(err){
-            console.log(err.message)
             return { error: err.message };
         }
     },

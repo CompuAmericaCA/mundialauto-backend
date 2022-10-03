@@ -1491,7 +1491,6 @@ const operationValrepClient = async(authHeader, requestBody) => {
         cpais: requestBody.cpais,
         ccompania: requestBody.ccompania
     };
-    console.log(searchData);
     let query = await bd.clientValrepQuery(searchData).then((res) => res);
     if(query.error){ return { status: false, code: 500, message: query.error }; }
     let jsonArray = [];
