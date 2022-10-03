@@ -15,9 +15,11 @@ module.exports = {
                 .input('bactivo', sql.Bit, true)
                 .query('select * from VWAUTENTICACIONUSUARIO where XEMAIL = @xemail and BACTIVO = @bactivo');
             //sql.close();
+            console.log(result)
             return { result: result };
         }
         catch(err){
+            console.log(err.message + 'de pana')
             return { error: err.message};
         }
     },
@@ -11736,6 +11738,73 @@ module.exports = {
             return { error: err.message };
         }
     },
+    searchCollectionQuery: async(searchData) => {
+        try{
+            let query = `SELECT * FROM VWBUSCARRECIBOSPENDIENTES WHERE CESTATUSGENERAL = @cestatusgeneral AND CCOMPANIA = @ccompania${ searchData.xplaca ? " and XPLACA = @xplaca" : '' } `;
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .input('cestatusgeneral', sql.Int, 13)
+                .input('ccompania', sql.Int, searchData.ccompania ? searchData.ccompania: undefined)
+                .input('xplaca', sql.NVarChar, searchData.xplaca ? searchData.xplaca: undefined)
+                //.input('xclausulas', sql.NVarChar, searchData.xclausulas ? searchData.xclausulas: undefined)
+                .query(query);
+            //sql.close();
+            return { result: result };
+        }catch(err){
+            return { error: err.message };
+        }
+    },
+    detailCollectionQuery: async(searchData) => {
+        try{
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .input('cpais', sql.Int, searchData.cpais)
+                .input('ccompania', sql.Int, searchData.ccompania)
+                .input('crecibo', sql.Int, searchData.crecibo)
+                .query('select * from VWBUSCARPROPIETARIOXRECIBO where CRECIBO = @crecibo and CPAIS = @cpais and CCOMPANIA = @ccompania');
+            //sql.close();
+            return { result: result };
+        }catch(err){
+            return { error: err.message };
+        }
+    },
+    updateCollectionQuery: async(collectionDataList) => {
+        try{
+            let rowsAffected = 0;
+            let pool = await sql.connect(config);
+            for(let i = 0; i < collectionDataList.length; i++){
+                let update = await pool.request()
+                .input('crecibo', sql.Int, collectionDataList[i].crecibo)
+                .input('ctipopago', sql.Int, collectionDataList[i].ctipopago)
+                .input('cbanco', sql.Int, collectionDataList[i].cbanco)
+                .input('xreferencia', sql.NVarChar, collectionDataList[i].xreferencia)
+                .input('fcobro', sql.DateTime, collectionDataList[i].fcobro)
+                .input('mprima_pagada', sql.Numeric(17,2), collectionDataList[i].mprima_pagada)
+                .input('ccompania', sql.Int, collectionDataList[i].ccompania)
+                .input('cpais', sql.Int, collectionDataList[i].cpais)
+                .input('cestatusgeneral', sql.Int, collectionDataList[i].cestatusgeneral)
+                .query('update SURECIBO set XREFERENCIA = @xreferencia, CTIPOPAGO = @ctipopago, CBANCO = @cbanco, FCOBRO = @fcobro, MPRIMA_PAGADA = @mprima_pagada, CESTATUSGENERAL = @cestatusgeneral where CRECIBO = @crecibo AND CCOMPANIA = @ccompania AND CPAIS = @cpais');
+                rowsAffected = rowsAffected + update.rowsAffected;
+            }
+            //sql.close();
+            return { result: { rowsAffected: rowsAffected } };
+        }
+        catch(err){
+            console.log(err.message)
+            return { error: err.message };
+        }
+    },
+    plateValrepQuery: async(searchData) => {
+        try{
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .input('cpais', sql.Int, searchData.cpais)
+                .input('ccompania', sql.Int, searchData.ccompania)
+                .query('select * from VWBUSCARRECIBOSPENDIENTES where CPAIS = @cpais AND CCOMPANIA = @ccompania');
+            //sql.close();
+            return { result: result };
+        }catch(err){
+            return { error: err.message };
+        }
+    },
 }
-
-

@@ -60,6 +60,11 @@
         "route": "/api/accesory"
     },
     {
+        "name": "Administration Collection Route",
+        "router": "../routes/administration-collection",
+        "route": "/api/administration-collection"
+    },
+    {
         "name": "ArysVial Route",
         "router": "../routes/arysvial-conditions",
         "route": "/api/arysvial-conditions"
