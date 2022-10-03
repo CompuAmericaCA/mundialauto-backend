@@ -15,11 +15,9 @@ module.exports = {
                 .input('bactivo', sql.Bit, true)
                 .query('select * from VWAUTENTICACIONUSUARIO where XEMAIL = @xemail and BACTIVO = @bactivo');
             //sql.close();
-            console.log(result)
             return { result: result };
         }
         catch(err){
-            console.log(err.message + 'de pana')
             return { error: err.message};
         }
     },
@@ -6194,7 +6192,7 @@ module.exports = {
             let result = await pool.request()
                 .input('cpais', sql.Numeric(4, 0), searchData.cpais)
                 .input('ccompania', sql.Int, searchData.ccompania)
-                .query('select CCORREDOR, XNOMBRE, XAPELLIDO, BACTIVO from TRCORREDOR where CPAIS = @cpais and CCOMPANIA = @ccompania');
+                .query('select CCORREDOR, XCORREDOR, BACTIVO from MACORREDORES where CPAIS = @cpais and CCOMPANIA = @ccompania');
             //sql.close();
             return { result: result };
         }catch(err){
@@ -6613,7 +6611,6 @@ module.exports = {
             //sql.close();
             return { result: result };
         }catch(err){
-            console.log(err.message);
             return { error: err.message };
         }
     },
@@ -6633,7 +6630,7 @@ module.exports = {
             let pool = await sql.connect(config);
             let result = await pool.request()
                 .input('ccarga', sql.Int, searchData.ccarga)
-                .query('select * from supolizalote where ccarga = @ccarga ');
+                .query('select * from supolizalote where CCARGA = @ccarga ');
             //sql.close();
             return { result: result };
         }catch(err){
@@ -8458,6 +8455,43 @@ module.exports = {
             return { error: err.message };
         }
     },
+
+    createIndividualContractQuery: async(userData) => {
+        try{
+            let rowsAffected = 0;
+            let pool = await sql.connect(config);
+            let insert = await pool.request()
+                .input('xnombre', sql.NVarChar, userData.xnombre)
+                .input('xapellido', sql.NVarChar, userData.xapellido)
+                .input('cano', sql.Numeric(11, 2), userData.cano)
+                .input('xcolor', sql.NVarChar, userData.xcolor)
+                .input('cmarca', sql.Numeric(11, 0), userData.cmarca)
+                .input('cmodelo', sql.Numeric(11, 0), userData.cmodelo)
+                .input('cversion', sql.Numeric(11, 0), userData.cversion)
+                .input('xrif_cliente', sql.NVarChar, userData.xrif_cliente)
+                .input('email', sql.NVarChar, userData.email)
+                .input('fnac', sql.DateTime , userData.fnac)
+                .input('xdireccionfiscal', sql.NVarChar, userData.xdireccionfiscal)
+                .input('xserialmotor', sql.NVarChar, userData.xserialmotor)
+                .input('xserialcarroceria', sql.NVarChar, userData.xserialcarroceria)
+                .input('xplaca', sql.NVarChar, userData.xplaca)
+                .input('xuso', sql.NVarChar, userData.xuso)
+                .input('xtelefono_prop', sql.NVarChar, userData.xtelefono_prop)
+                .input('cplan', sql.Numeric(11, 0), userData.cplan)
+                .input('ccorredor', sql.Numeric(11, 0), userData.ccorredor)
+                .input('cmoneda', sql.Numeric(11, 0), userData.cmoneda)
+                .input('xcedula', sql.NVarChar, userData.xcedula)
+                .query('insert into TMEMISION_INDIVIDUAL(XNOMBRE, XAPELLIDO, CANO, XCOLOR, CMARCA, CMODELO, CVERSION, XRIF_CLIENTE, EMAIL, FNAC, XDIRECCIONFISCAL, XSERIALMOTOR, XSERIALCARROCERIA, XPLACA, XUSO, XTELEFONO_PROP, CPLAN, CCORREDOR, CMONEDA, XCEDULA) values (@xnombre, @xapellido, @cano, @xcolor, @cmarca, @cmodelo, @cversion, @xrif_cliente, @email, @fnac, @xdireccionfiscal, @xserialmotor, @xserialcarroceria, @xplaca, @xuso, @xtelefono_prop, @cplan, @ccorredor, @cmoneda, @xcedula)')
+            //sql.close();
+            return { result: { rowsAffected: rowsAffected, status: true } };
+        }
+        catch(err){
+            console.log(err.message)
+            return { error: err.message };
+        }
+    },
+
+
     getReceiptData: async(receiptData) => {
         try{
             let pool = await sql.connect(config);
@@ -8477,7 +8511,7 @@ module.exports = {
                 .input('cpais', sql.Numeric(4, 0), fleetContractData.cpais)
                 .input('ccompania', sql.Int, fleetContractData.ccompania)
                 .input('ccontratoflota', sql.Int, fleetContractData.ccontratoflota)
-                .query('select * from SUCONTRATOFLOTA where CCONTRATOFLOTA = @ccontratoflota and CPAIS = @cpais and CCOMPANIA = @ccompania');
+                .query('select * from VWBUSCARSUCONTRATOFLOTADATA where CCONTRATOFLOTA = @ccontratoflota and CPAIS = @cpais and CCOMPANIA = @ccompania');
             //sql.close();
             return { result: result };
         }catch(err){
@@ -8855,7 +8889,6 @@ module.exports = {
                 return { result: result };
             }
         }catch(err){
-            console.log(err.message);
             return { error: err.message };
         }
     },
@@ -9697,6 +9730,7 @@ module.exports = {
                 .input('ccontratoflota', sql.Int, ccontratoflota ? ccontratoflota : 1)
                 .query(query);
             //sql.close();
+            console.log(result)
             return { result: result };
         }catch(err){
             return { error: err.message };
@@ -10105,7 +10139,6 @@ module.exports = {
             return { result: { rowsAffected: rowsAffected } };
         }
         catch(err){
-            console.log(err.message)
             return { error: err.message };
         }
     },
@@ -11750,18 +11783,112 @@ module.exports = {
                 .input('xreferencia', sql.NVarChar, collectionDataList[i].xreferencia)
                 .input('fcobro', sql.DateTime, collectionDataList[i].fcobro)
                 .input('mprima_pagada', sql.Numeric(17,2), collectionDataList[i].mprima_pagada)
-                .input('cmoneda_pago', sql.Int, collectionDataList[i].cmoneda_pago)
                 .input('ccompania', sql.Int, collectionDataList[i].ccompania)
                 .input('cpais', sql.Int, collectionDataList[i].cpais)
                 .input('cestatusgeneral', sql.Int, collectionDataList[i].cestatusgeneral)
-                .query('update SURECIBO set XREFERENCIA = @xreferencia, CTIPOPAGO = @ctipopago, CBANCO = @cbanco, FCOBRO = @fcobro, MPRIMA_PAGADA = @mprima_pagada, CMONEDA_PAGO = @cmoneda_pago, CESTATUSGENERAL = @cestatusgeneral where CRECIBO = @crecibo AND CCOMPANIA = @ccompania AND CPAIS = @cpais');
+                .query('update SURECIBO set XREFERENCIA = @xreferencia, CTIPOPAGO = @ctipopago, CBANCO = @cbanco, FCOBRO = @fcobro, MPRIMA_PAGADA = @mprima_pagada, CESTATUSGENERAL = @cestatusgeneral where CRECIBO = @crecibo AND CCOMPANIA = @ccompania AND CPAIS = @cpais');
                 rowsAffected = rowsAffected + update.rowsAffected;
             }
             //sql.close();
             return { result: { rowsAffected: rowsAffected } };
         }
         catch(err){
-            console.log(err.message)
+            return { error: err.message };
+        }
+    },
+    plateValrepQuery: async(searchData) => {
+        try{
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .input('cpais', sql.Int, searchData.cpais)
+                .input('ccompania', sql.Int, searchData.ccompania)
+                .query('select * from VWBUSCARRECIBOSPENDIENTES where CPAIS = @cpais AND CCOMPANIA = @ccompania');
+            //sql.close();
+            return { result: result };
+        }catch(err){
+            return { error: err.message };
+        }
+    },
+    planRcvTypeValrepQuery: async() => {
+        try{
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .query('select * from PRPLAN_RC');
+            //sql.close();
+            return { result: result };
+        }catch(err){
+            return { error: err.message };
+        }
+    },
+    searchPlanRcvQuery: async(cplan_rc) => {
+        try{
+            let query = `select * from PRPLAN_RC_DETALLE where BACTIVO = @bactivo${cplan_rc ? " and CPLAN_RC = @cplan_rc" : '' }`;
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .input('bactivo', sql.Bit, 1)
+                .input('cplan_rc', sql.Int, cplan_rc ? cplan_rc : undefined)
+                .query(query);
+            //sql.close();
+            return { result: result };
+        }catch(err){
+            return { error: err.message };
+        }
+    },
+    detailPlanRcvQuery: async(searchData) => {
+        try{
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .input('cplan_rc', sql.Int, searchData.cplan_rc)
+                .input('ctarifa', sql.Int, searchData.ctarifa)
+                .query('select * from VWBUSCARPLANESRCV where CPLAN_RC = @cplan_rc AND CTARIFA = @ctarifa');
+            //sql.close();
+            return { result: result };
+        }catch(err){
+            return { error: err.message };
+        }
+    },
+    updatePlanRcvQuery: async(dataPlanRcv) => {
+        try{
+            let rowsAffected = 0;
+            let pool = await sql.connect(config);
+            let update = await pool.request()
+                .input('cplan_rc', sql.Int, dataPlanRcv.cplan_rc)
+                .input('ctarifa', sql.Int, dataPlanRcv.ctarifa)
+                .input('xclase', sql.NVarChar, dataPlanRcv.xclase)
+                .input('xtipo', sql.NVarChar, dataPlanRcv.xtipo)
+                .input('xgrupo', sql.NVarChar, dataPlanRcv.xgrupo)
+                .input('msuma_cosas_rc', sql.Numeric(18, 2), dataPlanRcv.msuma_cosas_rc)
+                .input('msuma_personas_rc', sql.Numeric(18, 2), dataPlanRcv.msuma_personas_rc)
+                .input('mprima_rc', sql.Numeric(18, 2), dataPlanRcv.mprima_rc)
+                .input('msuma_defensa_per', sql.Numeric(18, 2), dataPlanRcv.msuma_defensa_per)
+                .input('mprima_defensa_per', sql.Numeric(18, 2), dataPlanRcv.mprima_defensa_per)
+                .input('msuma_limite_ind', sql.Numeric(18, 2), dataPlanRcv.msuma_limite_ind)
+                .input('mprima_limite_ind', sql.Numeric(18, 2), dataPlanRcv.mprima_limite_ind)
+                .input('msuma_apov_mu', sql.Numeric(18, 2), dataPlanRcv.msuma_apov_mu)
+                .input('mapov_mu', sql.Numeric(18, 2), dataPlanRcv.mapov_mu)
+                .input('msuma_apov_in', sql.Numeric(18, 2), dataPlanRcv.msuma_apov_in)
+                .input('mapov_in', sql.Numeric(18, 2), dataPlanRcv.mapov_in)
+                .input('msuma_apov_ga', sql.Numeric(18, 2), dataPlanRcv.msuma_apov_ga)
+                .input('mapov_ga', sql.Numeric(18, 2), dataPlanRcv.mapov_ga)
+                .input('msuma_apov_fu', sql.Numeric(18, 2), dataPlanRcv.msuma_apov_fu)
+                .input('mapov_fu', sql.Numeric(18, 2), dataPlanRcv.mapov_fu)
+                .input('cusuariomodificacion', sql.Int, dataPlanRcv.cusuario)
+                .input('fmodificacion', sql.DateTime, new Date())
+                .query('update PRPLAN_RC_DETALLE set XCLASE = @xclase, XTIPO = @xtipo, XGRUPO = @xgrupo, MSUMA_COSAS_RC = @msuma_cosas_rc, MSUMA_PERSONAS_RC = @msuma_personas_rc, MPRIMA_RC = @mprima_rc, MSUMA_DEFENSA_PER = @msuma_defensa_per, MPRIMA_DEFENSA_PER = @mprima_defensa_per, MSUMA_LIMITE_IND = @msuma_limite_ind, MPRIMA_LIMITE_IND = @mprima_limite_ind, MSUMA_APOV_MU = @msuma_apov_mu, MAPOV_MU = @mapov_mu, MSUMA_APOV_IN = @msuma_apov_in, MAPOV_IN = @mapov_in, MSUMA_APOV_GA = @msuma_apov_ga, MAPOV_GA = @mapov_ga, MSUMA_APOV_FU = @msuma_apov_fu, MAPOV_FU = @mapov_fu, FMODIFICACION = @fmodificacion, CUSUARIOMODIFICACION = @cusuariomodificacion where CPLAN_RC = @cplan_rc AND CTARIFA = @ctarifa');
+                rowsAffected = rowsAffected + update.rowsAffected;
+                if(dataPlanRcv.xplan_rc){
+                    let pool = await sql.connect(config);
+                    let update = await pool.request()
+                    .input('cplan_rc', sql.Int, dataPlanRcv.cplan_rc)
+                    .input('xplan_rc', sql.NVarChar, dataPlanRcv.xplan_rc)
+                    .input('cusuariomodificacion', sql.Int, dataPlanRcv.cusuario)
+                    .input('fmodificacion', sql.DateTime, new Date())
+                    .query('update PRPLAN_RC set XPLAN_RC = @xplan_rc, FMODIFICACION = @fmodificacion, CUSUARIOMODIFICACION = @cusuariomodificacion where CPLAN_RC = @cplan_rc');
+                    rowsAffected = rowsAffected + update.rowsAffected;
+                }
+            //sql.close();
+            return { result: { rowsAffected: rowsAffected } };
+        }catch(err){
             return { error: err.message };
         }
     },

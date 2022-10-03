@@ -38,7 +38,9 @@ const operationSearchCollection = async(authHeader, requestBody) => {
                 fhasta_pol: searchCollection.result.recordset[i].FHASTA_POL,
                 xnombrepropietario: searchCollection.result.recordset[i].XNOMBREPROPIETARIO,
                 cestatusgeneral: searchCollection.result.recordset[i].CESTATUSGENERAL,
-                xestatusgeneral: searchCollection.result.recordset[i].XESTATUSGENERAL
+                xestatusgeneral: searchCollection.result.recordset[i].XESTATUSGENERAL,
+                mprima_anual: searchCollection.result.recordset[i].MPRIMA_ANUAL,
+                xplaca: searchCollection.result.recordset[i].XPLACA
             });
         }
         return { status: true, list: jsonList };
@@ -74,18 +76,21 @@ const operationDetailCollection = async(authHeader, requestBody) => {
     if(detailCollection.error){ return { status: false, code: 500, message: detailCollection.error }; }
     if(detailCollection.result.rowsAffected > 0){
         let xvehiculo = detailCollection.result.recordset[0].XMARCA + ' ' + detailCollection.result.recordset[0].XMODELO + ' ' + detailCollection.result.recordset[0].XVERSION
+        let mprima = detailCollection.result.recordset[0].MPRIMA_ANUAL + ' ' + detailCollection.result.recordset[0].xmoneda
         return {    
                 status: true, 
-                xnombrepropietario: detailCollection.result.recordset[0].XNOMBREPROPIETARIO,
-                xapellidopropietario: detailCollection.result.recordset[0].XAPELLIDOPROPIETARIO,
+                ccliente: detailCollection.result.recordset[0].CCLIENTE,
+                xcliente: detailCollection.result.recordset[0].XCLIENTE,
+                xdocidentidadcliente: detailCollection.result.recordset[0].XDOCIDENTIDADCLIENTE,
+                xemail: detailCollection.result.recordset[0].XEMAIL,
+                xtelefono: detailCollection.result.recordset[0].XTELEFONO,
                 fdesde_pol: detailCollection.result.recordset[0].FDESDE_POL,
                 fhasta_pol: detailCollection.result.recordset[0].FHASTA_POL,
-                xdocidentidad: detailCollection.result.recordset[0].XDOCIDENTIDAD,
                 xvehiculo: xvehiculo,
                 xplaca: detailCollection.result.recordset[0].XPLACA,
-                xmoneda: detailCollection.result.recordset[0].xmoneda,
                 xestatusgeneral: detailCollection.result.recordset[0].XESTATUSGENERAL,
-                mprima: detailCollection.result.recordset[0].MPRIMA_ANUAL
+                mprima: mprima,
+                mprima_pagada: detailCollection.result.recordset[0].MPRIMA_ANUAL
                };
 
     }else{ return { status: false, code: 404, message: 'Coin not found.' }; }
@@ -120,7 +125,6 @@ const operationUpdateCollection = async(authHeader, requestBody) => {
             fcobro: requestBody.pago[i].fcobro,
             cbanco: requestBody.pago[i].cbanco,
             mprima_pagada: requestBody.pago[i].mprima_pagada,
-            cmoneda_pago: requestBody.pago[i].cmoneda_pago,
             ccompania: requestBody.ccompania,
             cpais: requestBody.cpais,
             cestatusgeneral: 7
