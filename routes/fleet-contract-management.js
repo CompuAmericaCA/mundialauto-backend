@@ -506,7 +506,6 @@ router.route('/detail').post((req, res) => {
             }
             res.json({ data: result });
         }).catch((err) => {
-            console.log(err.message);
             res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationDetailFleetContractManagement' } });
         });
     }
@@ -521,7 +520,7 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
         ccontratoflota: requestBody.ccontratoflota
     };
     let getFleetContractData = await bd.getFleetContractDataQuery(fleetContractData).then((res) => res);
-    if(getFleetContractData.error){ console.log(getFleetContractData.error);return { status: false, code: 500, message: getFleetContractData.error }; }
+    if(getFleetContractData.error){ return { status: false, code: 500, message: getFleetContractData.error }; }
     if(getFleetContractData.result.rowsAffected > 0){
         /*let getFleetContractWorkerData = await bd.getFleetContractWorkerDataQuery(getFleetContractData.result.recordset[0].CCLIENTE, getFleetContractData.result.recordset[0].CTRABAJADOR).then((res) => res);
         if(getFleetContractWorkerData.error){ return { status: false, code: 500, message: getFleetContractWorkerData.error }; }
@@ -779,7 +778,6 @@ router.route('/receipt-detail').post((req, res) => {
             }
             res.json({ data: result });
         }).catch((err) => {
-            console.log('error: ' + err.message);
             res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationReceiptDetail' } });
         });
     }
@@ -1011,7 +1009,6 @@ router.route('/charge-contracts').post((req, res) => {
 
 const operationChargeContracts = async(authHeader, requestBody) => { 
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
-    console.log(requestBody.ccliente); console.log(requestBody.ctipopago); console.log(requestBody.npoliza);
     let processCharge = await bd.createChargeQuery(requestBody.parsedData, requestBody.ccliente, requestBody.ctipopago, requestBody.npoliza);
     if(processCharge.error){ return { status: false, code: 500, message: getReceiptData.error }; }
     if(processCharge.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Receipt Data not found.' }; }
@@ -1021,6 +1018,55 @@ const operationChargeContracts = async(authHeader, requestBody) => {
         message: "todo bien"
     }
 }
+
+
+
+
+router.route('/create/individualContract').post((req, res) => {
+    operationCreateIndividualContract(req.body).then((result) => {
+        if(!result.status){
+            res.status(result.code).json({ data: result });
+            return;
+        }
+        res.json({ data: result });
+    }).catch((err) => {
+        console.log(err.message)
+        res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationContract' } });
+    });
+});
+
+const operationCreateIndividualContract = async(requestBody) => {
+    let userData = {
+        xnombre: requestBody.xnombre,
+        xapellido: requestBody.xapellido,
+        cano: requestBody.cano,
+        xcolor: requestBody.xcolor,
+        cmarca: requestBody.cmarca,
+        cmodelo: requestBody.cmodelo,
+        cversion: requestBody.cversion,
+        xrif_cliente: requestBody.xrif_cliente,
+        email: requestBody.email,
+        fnac: requestBody.fnac,
+        xdireccionfiscal: requestBody.xdireccionfiscal,
+        xserialmotor: requestBody.xserialmotor,
+        xserialcarroceria: requestBody.xserialcarroceria,
+        xplaca: requestBody.xplaca,
+        xuso: requestBody.xuso,
+        cmoneda: requestBody.cmoneda,
+        xtelefono_prop: requestBody.xtelefono_prop,
+        cplan: requestBody.cplan,
+        ccorredor: requestBody.ccorredor,
+        xcedula:requestBody.xcedula,
+    };
+      console.log(userData)
+    let operationCreateIndividualContract = await bd.createIndividualContractQuery(userData).then((res) => res);
+    //if(operationCreateIndividualContract.error){ console.log(operationCreateIndividualContract.error);return { status: true, code: 500, message: operationCreateIndividualContract.error }; }
+    if(operationCreateIndividualContract.result.rowsAffected > 0){ return { status: true}; }
+    else{ return { status: true, code: 500, message: 'Server Internal Error.', hint: 'createContract' }; }
+}
+
+
+
 
 // Funcion para redondear, tomada de: https://developer.mozilla.org/es/docs/Web/JavaScript/Reference/Global_Objects/Math/round
 (function() {

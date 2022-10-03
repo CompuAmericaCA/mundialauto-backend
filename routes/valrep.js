@@ -784,6 +784,38 @@ const operationValrepBankAccountType = async(authHeader, requestBody) => {
     return { status: true, list: jsonArray }
 }
 
+router.route('/plate').post((req, res) => {
+    if(!req.header('Authorization')){ 
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
+        return;
+    }else{
+        operationValrepPlate(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){ 
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationValrepPlate' } });
+        });
+    }
+});
+
+const operationValrepPlate = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let searchData = {
+        cpais: requestBody.cpais,
+        ccompania: requestBody.ccompania
+    } 
+    let query = await bd.plateValrepQuery(searchData).then((res) => res);
+    if(query.error){ return { status: false, code: 500, message: query.error }; }
+    let jsonArray = [];
+    for(let i = 0; i < query.result.recordset.length; i++){
+        jsonArray.push({ crecibo: query.result.recordset[i].CRECIBO, xplaca: query.result.recordset[i].XPLACA, xnombrepropietario: query.result.recordset[i].XNOMBREPROPIETARIO });
+    }
+    return { status: true, list: jsonArray }
+}
+
 router.route('/service').post((req, res) => {
     if(!req.header('Authorization')){ 
         res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
@@ -1235,7 +1267,7 @@ const operationValrepBroker = async(authHeader, requestBody) => {
     if(query.error){ return { status: false, code: 500, message: query.error }; }
     let jsonArray = [];
     for(let i = 0; i < query.result.recordset.length; i++){
-        jsonArray.push({ ccorredor: query.result.recordset[i].CCORREDOR, xcorredor: `${helper.decrypt(query.result.recordset[i].XNOMBRE)} ${helper.decrypt(query.result.recordset[i].XAPELLIDO)}`, bactivo: query.result.recordset[i].BACTIVO });
+        jsonArray.push({ ccorredor: query.result.recordset[i].CCORREDOR, xcorredor: `${helper.decrypt(query.result.recordset[i].XCORREDOR)} `, bactivo: query.result.recordset[i].BACTIVO });
     }
     return { status: true, list: jsonArray }
 }
@@ -1491,7 +1523,6 @@ const operationValrepClient = async(authHeader, requestBody) => {
         cpais: requestBody.cpais,
         ccompania: requestBody.ccompania
     };
-    console.log(searchData);
     let query = await bd.clientValrepQuery(searchData).then((res) => res);
     if(query.error){ return { status: false, code: 500, message: query.error }; }
     let jsonArray = [];
