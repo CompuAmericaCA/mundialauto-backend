@@ -15,11 +15,9 @@ module.exports = {
                 .input('bactivo', sql.Bit, true)
                 .query('select * from VWAUTENTICACIONUSUARIO where XEMAIL = @xemail and BACTIVO = @bactivo');
             //sql.close();
-            console.log(result)
             return { result: result };
         }
         catch(err){
-            console.log(err.message + 'de pana')
             return { error: err.message};
         }
     },
@@ -6611,7 +6609,6 @@ module.exports = {
             //sql.close();
             return { result: result };
         }catch(err){
-            console.log(err.message);
             return { error: err.message };
         }
     },
@@ -8475,7 +8472,7 @@ module.exports = {
                 .input('cpais', sql.Numeric(4, 0), fleetContractData.cpais)
                 .input('ccompania', sql.Int, fleetContractData.ccompania)
                 .input('ccontratoflota', sql.Int, fleetContractData.ccontratoflota)
-                .query('select * from SUCONTRATOFLOTA where CCONTRATOFLOTA = @ccontratoflota and CPAIS = @cpais and CCOMPANIA = @ccompania');
+                .query('select * from VWBUSCARSUCONTRATOFLOTADATA where CCONTRATOFLOTA = @ccontratoflota and CPAIS = @cpais and CCOMPANIA = @ccompania');
             //sql.close();
             return { result: result };
         }catch(err){
@@ -8853,7 +8850,6 @@ module.exports = {
                 return { result: result };
             }
         }catch(err){
-            console.log(err.message);
             return { error: err.message };
         }
     },
@@ -9695,6 +9691,7 @@ module.exports = {
                 .input('ccontratoflota', sql.Int, ccontratoflota ? ccontratoflota : 1)
                 .query(query);
             //sql.close();
+            console.log(result)
             return { result: result };
         }catch(err){
             return { error: err.message };
@@ -10103,7 +10100,6 @@ module.exports = {
             return { result: { rowsAffected: rowsAffected } };
         }
         catch(err){
-            console.log(err.message)
             return { error: err.message };
         }
     },
@@ -11758,7 +11754,6 @@ module.exports = {
             return { result: { rowsAffected: rowsAffected } };
         }
         catch(err){
-            console.log(err.message)
             return { error: err.message };
         }
     },
@@ -11797,7 +11792,6 @@ module.exports = {
             //sql.close();
             return { result: result };
         }catch(err){
-            console.log(err.message)
             return { error: err.message };
         }
     },

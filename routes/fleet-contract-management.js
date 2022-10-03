@@ -707,6 +707,7 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
             fhastarecibo: getFleetContractData.result.recordset[0].FHASTA_REC,
             femision: getFleetContractData.result.recordset[0].femision,
             cestatusgeneral: getFleetContractData.result.recordset[0].CESTATUSGENERAL,
+            xestatusgeneral: getFleetContractData.result.recordset[0].XESTATUSGENERAL,
             ctrabajador: getFleetContractData.result.recordset[0].CTRABAJADOR,
             ccorredor: getBroker.result.recordset[0].CCORREDOR,
             xcorredor: getBroker.result.recordset[0].XCORREDOR,
