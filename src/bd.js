@@ -3756,16 +3756,18 @@ module.exports = {
     },
     searchInsurerServiceQuery: async(searchData) => {
         try{
-            let query = `select * from MASERVICIO_ASEG where CPAIS = @cpais and CCOMPANIA = @ccompania${ searchData.xservicio ? " and XSERVICIO like '%" + searchData.xservicio + "%'" : '' }`;
+            let query = `select * from VWBUSCARSERVICIOASEGURADORA where CPAIS = @cpais and CCOMPANIA = @ccompania${ searchData.ctiposervicio ? " and CTIPOSERVICIO = @CTIPOSERVICIO" : '' }${ searchData.xservicio ? " and XSERVICIO_ASEG like '%" + searchData.xservicio + "%'" : '' }`;
             let pool = await sql.connect(config);
             let result = await pool.request()
                 .input('cpais', sql.Numeric(4, 0), searchData.cpais ? searchData.cpais : 1)
                 .input('ccompania', sql.Int, searchData.ccompania ? searchData.ccompania : 1)
+                .input('ctiposervicio', sql.Int, searchData.ctiposervicio ? searchData.ctiposervicio : 1)
                 .input('xservicio', sql.NVarChar, searchData.xservicio ? searchData.xservicio : 1)
                 .query(query);
             //sql.close();
             return { result: result };
         }catch(err){
+            console.log(err.message);
             return { error: err.message };
         }
     },
@@ -3875,7 +3877,7 @@ module.exports = {
                 .input('cpais', sql.Numeric(4, 0), serviceData.cpais)
                 .input('ccompania', sql.Int, serviceData.ccompania)
                 .input('cservicio', sql.Int, serviceData.cservicio)
-                .query('select * from MASERVICIO_ASEG where CPAIS = @cpais and CCOMPANIA = @ccompania and CSERVICIO = @cservicio');
+                .query('select * from VWBUSCARSERVICIOASEGURADORA where CPAIS = @cpais and CCOMPANIA = @ccompania and CSERVICIO_ASEG = @cservicio');
             //sql.close();
             return { result: result };
         }catch(err){

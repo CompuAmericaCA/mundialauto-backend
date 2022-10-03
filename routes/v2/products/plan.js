@@ -267,6 +267,429 @@ const operationDetailPlan = async(authHeader, requestBody) => {
         }
     }
     let servicesInsurers = [];
+    let getPlanServicesInsurersData = await db.getPlanServicesInsurersDataQuery(planData.cplan).then((res) => res);
+    if(getPlanServicesInsurersData.error){ return { status: false, code: 500, message: getPlanServicesInsurersData.error }; }
+    if(getPlanServicesInsurersData.result.rowsAffected > 0){
+        for(let i = 0; i < getPlanServicesInsurersData.result.recordset.length; i++){
+            let serviceInsurer = {
+                cservicio: getPlanServicesInsurersData.result.recordset[i].CSERVICIO_ASEG,
+                cservicioplan: getPlanServicesInsurersData.result.recordset[i].CSERVICIOPLAN,
+                xservicio: getPlanServicesInsurersData.result.recordset[i].XSERVICIO_ASEG,
+                ctiposervicio: getPlanServicesInsurersData.result.recordset[i].CTIPOSERVICIO,
+                xtiposervicio: getPlanServicesInsurersData.result.recordset[i].XTIPOSERVICIO,
+            }
+            servicesInsurers.push(serviceInsurer);
+        }
+    }
+    console.log(servicesInsurers);
+    return { 
+        status: true,
+        cplan: getPlanData.result.recordset[0].CPLAN,
+        xplan: getPlanData.result.recordset[0].XPLAN,
+        mcosto: getPlanData.result.recordset[0].MCOSTO,
+        ctipoplan: getPlanData.result.recordset[0].CTIPOPLAN,
+        bactivo: getPlanData.result.recordset[0].BACTIVO,
+        paymentMethodologies: paymentMethodologies,
+        insurers: insurers,
+        services: services,
+        servicesInsurers: servicesInsurers
+    }
+}
+
+router.route('/productos').get((req, res) => {
+    operationDetailProducts().then((result) => {
+        if(!result.status){
+            res.status(result.code).json({ data: result });
+            return;
+        }
+        res.json({ data: result });
+    }).catch((err) => {
+        console.log(err.message);
+        res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationDetailPlan' } });
+    });
+});
+
+const operationDetailProducts = async() => {
+
+    let planes = [
+        {
+            codigoplan: 1,
+            nombreplan: "PLAN BÁSICO",
+            costomensualusd: 1,
+            costoanualusd: 12,
+            detalle: [
+                {
+                    codigotiposervicio: 71,
+                    nombretiposervicio: "JURÍDICO",
+                    servicios: [
+                        {
+                            nombreservicio: "ASESORÍA Y ASISTENCIA LEGAL TELEFÓNICA"
+                        }
+                    ]
+                },
+                {
+                    codigotiposervicio: 72,
+                    nombretiposervicio: "MANTENIMIENTO",
+                    servicios: [
+                        {
+                            nombreservicio: "MANTENIMIENTO CORRECTIVO"
+                        },
+                        {
+                            nombreservicio: "MANTENIMIENTO PREVENTIVO"
+                        }
+                    ]
+                },
+                {
+                    codigotiposervicio: 75,
+                    nombretiposervicio: "SERVICIOS",
+                    servicios: [
+                        {
+                            nombreservicio: "CENTRO DE ATENCIÓN 24/7 (CALL CENTER)"
+                        },
+                        {
+                            nombreservicio: "RED DE PROVEEDORES CERTIFICADOS"
+                        },
+                        {
+                            nombreservicio: "ACOMPAÑAMIENTO"
+                        },
+                        {
+                            nombreservicio: "APOYO ESTADÍSTICO"
+                        },
+                        {
+                            nombreservicio: "ASISTENCIA VIAL TELEFÓNICA EN CASO DE SINIESTRO"
+                        },
+                        {
+                            nombreservicio: "BÚSQUEDA O UBICACIÓN DE REPUESTOS"
+                        },
+                        {
+                            nombreservicio: "CRISTALERÍA Y VIDRIOS"
+                        },
+                        {
+                            nombreservicio: "EXPEDIENTES ELECTRÓNICOS"
+                        },
+                        {
+                            nombreservicio: "MANEJO Y ADMINISTRACIÓN DE SINIESTROS"
+                        },
+                        {
+                            nombreservicio: "TALLER DE REPARACIÓN MECÁNICA LATONERIA Y PINTURA"
+                        }
+                    ]
+                },
+                {
+                    codigotiposervicio: 68,
+                    nombretiposervicio: "ASISTENCIA PERSONAS",
+                    servicios: [
+                        {
+                            nombreservicio: "RCV"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            codigoplan: 2,
+            nombreplan: "PLAN GENERAL",
+            costomensualusd: 3,
+            costoanualusd: 36,
+            detalle: [
+                {
+                    codigotiposervicio: 71,
+                    nombretiposervicio: "JURÍDICO",
+                    servicios: [
+                        {
+                            nombreservicio: "ASESORÍA Y ASISTENCIA LEGAL TELEFÓNICA"
+                        }
+                    ]
+                },
+                {
+                    codigotiposervicio: 72,
+                    nombretiposervicio: "MANTENIMIENTO",
+                    servicios: [
+                        {
+                            nombreservicio: "MANTENIMIENTO CORRECTIVO"
+                        },
+                        {
+                            nombreservicio: "MANTENIMIENTO PREVENTIVO"
+                        }
+                    ]
+                },
+                {
+                    codigotiposervicio: 75,
+                    nombretiposervicio: "SERVICIOS",
+                    servicios: [
+                        {
+                            nombreservicio: "CENTRO DE ATENCIÓN 24/7 (CALL CENTER)"
+                        },
+                        {
+                            nombreservicio: "RED DE PROVEEDORES CERTIFICADOS"
+                        },
+                        {
+                            nombreservicio: "ACOMPAÑAMIENTO"
+                        },
+                        {
+                            nombreservicio: "APOYO ESTADISTICO"
+                        },
+                        {
+                            nombreservicio: "ASISTENCIA VIAL TELEFÓNICA EN CASO DE SINIESTRO"
+                        },
+                        {
+                            nombreservicio: "BÚSQUEDA O UBICACIÓN DE REPUESTOS"
+                        },
+                        {
+                            nombreservicio: "CRISTALERÍA Y VIDRIOS"
+                        },
+                        {
+                            nombreservicio: "EXPEDIENTES ELECTRÓNICOS"
+                        },
+                        {
+                            nombreservicio: "MANEJO Y ADMINISTRACIÓN DE SINIESTROS"
+                        },
+                        {
+                            nombreservicio: "TALLER DE REPARACIÓN MECÁNICA LATONERIA Y PINTURA"
+                        }
+                    ]
+                },
+                {
+                    codigotiposervicio: 73,
+                    nombretiposervicio: "MECÁNICA",
+                    servicios: [
+                        {
+                            nombreservicio: "MECÁNICA A DOMICILIO"
+                        },
+                        {
+                            nombreservicio: "CAMBIO CAUCHO DE REPUESTO"
+                        },
+                        {
+                            nombreservicio: "VIDRIOS ROTOS SUSTITUCION COBERTURA HASTA 80$"
+                        }
+                    ]
+                },
+                {
+                    codigotiposervicio: 69,
+                    nombretiposervicio: "ASISTENCIA VEHICULOS",
+                    servicios: [
+                        {
+                            nombreservicio: "MECÁNICA LIGERA"
+                        },
+                        {
+                            nombreservicio: "TALLER"
+                        }
+                    ]
+                },
+                {
+                    codigotiposervicio: 70,
+                    nombretiposervicio: "GRUAS",
+                    servicios: [
+                        {
+                            nombreservicio: "ARYSVIAL COBERTURA HASTA 70$"
+                        }
+                    ]
+                },
+                {
+                    codigotiposervicio: 68,
+                    nombretiposervicio: "ASISTENCIA PERSONAS",
+                    servicios: [
+                        {
+                            nombreservicio: "RCV"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            codigoplan: 3,
+            nombreplan: "PLAN TOTAL",
+            costomensualusd: 3,
+            costoanualusd: 36,
+            detalle: [
+                {
+                    codigotiposervicio: 71,
+                    nombretiposervicio: "JURÍDICO",
+                    servicios: [
+                        {
+                            nombreservicio: "ASESORÍA Y ASISTENCIA LEGAL TELEFÓNICA"
+                        }
+                    ]
+                },
+                {
+                    codigotiposervicio: 72,
+                    nombretiposervicio: "MANTENIMIENTO",
+                    servicios: [
+                        {
+                            nombreservicio: "MANTENIMIENTO CORRECTIVO"
+                        },
+                        {
+                            nombreservicio: "MANTENIMIENTO PREVENTIVO"
+                        }
+                    ]
+                },
+                {
+                    codigotiposervicio: 75,
+                    nombretiposervicio: "SERVICIOS",
+                    servicios: [
+                        {
+                            nombreservicio: "CENTRO DE ATENCIÓN 24/7 (CALL CENTER)"
+                        },
+                        {
+                            nombreservicio: "RED DE PROVEEDORES CERTIFICADOS"
+                        },
+                        {
+                            nombreservicio: "ACOMPAÑAMIENTO"
+                        },
+                        {
+                            nombreservicio: "APOYO ESTADISTICO"
+                        },
+                        {
+                            nombreservicio: "ASISTENCIA VIAL TELEFÓNICA EN CASO DE SINIESTRO"
+                        },
+                        {
+                            nombreservicio: "BÚSQUEDA O UBICACIÓN DE REPUESTOS"
+                        },
+                        {
+                            nombreservicio: "CRISTALERÍA Y VIDRIOS"
+                        },
+                        {
+                            nombreservicio: "EXPEDIENTES ELECTRÓNICOS"
+                        },
+                        {
+                            nombreservicio: "MANEJO Y ADMINISTRACIÓN DE SINIESTROS"
+                        },
+                        {
+                            nombreservicio: "TALLER DE REPARACIÓN MECÁNICA LATONERIA Y PINTURA"
+                        }
+                    ]
+                },
+                {
+                    codigotiposervicio: 73,
+                    nombretiposervicio: "MECÁNICA",
+                    servicios: [
+                        {
+                            nombreservicio: "MECÁNICA A DOMICILIO"
+                        },
+                        {
+                            nombreservicio: "CAMBIO CAUCHO DE REPUESTO"
+                        },
+                        {
+                            nombreservicio: "VIDRIOS ROTOS SUSTITUCION COBERTURA HASTA 80$"
+                        }
+                    ]
+                },
+                {
+                    codigotiposervicio: 69,
+                    nombretiposervicio: "ASISTENCIA VEHICULOS",
+                    servicios: [
+                        {
+                            nombreservicio: "MECÁNICA LIGERA"
+                        },
+                        {
+                            nombreservicio: "TALLER"
+                        }
+                    ]
+                },
+                {
+                    codigotiposervicio: 70,
+                    nombretiposervicio: "GRUAS",
+                    servicios: [
+                        {
+                            nombreservicio: "ARYSVIAL COBERTURA HASTA 70$"
+                        }
+                    ]
+                },
+                {
+                    codigotiposervicio: 68,
+                    nombretiposervicio: "ASISTENCIA PERSONAS",
+                    servicios: [
+                        {
+                            nombreservicio: "RCV"
+                        }
+                    ]
+                },
+                {
+                    codigotiposervicio: 76,
+                    nombretiposervicio: "SINIESTROS",
+                    servicios: [
+                        {
+                            nombreservicio: "PARABRISAS Y VIDRIOS"
+                        },
+                        {
+                            nombreservicio: "VIDRIOS ROTOS SUSTITUCION COBERTURA HASTA 80$"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+
+    return {
+        status: true,
+        code: 200,
+        productos: planes
+    }
+    /*let getPlanData = await db.getPlanDataQuery(planData).then((res) => res);
+    if(getPlanData.error){ return { status: false, code: 500, message: getPlanData.error }; }
+    if(getPlanData.result.rowsAffected == 0){ return { status: false, code: 404, message: 'Plan not found.' }; }
+    let paymentMethodologies = [];
+    let getPlanPaymentMethodologiesData = await db.getPlanPaymentMethodologiesDataQuery(planData.cplan).then((res) => res);
+    if(getPlanPaymentMethodologiesData.error){ return { status: false, code: 500, message: getPlanPaymentMethodologiesData.error }; }
+    if(getPlanPaymentMethodologiesData.result.rowsAffected > 0){
+        for(let i = 0; i < getPlanPaymentMethodologiesData.result.recordset.length; i++){
+            let paymentMethodology = {
+                cmetodologiapago: getPlanPaymentMethodologiesData.result.recordset[i].CMETODOLOGIAPAGO,
+                xmetodologiapago: getPlanPaymentMethodologiesData.result.recordset[i].XMETODOLOGIAPAGO,
+                mmetodologiapago: getPlanPaymentMethodologiesData.result.recordset[i].MMETODOLOGIAPAGO
+            }
+            paymentMethodologies.push(paymentMethodology);
+        }
+    }
+    let insurers = [];
+    let getPlanInsurersData = await db.getPlanInsurersDataQuery(planData.cplan).then((res) => res);
+    if(getPlanInsurersData.error){ return { status: false, code: 500, message: getPlanInsurersData.error }; }
+    if(getPlanInsurersData.result.rowsAffected > 0){
+        for(let i = 0; i < getPlanInsurersData.result.recordset.length; i++){
+            let insurer = {
+                caseguradora: getPlanInsurersData.result.recordset[i].CASEGURADORA,
+                xaseguradora: getPlanInsurersData.result.recordset[i].XASEGURADORA
+            }
+            insurers.push(insurer);
+        }
+    }
+    let services = [];
+    let getPlanServicesData = await db.getPlanServicesDataQuery(planData.cplan).then((res) => res);
+    if(getPlanServicesData.error){ return { status: false, code: 500, message: getPlanServicesData.error }; }
+    if(getPlanServicesData.result.rowsAffected > 0){
+        for(let i = 0; i < getPlanServicesData.result.recordset.length; i++){
+            let coverages = [];
+            let getCoveragesServiceData = await db.getCoveragesServiceDataQuery(getPlanServicesData.result.recordset[i].CSERVICIOPLAN).then((res) => res);
+            if(getCoveragesServiceData.error){ return { status: false, code: 500, message: getCoveragesServiceData.error }; }
+            if(getCoveragesServiceData.result.rowsAffected > 0){
+                for(let i = 0; i < getCoveragesServiceData.result.recordset.length; i++){
+                    let coverage = {
+                        ccobertura: getCoveragesServiceData.result.recordset[i].CCOBERTURA,
+                        xcobertura: getCoveragesServiceData.result.recordset[i].XCOBERTURA,
+                        cconceptocobertura: getCoveragesServiceData.result.recordset[i].CCONCEPTOCOBERTURA,
+                        xconceptocobertura: getCoveragesServiceData.result.recordset[i].XCONCEPTOCOBERTURA
+                    }
+                    coverages.push(coverage);
+                }
+            }
+            let service = {
+                cservicio: getPlanServicesData.result.recordset[i].CSERVICIO,
+                cservicioplan: getPlanServicesData.result.recordset[i].CSERVICIOPLAN,
+                xservicio: getPlanServicesData.result.recordset[i].XSERVICIO,
+                ctiposervicio: getPlanServicesData.result.recordset[i].CTIPOSERVICIO,
+                xtiposervicio: getPlanServicesData.result.recordset[i].XTIPOSERVICIO,
+                ctipoagotamientoservicio: getPlanServicesData.result.recordset[i].CTIPOAGOTAMIENTOSERVICIO,
+                ncantidad: getPlanServicesData.result.recordset[i].NCANTIDAD,
+                pservicio: getPlanServicesData.result.recordset[i].PSERVICIO,
+                mmaximocobertura: getPlanServicesData.result.recordset[i].MMAXIMOCOBERTURA,
+                mdeducible: getPlanServicesData.result.recordset[i].MDEDUCIBLE,
+                bserviciopadre: getPlanServicesData.result.recordset[i].BSERVICIOPADRE,
+                coverages: coverages
+            }
+            services.push(service);
+        }
+    }
+    let servicesInsurers = [];
     let getPlanServicesInsurersData = await db.getPlanServicesDataQuery(planData.cplan).then((res) => res);
     if(getPlanServicesInsurersData.error){ return { status: false, code: 500, message: getPlanServicesInsurersData.error }; }
     if(getPlanServicesInsurersData.result.rowsAffected > 0){
@@ -283,7 +706,7 @@ const operationDetailPlan = async(authHeader, requestBody) => {
         paymentMethodologies: paymentMethodologies,
         insurers: insurers,
         services: services
-    }
+    }*/
 }
 
 router.route('/production/update').post((req, res) => {
