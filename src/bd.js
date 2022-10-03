@@ -8479,7 +8479,9 @@ module.exports = {
                 .input('xtelefono_prop', sql.NVarChar, userData.xtelefono_prop)
                 .input('cplan', sql.Numeric(11, 0), userData.cplan)
                 .input('ccorredor', sql.Numeric(11, 0), userData.ccorredor)
-                .query('insert into TMEMISION_INDIVIDUAL(XNOMBRE, XAPELLIDO, CANO, XCOLOR, CMARCA, CMODELO, CVERSION, XRIF_CLIENTE, EMAIL, FNAC, XDIRECCIONFISCAL, XSERIALMOTOR, XSERIALCARROCERIA, XPLACA, XUSO, XTELEFONO_PROP, CPLAN, CCORREDOR) values (@xnombre, @xapellido, @cano, @xcolor, @cmarca, @cmodelo, @cversion, @xrif_cliente, @email, @fnac, @xdireccionfiscal, @xserialmotor, @xserialcarroceria, @xplaca, @xuso, @xtelefono_prop, @cplan, @ccorredor)')
+                .input('cmoneda', sql.Numeric(11, 0), userData.cmoneda)
+                .input('xcedula', sql.NVarChar, userData.xcedula)
+                .query('insert into TMEMISION_INDIVIDUAL(XNOMBRE, XAPELLIDO, CANO, XCOLOR, CMARCA, CMODELO, CVERSION, XRIF_CLIENTE, EMAIL, FNAC, XDIRECCIONFISCAL, XSERIALMOTOR, XSERIALCARROCERIA, XPLACA, XUSO, XTELEFONO_PROP, CPLAN, CCORREDOR, CMONEDA, XCEDULA) values (@xnombre, @xapellido, @cano, @xcolor, @cmarca, @cmodelo, @cversion, @xrif_cliente, @email, @fnac, @xdireccionfiscal, @xserialmotor, @xserialcarroceria, @xplaca, @xuso, @xtelefono_prop, @cplan, @ccorredor, @cmoneda, @xcedula)')
             //sql.close();
             return { result: { rowsAffected: rowsAffected, status: true } };
         }

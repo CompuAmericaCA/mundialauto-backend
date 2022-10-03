@@ -1052,9 +1052,11 @@ const operationCreateIndividualContract = async(requestBody) => {
         xserialcarroceria: requestBody.xserialcarroceria,
         xplaca: requestBody.xplaca,
         xuso: requestBody.xuso,
+        cmoneda: requestBody.cmoneda,
         xtelefono_prop: requestBody.xtelefono_prop,
         cplan: requestBody.cplan,
         ccorredor: requestBody.ccorredor,
+        xcedula:requestBody.xcedula,
     };
       console.log(userData)
     let operationCreateIndividualContract = await bd.createIndividualContractQuery(userData).then((res) => res);
