@@ -1267,7 +1267,7 @@ const operationValrepBroker = async(authHeader, requestBody) => {
     if(query.error){ return { status: false, code: 500, message: query.error }; }
     let jsonArray = [];
     for(let i = 0; i < query.result.recordset.length; i++){
-        jsonArray.push({ ccorredor: query.result.recordset[i].CCORREDOR, xcorredor: `${helper.decrypt(query.result.recordset[i].XNOMBRE)} ${helper.decrypt(query.result.recordset[i].XAPELLIDO)}`, bactivo: query.result.recordset[i].BACTIVO });
+        jsonArray.push({ ccorredor: query.result.recordset[i].CCORREDOR, xcorredor: `${helper.decrypt(query.result.recordset[i].XCORREDOR)} `, bactivo: query.result.recordset[i].BACTIVO });
     }
     return { status: true, list: jsonArray }
 }
@@ -1551,7 +1551,6 @@ const operationValrepClient = async(authHeader, requestBody) => {
         cpais: requestBody.cpais,
         ccompania: requestBody.ccompania
     };
-    console.log(searchData);
     let query = await bd.clientValrepQuery(searchData).then((res) => res);
     if(query.error){ return { status: false, code: 500, message: query.error }; }
     let jsonArray = [];

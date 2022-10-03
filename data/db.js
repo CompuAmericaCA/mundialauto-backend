@@ -520,7 +520,7 @@ module.exports = {
             let pool = await sql.connect(config);
             let result = await pool.request()
                 .input('cplan', sql.Int, cplan)
-                .query('select * from VWBUSCARSERVICIOXPLANDATA where CPLAN = @cplan');
+                .query('select * from VWBUSCARSERVICIOASEGURADORAXPLANDATA where CPLAN = @cplan');
             //sql.close();
             return { result: result };
         }catch(err){
