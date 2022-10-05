@@ -1499,6 +1499,34 @@ const operationValrepPlanType = async(authHeader, requestBody) => {
     return { status: true, list: jsonArray }
 }
 
+router.route('/planrcv-type').post((req, res) => {
+    if(!req.header('Authorization')){ 
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
+        return;
+    }else{
+        operationValrepPlanRcvType(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){ 
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationValrepPlanRcvType' } });
+        });
+    }
+});
+
+const operationValrepPlanRcvType = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let query = await bd.planRcvTypeValrepQuery().then((res) => res);
+    if(query.error){ return { status: false, code: 500, message: query.error }; }
+    let jsonArray = [];
+    for(let i = 0; i < query.result.recordset.length; i++){
+        jsonArray.push({ cplan_rc: query.result.recordset[i].CPLAN_RC, xplan_rc: query.result.recordset[i].XPLAN_RC, bactivo: query.result.recordset[i].BACTIVO });
+    }
+    return { status: true, list: jsonArray }
+}
+
 router.route('/client').post((req, res) => {
     if(!req.header('Authorization')){ 
         res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
@@ -1606,24 +1634,24 @@ const operationValrepBatch = async(authHeader, requestBody) => {
     if(query.error){ return { status: false, code: 500, message: query.error }; }
     let jsonArray = [];
     //primero se modifica el formato de la primera fecha de creación antes de agregar el lote al array
-    let dateFormat = new Date(query.result.recordset[0].fcreacion);
+    let dateFormat = new Date(query.result.recordset[0].FCREACION);
     let dd = dateFormat.getDate() + 1;
     let mm = dateFormat.getMonth() + 1;
     let yyyy = dateFormat.getFullYear();
     let fcreacion = dd + '/' + mm + '/' + yyyy;
 
     // se agrega el primer lote
-    jsonArray.push({ xobservacion: query.result.recordset[0].xobservacion, ccarga: query.result.recordset[0].ccarga, clote: query.result.recordset[0].clote, fcreacion: fcreacion });
-    let ccarga = query.result.recordset[0].ccarga;
+    jsonArray.push({ xobservacion: query.result.recordset[0].XOBSERVACION, ccarga: query.result.recordset[0].CCARGA, clote: query.result.recordset[0].CLOTE, fcreacion: fcreacion });
+    let ccarga = query.result.recordset[0].CCARGA;
     // se busca agregar solo los lotes que tengan codigo distinto, para eliminar repetidos
     for(let i = 0; i < query.result.recordset.length; i++){
-        if (query.result.recordset[i].ccarga != ccarga) {
-                let dateFormat = new Date(query.result.recordset[i].fingreso);
+        if (query.result.recordset[i].CCARGA != ccarga) {
+                let dateFormat = new Date(query.result.recordset[i].FCREACION);
                 let dd = dateFormat.getDate() + 1;
                 let mm = dateFormat.getMonth() + 1;
                 let yyyy = dateFormat.getFullYear();
                 let fcreacion = dd + '/' + mm + '/' + yyyy;
-            jsonArray.push({ xobservacion: query.result.recordset[i].xobservacion, clote: query.result.recordset[0].clote,  ccarga: query.result.recordset[i].ccarga, fcreacion: fcreacion });
+            jsonArray.push({ xobservacion: query.result.recordset[i].XOBSERVACION, clote: query.result.recordset[0].CLOTE,  ccarga: query.result.recordset[i].CCARGA, fcreacion: fcreacion });
             ccarga = query.result.recordset[i].ccarga;
         }
     }
