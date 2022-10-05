@@ -11812,8 +11812,6 @@ module.exports = {
             return { error: err.message };
         }
     },
-<<<<<<< HEAD
-=======
 
 
     vehicleQuery: async(searchData) => {
@@ -11841,7 +11839,6 @@ module.exports = {
             return { error: err.message };
         }
     },
->>>>>>> origin/fran
     planRcvTypeValrepQuery: async() => {
         try{
             let pool = await sql.connect(config);
