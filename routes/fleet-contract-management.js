@@ -1021,8 +1021,6 @@ const operationChargeContracts = async(authHeader, requestBody) => {
 }
 
 
-
-
 router.route('/create/individualContract').post((req, res) => {
     operationCreateIndividualContract(req.body).then((result) => {
         if(!result.status){

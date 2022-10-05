@@ -11812,11 +11812,12 @@ module.exports = {
     },
 
 
-    vehicleQuery: async() => {
+    vehicleQuery: async(searchData) => {
         try{
             let pool = await sql.connect(config);
             let result = await pool.request()
-                .query('select * from PRPLAN_RC_DETALLE ');
+            .input('cpais', sql.Int, searchData.cpais)
+            .query('select * from VWBUSCARPLANRC where  ');
             //sql.close();
             return { result: result };
         }
@@ -11824,7 +11825,18 @@ module.exports = {
             return { error: err.message };
         }
     },
-}
+
+    planRcvTypeQuery: async() => {
+        try{
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .query('select distinct XCLASE from VWBUSCARPLANRC');
+            //sql.close();
+            return { result: result };
+        }catch(err){
+            return { error: err.message };
+        }
+    },
     planRcvTypeValrepQuery: async() => {
         try{
             let pool = await sql.connect(config);
@@ -11835,7 +11847,7 @@ module.exports = {
         }catch(err){
             return { error: err.message };
         }
-    }
+    },
     searchPlanRcvQuery: async(cplan_rc) => {
         try{
             let query = `select * from PRPLAN_RC_DETALLE where BACTIVO = @bactivo${cplan_rc ? " and CPLAN_RC = @cplan_rc" : '' }`;
@@ -11849,7 +11861,7 @@ module.exports = {
         }catch(err){
             return { error: err.message };
         }
-    }
+    },
     detailPlanRcvQuery: async(searchData) => {
         try{
             let pool = await sql.connect(config);
@@ -11862,7 +11874,7 @@ module.exports = {
         }catch(err){
             return { error: err.message };
         }
-    }
+    },
     updatePlanRcvQuery: async(dataPlanRcv) => {
         try{
             let rowsAffected = 0;
@@ -11908,4 +11920,5 @@ module.exports = {
             return { error: err.message };
         }
     
+}
 }
