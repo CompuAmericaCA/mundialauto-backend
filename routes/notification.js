@@ -36,6 +36,7 @@ const operationSearchNotification = async(authHeader, requestBody) => {
     if(searchNotification.result.rowsAffected > 0){
         let jsonList = [];
         for(let i = 0; i < searchNotification.result.recordset.length; i++){
+            let vehiculo = searchNotification.result.recordset[i].XMARCA + ' ' + searchNotification.result.recordset[i].XMODELO + ' ' + searchNotification.result.recordset[i].XVERSION
             jsonList.push({
                 cnotificacion: searchNotification.result.recordset[i].CNOTIFICACION,
                 fcreacion: searchNotification.result.recordset[i].FCREACION,
@@ -44,6 +45,8 @@ const operationSearchNotification = async(authHeader, requestBody) => {
                 xcliente: searchNotification.result.recordset[i].XCLIENTE,
                 casociado: searchNotification.result.recordset[i].CASOCIADO,
                 xasociado: searchNotification.result.recordset[i].XASOCIADO,
+                xvehiculo: vehiculo,
+                xcausasiniestro: searchNotification.result.recordset[i].XCAUSASINIESTRO,
                 xplaca: searchNotification.result.recordset[i].XPLACA,
                 bactivo: searchNotification.result.recordset[i].BACTIVO
             });
@@ -83,6 +86,7 @@ const operationSearchContractVehicle = async(authHeader, requestBody) => {
     if(searchFleetContractManagement.result.rowsAffected > 0){
         let jsonList = [];
         for(let i = 0; i < searchFleetContractManagement.result.recordset.length; i++){
+            let propietario = searchFleetContractManagement.result.recordset[i].XNOMBRE + ' ' + searchFleetContractManagement.result.recordset[i].XAPELLIDO
             jsonList.push({
                 ccontratoflota: searchFleetContractManagement.result.recordset[i].CCONTRATOFLOTA,
                 ccliente: searchFleetContractManagement.result.recordset[i].CCLIENTE,
@@ -93,6 +97,7 @@ const operationSearchContractVehicle = async(authHeader, requestBody) => {
                 xmarca: searchFleetContractManagement.result.recordset[i].XMARCA,
                 cmodelo: searchFleetContractManagement.result.recordset[i].CMODELO,
                 xmodelo: searchFleetContractManagement.result.recordset[i].XMODELO,
+                xversion: searchFleetContractManagement.result.recordset[i].XVERSION,
                 xplaca: searchFleetContractManagement.result.recordset[i].XPLACA,
                 fano: searchFleetContractManagement.result.recordset[i].FANO,
                 xcolor: searchFleetContractManagement.result.recordset[i].xcolor,
@@ -107,6 +112,7 @@ const operationSearchContractVehicle = async(authHeader, requestBody) => {
                 xdireccionpropietario: searchFleetContractManagement.result.recordset[i].XDIRECCION,
                 xtelefonocelularpropietario: searchFleetContractManagement.result.recordset[i].XTELEFONOCELULAR,
                 xemailpropietario: searchFleetContractManagement.result.recordset[i].XEMAIL,
+                xpropietario: propietario,
                 bactivo: searchFleetContractManagement.result.recordset[i].BACTIVO
             });
         }
@@ -259,11 +265,11 @@ router.route('/search/provider').post((req, res) => {
 
 const operationSearchProvider = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
-    /*if(!helper.validateRequestObj(requestBody, ['cproveedor'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
+    if(!helper.validateRequestObj(requestBody, ['cproveedor'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
     let searchData = {
         ccompania: requestBody.ccompania,
         cproveedor: requestBody.cproveedor
-    };*/
+    }
     let getServicesByNotificationTypeData = await bd.getServicesByNotificationTypeDataQuery().then((res) => res);
     if(getServicesByNotificationTypeData.error){ return  { status: false, code: 500, message: getServicesByNotificationTypeData.error }; }
     if(getServicesByNotificationTypeData.result.rowsAffected > 0){
@@ -1097,7 +1103,6 @@ const operationUpdateNotification = async(authHeader, requestBody) => {
                     cestatusgeneral: requestBody.serviceOrder.update[i].orden.cestatusgeneral,
                     ccausaanulacion: requestBody.serviceOrder.update[i].orden.ccausaanulacion
                 })
-                console.log(serviceOrderUpdateList)
             }
             let updateServiceOrderByNotificationUpdate = await bd.updateServiceOrderByNotificationUpdateQuery(serviceOrderUpdateList, notificationData).then((res) => res);
             if(updateServiceOrderByNotificationUpdate.error){ return { status: false, code: 500, message: updateServiceOrderByNotificationUpdate.error }; }
@@ -1199,7 +1204,6 @@ const operationDetailSettlement = async(authHeader, requestBody) => {
         cfiniquito: requestBody.cfiniquito,
         ccompania: requestBody.ccompania
     }
-    console.log(searchData)
     let detailSettlement = await bd.detailSettlementQuery(searchData).then((res) => res);
     if(detailSettlement.error){ return { status: false, code: 500, message: detailSettlement.error }; }
     if(detailSettlement.result.rowsAffected > 0){

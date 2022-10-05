@@ -3880,12 +3880,12 @@ module.exports = {
             return { error: err.message };
         }
     },
-    getAditionalServices: async(ccompania, cpais) => {
+    getAditionalServices: async(searchData) => {
         try{
             let pool = await sql.connect(config);
             let result = await pool.request()
-                .input('ccompania', sql.Int, ccompania)
-                .input('cpais', sql.Int, cpais)
+                .input('ccompania', sql.Int, searchData.ccompania)
+                .input('cpais', sql.Int, searchData.cpais)
                 .query('select * from MASERVICIO where CCOMPANIA = @ccompania and CSERVICIO in (282,283) and CPAIS = @cpais');
             //sql.close();
             return { result: result };
@@ -3893,12 +3893,13 @@ module.exports = {
             return { error: err.message };
         }
     },
-    getAditionalServicesQuotes: async(ccompania) => {
+    getAditionalServicesQuotes: async(searchData) => {
         try{
             let pool = await sql.connect(config);
             let result = await pool.request()
-                .input('ccompania', sql.Int, ccompania)
-                .query('select * from MASERVICIO where CCOMPANIA = @ccompania and CSERVICIO in (282,283)');
+                .input('ccompania', sql.Int, searchData.ccompania)
+                .input('cpais', sql.Int, searchData.cpais)
+                .query('select * from MASERVICIO where CCOMPANIA = @ccompania AND CPAIS = @cpais AND CSERVICIO in (282,283)');
             //sql.close();
             return { result: result };
         }catch(err){
@@ -4174,8 +4175,9 @@ module.exports = {
             let pool = await sql.connect(config);
             let result = await pool.request()
                 .input('cnotificacion', sql.Int, cnotificacion ? cnotificacion: undefined)
-                .query('select * from VWBUSCAR_JHON where CNOTIFICACION = @cnotificacion');
+                .query('select * from VWBUSCARDATAORDENSERVICIO where CNOTIFICACION = @cnotificacion');
             //sql.close();
+            console.log(result)
             return { result: result };
         }catch(err){
             return { error: err.message };
@@ -5674,8 +5676,7 @@ module.exports = {
             let result = await pool.request()
                 .input('cpais', sql.Numeric(4, 0), searchData.cpais)
                 .input('ccompania', sql.Int, searchData.ccompania)
-                .input('ctiposervicio', sql.Int, searchData.ctiposervicio)
-                .query('select CSERVICIO, XSERVICIO, BACTIVO from MASERVICIO where CPAIS = @cpais and CCOMPANIA = @ccompania and CTIPOSERVICIO = @ctiposervicio');
+                .query('select CSERVICIO, XSERVICIO, BACTIVO from MASERVICIO where CPAIS = @cpais and CCOMPANIA = @ccompania');
             //sql.close();
             return { result: result };
         }catch(err){
@@ -6640,7 +6641,7 @@ module.exports = {
             let pool = await sql.connect(config);
             let result = await pool.request()
                 .input('clote', sql.Int, searchData.clote)
-                .query('select ccarga, crecibo, fdesde_rec, fhasta_rec from sureciboflota where clote = @clote ');
+                .query('select * from surecibo where CLOTE = @clote ');
             //sql.close();
             return { result: result };
         }catch(err){
@@ -9197,9 +9198,9 @@ module.exports = {
         try{
             let pool = await sql.connect(config);
             let result = await pool.request()
-                //.input('cpais', sql.Numeric(4, 0), searchData.cpais)
-                //.input('ccompania', sql.Int, 5)
-                .query('select CCAUSASINIESTRO, XCAUSASINIESTRO, BACTIVO from MACAUSASINIESTRO where CCOMPANIA = 5');
+                .input('cpais', sql.Numeric(4, 0), searchData.cpais)
+                .input('ccompania', sql.Int, searchData.ccompania)
+                .query('select CCAUSASINIESTRO, XCAUSASINIESTRO, BACTIVO from MACAUSASINIESTRO where CCOMPANIA = ccompania AND CPAIS = @cpais');
             //sql.close();
             return { result: result };
         }catch(err){
@@ -9454,9 +9455,9 @@ module.exports = {
         try{
             let pool = await sql.connect(config);
             let result = await pool.request()
-                //.input('cpais', sql.Numeric(4, 0), searchData.cpais ? searchData.cpais:)
-                //.input('ccompania', sql.Int, searchData.ccompania)
-                .query('select CTIPOSEGUIMIENTO, XTIPOSEGUIMIENTO, BACTIVO from MATIPOSEGUIMIENTO where CCOMPANIA = 5');
+                .input('cpais', sql.Numeric(4, 0), searchData.cpais)
+                .input('ccompania', sql.Int, searchData.ccompania)
+                .query('select CTIPOSEGUIMIENTO, XTIPOSEGUIMIENTO, BACTIVO from MATIPOSEGUIMIENTO where CCOMPANIA = @ccompania AND CPAIS = @cpais');
             //sql.close();
             return { result: result };
         }catch(err){
@@ -9467,9 +9468,9 @@ module.exports = {
         try{
             let pool = await sql.connect(config);
             let result = await pool.request()
-                //.input('cpais', sql.Numeric(4, 0), searchData.cpais)
-                //.input('ccompania', sql.Int, searchData.ccompania)
-                .query('select CMOTIVOSEGUIMIENTO, XMOTIVOSEGUIMIENTO, BACTIVO from MAMOTIVOSEGUIMIENTO where CCOMPANIA = 5');
+                .input('cpais', sql.Numeric(4, 0), searchData.cpais)
+                .input('ccompania', sql.Int, searchData.ccompania)
+                .query('select CMOTIVOSEGUIMIENTO, XMOTIVOSEGUIMIENTO, BACTIVO from MAMOTIVOSEGUIMIENTO where CCOMPANIA = @ccompania AND CPAIS = @cpais');
             //sql.close();
             return { result: result };
         }catch(err){
@@ -9691,7 +9692,6 @@ module.exports = {
                 .input('ccontratoflota', sql.Int, ccontratoflota ? ccontratoflota : 1)
                 .query(query);
             //sql.close();
-            console.log(result)
             return { result: result };
         }catch(err){
             return { error: err.message };
@@ -10068,7 +10068,7 @@ module.exports = {
                     .input('xmensaje', sql.NVarChar, serviceOrderCreateList[i].xmensaje)
                     .input('xrutaarchivo', sql.NVarChar, serviceOrderCreateList[i].xrutaarchivo)
                     .input('ccotizacion', sql.Int, serviceOrderCreateList[i].ccotizacion)
-                    .input('cestatusgeneral', sql.Int, 52)
+                    .input('cestatusgeneral', sql.Int, 13)
                     .input('ccausaanulacion', sql.Int, serviceOrderCreateList[i].ccausaanulacion)
                     .input('fcreacion', sql.DateTime, new Date())
                     .query('insert into EVORDENSERVICIO (CSERVICIO, FCREACION, CNOTIFICACION, XOBSERVACION, CSERVICIOADICIONAL, CCOTIZACION, XDANOS, XFECHA, FAJUSTE, XDESDE, XHACIA, MMONTO, MMONTOTOTAL, CMONEDA, CIMPUESTO, PIMPUESTO, MMONTOTOTALIVA, XMENSAJE, XRUTAARCHIVO, CPROVEEDOR, CCOMPANIA, CESTATUSGENERAL, CCAUSAANULACION, BACTIVO) values (@cservicio, @fcreacion, @cnotificacion, @xobservacion, @cservicioadicional, @ccotizacion, @xdanos, @xfecha, @fajuste, @xdesde, @xhacia, @mmonto, @mmontototal, @cmoneda, @cimpuesto, @pimpuesto, @mmontototaliva, @xmensaje, @xrutaarchivo, @cproveedor, @ccompania, @cestatusgeneral, @ccausaanulacion, 1)')
@@ -10281,6 +10281,7 @@ module.exports = {
                 .input('ccotizacion', sql.Int, ccotizacion)
                 .query('select * from VWBUSCARREPUESTOXCOTIZACIONDATA where CCOTIZACION = @ccotizacion');
             //sql.close();
+            console.log(result)
             return { result: result };
         }catch(err){
             return { error: err.message };
@@ -10318,7 +10319,7 @@ module.exports = {
     },
     searchQuoteListRequestQuery: async(searchData) => {
         try{
-            let query = `select * from EVREPUESTONOTIFICACION where CNOTIFICACION = @cnotificacion`;
+            let query = `select * from EVCOTIZACIONNOTIFICACION where CNOTIFICACION = @cnotificacion`;
             let pool = await sql.connect(config);
             let result = await pool.request()
                 .input('cnotificacion', sql.Int, searchData.cnotificacion)
@@ -11695,7 +11696,7 @@ module.exports = {
             let result = await pool.request()
                 .input('cpais', sql.Numeric(4, 0), searchData.cpais)
                 .input('ccompania', sql.Int, searchData.ccompania)
-                .query('select CESTATUSGENERAL, XESTATUSGENERAL, BACTIVO from MAESTATUSGENERAL where CESTATUSGENERAL in (42, 43, 44, 46, 52, 53) AND CPAIS = @cpais and CCOMPANIA = @ccompania');
+                .query('select CESTATUSGENERAL, XESTATUSGENERAL, BACTIVO from MAESTATUSGENERAL where CESTATUSGENERAL in (3, 4, 5, 7, 13, 19) AND CPAIS = @cpais and CCOMPANIA = @ccompania');
             //sql.close();
             return { result: result };
         }catch(err){
