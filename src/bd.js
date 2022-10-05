@@ -8481,7 +8481,10 @@ module.exports = {
                 .input('ccorredor', sql.Numeric(11, 0), userData.ccorredor)
                 .input('cmoneda', sql.Numeric(11, 0), userData.cmoneda)
                 .input('xcedula', sql.NVarChar, userData.xcedula)
-                .query('insert into TMEMISION_INDIVIDUAL(XNOMBRE, XAPELLIDO, CANO, XCOLOR, CMARCA, CMODELO, CVERSION, XRIF_CLIENTE, EMAIL, FNAC, XDIRECCIONFISCAL, XSERIALMOTOR, XSERIALCARROCERIA, XPLACA, XUSO, XTELEFONO_PROP, CPLAN, CCORREDOR, CMONEDA, XCEDULA) values (@xnombre, @xapellido, @cano, @xcolor, @cmarca, @cmodelo, @cversion, @xrif_cliente, @email, @fnac, @xdireccionfiscal, @xserialmotor, @xserialcarroceria, @xplaca, @xuso, @xtelefono_prop, @cplan, @ccorredor, @cmoneda, @xcedula)')
+                .input('xcobertura', sql.NVarChar, userData.xcobertura)
+                .input('ncapacidad_p', sql.NVarChar, userData.ncapacidad_p)
+                .input('xtipo', sql.NVarChar, userData.xtipo)
+                .query('insert into TMEMISION_INDIVIDUAL(XNOMBRE, XAPELLIDO, CANO, XCOLOR, CMARCA, CMODELO, CVERSION, XRIF_CLIENTE, EMAIL, FNAC, XDIRECCIONFISCAL, XSERIALMOTOR, XSERIALCARROCERIA, XPLACA, XUSO, XTELEFONO_PROP, CPLAN, CCORREDOR, CMONEDA, XCEDULA, XCOBERTURA, NCAPACIDAD_P, XTIPO) values (@xnombre, @xapellido, @cano, @xcolor, @cmarca, @cmodelo, @cversion, @xrif_cliente, @email, @fnac, @xdireccionfiscal, @xserialmotor, @xserialcarroceria, @xplaca, @xuso, @xtelefono_prop, @cplan, @ccorredor, @cmoneda, @xcedula, @xcobertura, @ncapacidad_p, @xtipo)')
             //sql.close();
             return { result: { rowsAffected: rowsAffected, status: true } };
         }
@@ -11809,6 +11812,36 @@ module.exports = {
             return { error: err.message };
         }
     },
+<<<<<<< HEAD
+=======
+
+
+    vehicleQuery: async(searchData) => {
+        try{
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+            .input('cpais', sql.Int, searchData.cpais)
+            .query('select * from VWBUSCARPLANRC where  ');
+            //sql.close();
+            return { result: result };
+        }
+        catch(err){
+            return { error: err.message };
+        }
+    },
+
+    planRcvTypeQuery: async() => {
+        try{
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .query('select distinct XCLASE from VWBUSCARPLANRC');
+            //sql.close();
+            return { result: result };
+        }catch(err){
+            return { error: err.message };
+        }
+    },
+>>>>>>> origin/fran
     planRcvTypeValrepQuery: async() => {
         try{
             let pool = await sql.connect(config);
@@ -11891,5 +11924,6 @@ module.exports = {
         }catch(err){
             return { error: err.message };
         }
-    },
+    
+}
 }
