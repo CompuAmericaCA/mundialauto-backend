@@ -8481,7 +8481,10 @@ module.exports = {
                 .input('ccorredor', sql.Numeric(11, 0), userData.ccorredor)
                 .input('cmoneda', sql.Numeric(11, 0), userData.cmoneda)
                 .input('xcedula', sql.NVarChar, userData.xcedula)
-                .query('insert into TMEMISION_INDIVIDUAL(XNOMBRE, XAPELLIDO, CANO, XCOLOR, CMARCA, CMODELO, CVERSION, XRIF_CLIENTE, EMAIL, FNAC, XDIRECCIONFISCAL, XSERIALMOTOR, XSERIALCARROCERIA, XPLACA, XUSO, XTELEFONO_PROP, CPLAN, CCORREDOR, CMONEDA, XCEDULA) values (@xnombre, @xapellido, @cano, @xcolor, @cmarca, @cmodelo, @cversion, @xrif_cliente, @email, @fnac, @xdireccionfiscal, @xserialmotor, @xserialcarroceria, @xplaca, @xuso, @xtelefono_prop, @cplan, @ccorredor, @cmoneda, @xcedula)')
+                .input('xcobertura', sql.NVarChar, userData.xcobertura)
+                .input('ncapacidad_p', sql.NVarChar, userData.ncapacidad_p)
+                .input('xtipo', sql.NVarChar, userData.xtipo)
+                .query('insert into TMEMISION_INDIVIDUAL(XNOMBRE, XAPELLIDO, CANO, XCOLOR, CMARCA, CMODELO, CVERSION, XRIF_CLIENTE, EMAIL, FNAC, XDIRECCIONFISCAL, XSERIALMOTOR, XSERIALCARROCERIA, XPLACA, XUSO, XTELEFONO_PROP, CPLAN, CCORREDOR, CMONEDA, XCEDULA, XCOBERTURA, NCAPACIDAD_P, XTIPO) values (@xnombre, @xapellido, @cano, @xcolor, @cmarca, @cmodelo, @cversion, @xrif_cliente, @email, @fnac, @xdireccionfiscal, @xserialmotor, @xserialcarroceria, @xplaca, @xuso, @xtelefono_prop, @cplan, @ccorredor, @cmoneda, @xcedula, @xcobertura, @ncapacidad_p, @xtipo)')
             //sql.close();
             return { result: { rowsAffected: rowsAffected, status: true } };
         }
@@ -11806,6 +11809,20 @@ module.exports = {
             //sql.close();
             return { result: result };
         }catch(err){
+            return { error: err.message };
+        }
+    },
+
+
+    vehicleQuery: async() => {
+        try{
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .query('select * from PRPLAN_RC_DETALLE ');
+            //sql.close();
+            return { result: result };
+        }
+        catch(err){
             return { error: err.message };
         }
     },

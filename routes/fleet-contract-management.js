@@ -1037,8 +1037,8 @@ router.route('/create/individualContract').post((req, res) => {
 
 const operationCreateIndividualContract = async(requestBody) => {
     let userData = {
-        xnombre: requestBody.xnombre,
-        xapellido: requestBody.xapellido,
+        xnombre: requestBody.xnombre.toUpperCase(),
+        xapellido: requestBody.xapellido.toUpperCase(),
         cano: requestBody.cano,
         xcolor: requestBody.xcolor,
         cmarca: requestBody.cmarca,
@@ -1047,16 +1047,20 @@ const operationCreateIndividualContract = async(requestBody) => {
         xrif_cliente: requestBody.xrif_cliente,
         email: requestBody.email,
         fnac: requestBody.fnac,
-        xdireccionfiscal: requestBody.xdireccionfiscal,
+        xdireccionfiscal: requestBody.xdireccionfiscal.toUpperCase(),
         xserialmotor: requestBody.xserialmotor,
         xserialcarroceria: requestBody.xserialcarroceria,
         xplaca: requestBody.xplaca,
-        xuso: requestBody.xuso,
+        xuso: requestBody.xuso.toUpperCase(),
         cmoneda: requestBody.cmoneda,
         xtelefono_prop: requestBody.xtelefono_prop,
         cplan: requestBody.cplan,
         ccorredor: requestBody.ccorredor,
         xcedula:requestBody.xcedula,
+        xcobertura: requestBody.xcobertura.toUpperCase(),
+        ncapacidad_p: requestBody.ncapacidad_p,
+        xtipo: requestBody.xtipo.toUpperCase(),
+
     };
       console.log(userData)
     let operationCreateIndividualContract = await bd.createIndividualContractQuery(userData).then((res) => res);
