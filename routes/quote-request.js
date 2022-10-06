@@ -175,7 +175,6 @@ const operationDetailListQuoteRequest = async(authHeader, requestBody) => {
         //baceptacion: requestBody.baceptacion,
         ccotizacion: requestBody.ccotizacion
     };
-    console.log(quoteRequestData)
     let getQuoteRequestData = await bd.getQuoteListRequestDataQuery(quoteRequestData).then((res) => res);
     if(getQuoteRequestData.error){ return { status: false, code: 500, message: getQuoteRequestData.error }; }
     if(getQuoteRequestData.result.rowsAffected > 0){

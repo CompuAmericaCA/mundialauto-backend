@@ -506,6 +506,7 @@ router.route('/detail').post((req, res) => {
             }
             res.json({ data: result });
         }).catch((err) => {
+            console.log(err.message)
             res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationDetailFleetContractManagement' } });
         });
     }
@@ -738,23 +739,21 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
             cplan: getFleetContractData.result.recordset[0].CPLAN,
             cmetodologiapago: getFleetContractData.result.recordset[0].CMETODOLOGIAPAGO,
             ctiporecibo: getFleetContractData.result.recordset[0].CTIPORECIBO,
-            xmarca: getFleetContractOwnerVehicleData.result.recordset[0].XMARCA,
-            xmoneda: getFleetContractOwnerVehicleData.result.recordset[0].xmoneda,
-            xmodelo: getFleetContractOwnerVehicleData.result.recordset[0].XMODELO,
-            cversion: getFleetContractOwnerVehicleData.result.recordset[0].CVERSION,
-            xversion: getFleetContractOwnerVehicleData.result.recordset[0].XVERSION,
-            xplaca: getFleetContractOwnerVehicleData.result.recordset[0].XPLACA,
-            xuso: getFleetContractOwnerVehicleData.result.recordset[0].XUSO,
-            xtipovehiculo: getFleetContractOwnerVehicleData.result.recordset[0].XTIPO,
-            xcolor: getFleetContractOwnerVehicleData.result.recordset[0].XCOLOR,
-            fano: getFleetContractOwnerVehicleData.result.recordset[0].FANO,
-            xserialcarroceria: getFleetContractOwnerVehicleData.result.recordset[0].XSERIALCARROCERIA,
-            xserialmotor: getFleetContractOwnerVehicleData.result.recordset[0].XSERIALMOTOR,
-            mpreciovehiculo: getFleetContractOwnerVehicleData.result.recordset[0].MPRECIOVEHICULO,
-            ctipovehiculo: getFleetContractOwnerVehicleData.result.recordset[0].CTIPOVEHICULO,
-            xtipomodelovehiculo: getFleetContractOwnerVehicleData.result.recordset[0].XTIPOMODELO,
-            ncapacidadcargavehiculo: getFleetContractOwnerVehicleData.result.recordset[0].NCAPACIDADCARGA,
-            ncapacidadpasajerosvehiculo: getFleetContractOwnerVehicleData.result.recordset[0].NCAPACIDADPASAJEROS,
+            xmarca: getFleetContractData.result.recordset[0].XMARCA,
+            xmoneda: getFleetContractData.result.recordset[0].xmoneda,
+            xmodelo: getFleetContractData.result.recordset[0].XMODELO,
+            xversion: getFleetContractData.result.recordset[0].XVERSION,
+            xplaca: getFleetContractData.result.recordset[0].XPLACA,
+            xuso: getFleetContractData.result.recordset[0].XUSO,
+            xtipovehiculo: getFleetContractData.result.recordset[0].XTIPO,
+            fano: getFleetContractData.result.recordset[0].FANO,
+            xserialcarroceria: getFleetContractData.result.recordset[0].XSERIALCARROCERIA,
+            xserialmotor: getFleetContractData.result.recordset[0].XSERIALMOTOR,
+            mpreciovehiculo: getFleetContractData.result.recordset[0].MPRECIOVEHICULO,
+            ctipovehiculo: getFleetContractData.result.recordset[0].CTIPOVEHICULO,
+            xtipomodelovehiculo: getFleetContractData.result.recordset[0].XTIPOMODELO,
+            ncapacidadcargavehiculo: getFleetContractData.result.recordset[0].NCAPACIDADCARGA,
+            ncapacidadpasajerosvehiculo: getFleetContractData.result.recordset[0].NCAPACIDADPASAJEROS,
             xplancoberturas: getPlanData.result.recordset[0].XPLAN_RC,
             xplanservicios: xplanservicios,
             mprimatotal: mprimatotal,
@@ -794,18 +793,18 @@ const operationReceiptDetail = async(authHeader, requestBody) => {
     if(getReceiptData.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Receipt Data not found.' }; }
     return {
         status: true,
-            ccarga: getReceiptData.result.recordset[0].ccarga,
-            crecibo: getReceiptData.result.recordset[0].crecibo,
-            xrecibo: getReceiptData.result.recordset[0].xrecibo,
-            xpoliza: getReceiptData.result.recordset[0].xpoliza,
-            femision: getReceiptData.result.recordset[0].femision,
-            fdesde_pol: getReceiptData.result.recordset[0].fdesde_pol,
-            fhasta_pol: getReceiptData.result.recordset[0].fhasta_pol,
-            fdesde_rec: getReceiptData.result.recordset[0].fdesde_rec,
-            fhasta_rec: getReceiptData.result.recordset[0].fhasta_rec,
+            ccarga: getReceiptData.result.recordset[0].CCARGA,
+            crecibo: getReceiptData.result.recordset[0].CRECIBO,
+            xrecibo: getReceiptData.result.recordset[0].XRECIBO,
+            xpoliza: getReceiptData.result.recordset[0].XPOLIZA,
+            femision: getReceiptData.result.recordset[0].FEMISION,
+            fdesde_pol: getReceiptData.result.recordset[0].FDESDE_POL,
+            fhasta_pol: getReceiptData.result.recordset[0].FHASTA_POL,
+            fdesde_rec: getReceiptData.result.recordset[0].FDESDE_REC,
+            fhasta_rec: getReceiptData.result.recordset[0].FHASTA_REC,
             xsucursalemision: getReceiptData.result.recordset[0].xsucursalemision,
             xsucursalsuscriptora: getReceiptData.result.recordset[0].xsucursalsuscriptora,
-            cmoneda: getReceiptData.result.recordset[0].cmoneda,
+            cmoneda: getReceiptData.result.recordset[0].CMONEDA,
             xmoneda: getReceiptData.result.recordset[0].xmoneda,
             tcobertura: getReceiptData.result.recordset[0].tcobertura,
             c1: getReceiptData.result.recordset[0].c1,
@@ -839,10 +838,10 @@ const operationReceiptDetail = async(authHeader, requestBody) => {
             t4: getReceiptData.result.recordset[0].t4,
             x9: getReceiptData.result.recordset[0].x9,
             d9: getReceiptData.result.recordset[0].d9,
-            mprimaanual: getReceiptData.result.recordset[0].mprimaanual,
-            mprimaprorrata: getReceiptData.result.recordset[0].mprimaprorrata,
-            fanulado: getReceiptData.result.recordset[0].fanulado,
-            fcobro: getReceiptData.result.recordset[0].fcobro,
+            mprimaanual: getReceiptData.result.recordset[0].MPRIMA_ANUAL,
+            mprimaprorrata: getReceiptData.result.recordset[0].MPRIMA_PRORRATA,
+            fanulado: getReceiptData.result.recordset[0].FANULADO,
+            fcobro: getReceiptData.result.recordset[0].FCOBRO,
             iestado: getReceiptData.result.recordset[0].iestado,
             xnombrecliente: getReceiptData.result.recordset[0].XCLIENTE,
             xdocidentidadcliente: getReceiptData.result.recordset[0].XDOCIDENTIDAD,
@@ -1021,8 +1020,6 @@ const operationChargeContracts = async(authHeader, requestBody) => {
 }
 
 
-
-
 router.route('/create/individualContract').post((req, res) => {
     operationCreateIndividualContract(req.body).then((result) => {
         if(!result.status){
@@ -1038,8 +1035,8 @@ router.route('/create/individualContract').post((req, res) => {
 
 const operationCreateIndividualContract = async(requestBody) => {
     let userData = {
-        xnombre: requestBody.xnombre,
-        xapellido: requestBody.xapellido,
+        xnombre: requestBody.xnombre.toUpperCase(),
+        xapellido: requestBody.xapellido.toUpperCase(),
         cano: requestBody.cano,
         xcolor: requestBody.xcolor,
         cmarca: requestBody.cmarca,
@@ -1048,16 +1045,20 @@ const operationCreateIndividualContract = async(requestBody) => {
         xrif_cliente: requestBody.xrif_cliente,
         email: requestBody.email,
         fnac: requestBody.fnac,
-        xdireccionfiscal: requestBody.xdireccionfiscal,
+        xdireccionfiscal: requestBody.xdireccionfiscal.toUpperCase(),
         xserialmotor: requestBody.xserialmotor,
         xserialcarroceria: requestBody.xserialcarroceria,
         xplaca: requestBody.xplaca,
-        xuso: requestBody.xuso,
+        xuso: requestBody.xuso.toUpperCase(),
         cmoneda: requestBody.cmoneda,
         xtelefono_prop: requestBody.xtelefono_prop,
         cplan: requestBody.cplan,
         ccorredor: requestBody.ccorredor,
         xcedula:requestBody.xcedula,
+        xcobertura: requestBody.xcobertura.toUpperCase(),
+        ncapacidad_p: requestBody.ncapacidad_p,
+        xtipo: requestBody.xtipo.toUpperCase(),
+
     };
       console.log(userData)
     let operationCreateIndividualContract = await bd.createIndividualContractQuery(userData).then((res) => res);
