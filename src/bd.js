@@ -6641,7 +6641,8 @@ module.exports = {
             let pool = await sql.connect(config);
             let result = await pool.request()
                 .input('clote', sql.Int, searchData.clote)
-                .query('select * from surecibo where CLOTE = @clote ');
+                .input('ccarga', sql.Int, searchData.ccarga)
+                .query('select * from surecibo where CLOTE = @clote AND CCARGA = @ccarga ');
             //sql.close();
             return { result: result };
         }catch(err){
