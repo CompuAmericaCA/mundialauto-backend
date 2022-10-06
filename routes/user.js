@@ -133,6 +133,7 @@ const operationCreateUser = async(authHeader, requestBody) => {
         cproveedor: requestBody.cproveedor ? requestBody.cproveedor : undefined,
         cusuariocreacion: requestBody.cusuariocreacion
     };
+    console.log(userData)
     let verifyUserEmail = await bd.verifyUserEmailToCreateQuery(userData.xemail).then((res) => res);
     if(verifyUserEmail.error){ return { status: false, code: 500, message: verifyUserEmail.error }; }
     if(verifyUserEmail.result.rowsAffected > 0){ return { status: false, code: 200, condition: 'email-already-exist' }; }
