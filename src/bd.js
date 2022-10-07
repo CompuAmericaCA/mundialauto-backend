@@ -4177,7 +4177,6 @@ module.exports = {
                 .input('cnotificacion', sql.Int, cnotificacion ? cnotificacion: undefined)
                 .query('select * from VWBUSCARDATAORDENSERVICIO where CNOTIFICACION = @cnotificacion');
             //sql.close();
-            console.log(result)
             return { result: result };
         }catch(err){
             return { error: err.message };
@@ -10282,7 +10281,6 @@ module.exports = {
                 .input('ccotizacion', sql.Int, ccotizacion)
                 .query('select * from VWBUSCARREPUESTOXCOTIZACIONDATA where CCOTIZACION = @ccotizacion');
             //sql.close();
-            console.log(result)
             return { result: result };
         }catch(err){
             return { error: err.message };
