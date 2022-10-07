@@ -4179,7 +4179,6 @@ module.exports = {
                 .input('cnotificacion', sql.Int, cnotificacion ? cnotificacion: undefined)
                 .query('select * from VWBUSCARDATAORDENSERVICIO where CNOTIFICACION = @cnotificacion');
             //sql.close();
-            console.log(result)
             return { result: result };
         }catch(err){
             return { error: err.message };
@@ -4226,11 +4225,11 @@ module.exports = {
     },
     searchModelQuery: async(searchData) => {
         try{
-            let query = `select * from VWBUSCARMODELODATA where CPAIS = @cpais${ searchData.cmarca ? " and CMARCA = @cmarca" : '' }${ searchData.xmodelo ? " and XMODELO like '%" + searchData.xmodelo + "%'" : '' }`;
+            let query = `select DISTINCT XMODELO from VWBUSCARMARCAMODELOVERSION where CPAIS = @cpais and XMARCA= @xmarca`;
             let pool = await sql.connect(config);
             let result = await pool.request()
                 .input('cpais', sql.Numeric(4, 0), searchData.cpais ? searchData.cpais : 1)
-                .input('cmarca', sql.Int, searchData.cmarca ? searchData.cmarca : 1)
+                .input('xmarca', sql.NVarChar, searchData.xmarca ? searchData.xmarca : 1)
                 .query(query);
             //sql.close();
             return { result: result };
@@ -7623,9 +7622,8 @@ module.exports = {
             let pool = await sql.connect(config);
             let result = await pool.request()
                 .input('cpais', sql.Numeric(4, 0), searchData.cpais)
-                .input('cmarca', sql.Int, searchData.cmarca)
-                .input('cmodelo', sql.Int, searchData.cmodelo)
-                .query('select CVERSION, XVERSION, BACTIVO from MAVERSION where CPAIS = @cpais and CMARCA = @cmarca and CMODELO = @cmodelo');
+                .input('xmodelo', sql.NVarChar, searchData.xmodelo)
+                .query('select CVERSION, XVERSION, BACTIVO from VWBUSCARMARCAMODELOVERSION where CPAIS = @cpais and XMODELO = @xmodelo');
             //sql.close();
             return { result: result };
         }catch(err){
@@ -8467,9 +8465,9 @@ module.exports = {
                 .input('xapellido', sql.NVarChar, userData.xapellido)
                 .input('cano', sql.Numeric(11, 2), userData.cano)
                 .input('xcolor', sql.NVarChar, userData.xcolor)
-                .input('cmarca', sql.Numeric(11, 0), userData.cmarca)
-                .input('cmodelo', sql.Numeric(11, 0), userData.cmodelo)
-                .input('cversion', sql.Numeric(11, 0), userData.cversion)
+                .input('xmarca', sql.NVarChar, userData.xmarca)
+                .input('xmodelo', sql.NVarChar, userData.xmodelo)
+                .input('xversion', sql.NVarChar, userData.xversion)
                 .input('xrif_cliente', sql.NVarChar, userData.xrif_cliente)
                 .input('email', sql.NVarChar, userData.email)
                 .input('fnac', sql.DateTime , userData.fnac)
@@ -8478,7 +8476,7 @@ module.exports = {
                 .input('xserialcarroceria', sql.NVarChar, userData.xserialcarroceria)
                 .input('xplaca', sql.NVarChar, userData.xplaca)
                 .input('xuso', sql.NVarChar, userData.xuso)
-                .input('xtelefono_prop', sql.NVarChar, userData.xtelefono_prop)
+                .input('xtelefono_emp', sql.NVarChar, userData.xtelefono_emp)
                 .input('cplan', sql.Numeric(11, 0), userData.cplan)
                 .input('ccorredor', sql.Numeric(11, 0), userData.ccorredor)
                 .input('cmoneda', sql.Numeric(11, 0), userData.cmoneda)
@@ -8486,7 +8484,7 @@ module.exports = {
                 .input('xcobertura', sql.NVarChar, userData.xcobertura)
                 .input('ncapacidad_p', sql.NVarChar, userData.ncapacidad_p)
                 .input('xtipo', sql.NVarChar, userData.xtipo)
-                .query('insert into TMEMISION_INDIVIDUAL(XNOMBRE, XAPELLIDO, CANO, XCOLOR, CMARCA, CMODELO, CVERSION, XRIF_CLIENTE, EMAIL, FNAC, XDIRECCIONFISCAL, XSERIALMOTOR, XSERIALCARROCERIA, XPLACA, XUSO, XTELEFONO_PROP, CPLAN, CCORREDOR, CMONEDA, XCEDULA, XCOBERTURA, NCAPACIDAD_P, XTIPO) values (@xnombre, @xapellido, @cano, @xcolor, @cmarca, @cmodelo, @cversion, @xrif_cliente, @email, @fnac, @xdireccionfiscal, @xserialmotor, @xserialcarroceria, @xplaca, @xuso, @xtelefono_prop, @cplan, @ccorredor, @cmoneda, @xcedula, @xcobertura, @ncapacidad_p, @xtipo)')
+                .query('insert into TMEMISION_INDIVIDUAL(XNOMBRE, XAPELLIDO, CANO, XCOLOR, XMARCA, XMODELO, XVERSION, XRIF_CLIENTE, EMAIL, FNAC, XDIRECCIONFISCAL, XSERIALMOTOR, XSERIALCARROCERIA, XPLACA, XUSO, XTELEFONO_EMP, CPLAN, CCORREDOR, CMONEDA, XCEDULA, XCOBERTURA, NCAPACIDAD_P, XTIPO) values (@xnombre, @xapellido, @cano, @xcolor, @xmarca, @xmodelo, @xversion, @xrif_cliente, @email, @fnac, @xdireccionfiscal, @xserialmotor, @xserialcarroceria, @xplaca, @xuso, @xtelefono_emp, @cplan, @ccorredor, @cmoneda, @xcedula, @xcobertura, @ncapacidad_p, @xtipo)')
             //sql.close();
             return { result: { rowsAffected: rowsAffected, status: true } };
         }
@@ -10324,7 +10322,6 @@ module.exports = {
                 .input('ccotizacion', sql.Int, ccotizacion)
                 .query('select * from VWBUSCARREPUESTOXCOTIZACIONDATA where CCOTIZACION = @ccotizacion');
             //sql.close();
-            console.log(result)
             return { result: result };
         }catch(err){
             return { error: err.message };
@@ -11821,7 +11818,7 @@ module.exports = {
             let pool = await sql.connect(config);
             let result = await pool.request()
             .input('cpais', sql.Int, searchData.cpais)
-            .query('select * from VWBUSCARPLANRC where  ');
+            .query('select * from VWBUSCARPLANRC ');
             //sql.close();
             return { result: result };
         }
@@ -11830,11 +11827,12 @@ module.exports = {
         }
     },
 
-    planRcvTypeQuery: async() => {
+    planRcvTypeQuery: async(searchData) => {
         try{
             let pool = await sql.connect(config);
             let result = await pool.request()
-                .query('select distinct XCLASE from VWBUSCARPLANRC');
+            .input('xtipo', sql.NVarChar, searchData.xtipo)
+            .query('select * from VWBUSCARPLANRC where XTIPO = @xtipo ');
             //sql.close();
             return { result: result };
         }catch(err){
