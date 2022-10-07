@@ -309,7 +309,84 @@ const operationValrepNotificationServiceOrder = async(authHeader, requestBody) =
     if(query.error){ return { status: false, code: 500, message: query.error }; }
     let jsonArray = [];
     for(let i = 0; i < query.result.recordset.length; i++){
-        jsonArray.push({ cnotificacion: query.result.recordset[0].CNOTIFICACION, ccontratoflota: query.result.recordset[0].CCONTRATOFLOTA, xnombre: query.result.recordset[0].XNOMBRE, xapellido: query.result.recordset[0].XAPELLIDO, xnombrealternativo: query.result.recordset[0].XNOMBREALTERNATIVO, xapellidoalternativo: query.result.recordset[0].XAPELLIDOALTERNATIVO, fcreacion: query.result.recordset[0].FCREACION, xobservacion: query.result.recordset[0].XOBSERVACION, xdanos: query.result.recordset[0].XDANOS, xfecha: query.result.recordset[0].XFECHA, fajuste: query.result.recordset[0].FAJUSTE, xmarca: query.result.recordset[0].XMARCA, xdescripcion: query.result.recordset[0].XDESCRIPCION, xdanos: query.result.recordset[0].XDANOS, xfecha: query.result.recordset[0].XFECHA, xnombrepropietario: query.result.recordset[0].XNOMBREPROPIETARIO, xapellidopropietario: query.result.recordset[0].XAPELLIDOPROPIETARIO, xapellidopropietario: query.result.recordset[0].XAPELLIDOPROPIETARIO, xdocidentidad: query.result.recordset[0].XDOCIDENTIDAD, xtelefonocelular: query.result.recordset[0].XTELEFONOCELULAR, xplaca: query.result.recordset[0].XPLACA, xcolor: query.result.recordset[0].XCOLOR, xmodelo: query.result.recordset[0].XMODELO, xcliente: query.result.recordset[0].XCLIENTE, fano: query.result.recordset[0].FANO, cservicio: query.result.recordset[0].CSERVICIO, corden: query.result.recordset[0].CORDEN, cproveedor: query.result.recordset[0].CPROVEEDOR, xdireccionproveedor: query.result.recordset[0].XDIRECCIONPROVEEDOR, xnombreproveedor: query.result.recordset[0].XNOMBREPROVEEDOR, cservicioadicional: query.result.recordset[0].CSERVICIOADICIONAL, xservicioadicional: query.result.recordset[0].XSERVICIOADICIONAL, xdocumentocliente: query.result.recordset[0].XDOCIDENTIDADCLIENTE, xdireccionfiscal: query.result.recordset[0].XDIRECCIONFISCAL, xtelefono: query.result.recordset[0].XTELEFONO, xtelefonoproveedor: query.result.recordset[0].XTELEFONOPROVEEDOR, xdocumentoproveedor: query.result.recordset[0].XDOCIDENTIDADPROVEEDOR, xservicio: query.result.recordset[0].XSERVICIO, xdesde: query.result.recordset[0].XDESDE, xhacia: query.result.recordset[0].XHACIA, mmonto: query.result.recordset[0].MMONTO, mmontototal: query.result.recordset[0].MMONTOTOTAL, pimpuesto: query.result.recordset[0].PIMPUESTO, mmontototaliva: query.result.recordset[0].MMONTOTOTALIVA,mmontototaliva: query.result.recordset[0].MMONTOTOTALIVA, cmoneda: query.result.recordset[0].CMONEDA ,xmoneda: query.result.recordset[0].xmoneda, bactivo: query.result.recordset[0].BACTIVO, cestatusgeneral: query.result.recordset[0].CESTATUSGENERAL, xestatusgeneral: query.result.recordset[0].XESTATUSGENERAL, ccausaanulacion: query.result.recordset[0].CCAUSAANULACION, xcausaanulacion: query.result.recordset[0].XCAUSAANULACION});
+        if(query.result.recordset[0].XCOLOR){
+            let auto;
+            auto = query.result.recordset[0].XMARCA + ' ' + query.result.recordset[0].XMODELO + ' ' + query.result.recordset[0].XVERSION + ' ' + query.result.recordset[0].XCOLOR;
+        }else{
+            auto = query.result.recordset[0].XMARCA + ' ' + query.result.recordset[0].XMODELO + ' ' + query.result.recordset[0].XVERSION;
+        }
+
+        if(query.result.recordset[0].XAPELLIDOALTERNATIVO){
+            let nombresalternativos;
+            nombresalternativos = query.result.recordset[0].XNOMBREALTERNATIVO + ' ' + query.result.recordset[0].XAPELLIDOALTERNATIVO;
+        }else if(query.result.recordset[0].XNOMBREALTERNATIVO){
+            nombresalternativos = query.result.recordset[0].XNOMBREALTERNATIVO;
+        }else{
+            nombresalternativos = 'NO EXISTEN NOMBRES DE ALTERNATIVOS'
+        }
+
+        let nombres = query.result.recordset[0].XNOMBRE + ' ' + query.result.recordset[0].XAPELLIDO;
+        
+        if(query.result.recordset[0].XNOMBREPROPIETARIO == query.result.recordset[0].XAPELLIDOPROPIETARIO){
+            let nombrespropietario
+            nombrespropietario = query.result.recordset[0].XNOMBREPROPIETARIO
+        }else{
+            nombrespropietario = query.result.recordset[0].XNOMBREPROPIETARIO + ' ' + query.result.recordset[0].XAPELLIDOPROPIETARIO
+        }
+
+        jsonArray.push({ cnotificacion: query.result.recordset[0].CNOTIFICACION, 
+                         ccontratoflota: query.result.recordset[0].CCONTRATOFLOTA, 
+                         xnombre: query.result.recordset[0].XNOMBRE, 
+                         xapellido: query.result.recordset[0].XAPELLIDO, 
+                         xnombrealternativo: query.result.recordset[0].XNOMBREALTERNATIVO, 
+                         xapellidoalternativo: query.result.recordset[0].XAPELLIDOALTERNATIVO, 
+                         fcreacion: query.result.recordset[0].FCREACION, 
+                         xobservacion: query.result.recordset[0].XOBSERVACION, 
+                         xdanos: query.result.recordset[0].XDANOS, 
+                         xfecha: query.result.recordset[0].XFECHA, 
+                         fajuste: query.result.recordset[0].FAJUSTE, 
+                         xmarca: query.result.recordset[0].XMARCA, 
+                         xdescripcion: query.result.recordset[0].XDESCRIPCION, 
+                         xnombrepropietario: query.result.recordset[0].XNOMBREPROPIETARIO, 
+                         xapellidopropietario: query.result.recordset[0].XAPELLIDOPROPIETARIO, 
+                         xdocidentidad: query.result.recordset[0].XDOCIDENTIDADPROPIETARIO, 
+                         xtelefonocelular: query.result.recordset[0].XTELEFONOPROPIETARIO, 
+                         xplaca: query.result.recordset[0].XPLACA, 
+                         xcolor: query.result.recordset[0].XCOLOR, 
+                         xmodelo: query.result.recordset[0].XMODELO, 
+                         xcliente: query.result.recordset[0].XCLIENTE, 
+                         fano: query.result.recordset[0].FANO, 
+                         cservicio: query.result.recordset[0].CSERVICIO, 
+                         corden: query.result.recordset[0].CORDEN, 
+                         cproveedor: query.result.recordset[0].CPROVEEDOR, 
+                         xdireccionproveedor: query.result.recordset[0].XDIRECCIONPROVEEDOR, 
+                         xnombreproveedor: query.result.recordset[0].XNOMBREPROVEEDOR, 
+                         cservicioadicional: query.result.recordset[0].CSERVICIOADICIONAL, 
+                         xservicioadicional: query.result.recordset[0].XSERVICIOADICIONAL, 
+                         xdocumentocliente: query.result.recordset[0].XDOCIDENTIDADCLIENTE, 
+                         xdireccionfiscal: query.result.recordset[0].XDIRECCIONFISCAL, 
+                         xtelefono: query.result.recordset[0].XTELEFONO, 
+                         xtelefonoproveedor: query.result.recordset[0].XTELEFONOPROVEEDOR, 
+                         xdocumentoproveedor: query.result.recordset[0].XDOCUMENTOPROVEEDOR, 
+                         xservicio: query.result.recordset[0].XSERVICIO, 
+                         xdesde: query.result.recordset[0].XDESDE, 
+                         xhacia: query.result.recordset[0].XHACIA, 
+                         mmonto: query.result.recordset[0].MMONTO, 
+                         mmontototal: query.result.recordset[0].MMONTOTOTAL, 
+                         pimpuesto: query.result.recordset[0].PIMPUESTO, 
+                         mmontototaliva: query.result.recordset[0].MMONTOTOTALIVA,
+                         mmontototaliva: query.result.recordset[0].MMONTOTOTALIVA, 
+                         cmoneda: query.result.recordset[0].CMONEDA ,
+                         xmoneda: query.result.recordset[0].xmoneda, 
+                         bactivo: query.result.recordset[0].BACTIVO, 
+                         cestatusgeneral: query.result.recordset[0].CESTATUSGENERAL, 
+                         xestatusgeneral: query.result.recordset[0].XESTATUSGENERAL, 
+                         ccausaanulacion: query.result.recordset[0].CCAUSAANULACION, 
+                         xcausaanulacion: query.result.recordset[0].XCAUSAANULACION,
+                         xauto: auto,
+                         xnombres: nombres,
+                         xnombresalternativos: nombresalternativos,
+                         xnombrespropietario: nombrespropietario});
     }
     return { status: true, list: jsonArray }
 }
@@ -337,9 +414,61 @@ const operationValrepNotificationOrder = async(authHeader, requestBody) => {
     let cnotificacion = requestBody.cnotificacion;
     let query = await bd.notificationOrderDetailQuery(cnotificacion).then((res) => res);
     if(query.error){ return { status: false, code: 500, message: query.error }; }
+
+    if(query.result.recordset[0].XCOLOR){
+        let auto;
+        auto = query.result.recordset[0].XMARCA + ' ' + query.result.recordset[0].XMODELO + ' ' + query.result.recordset[0].XVERSION + ' ' + query.result.recordset[0].XCOLOR;
+    }else{
+        auto = query.result.recordset[0].XMARCA + ' ' + query.result.recordset[0].XMODELO + ' ' + query.result.recordset[0].XVERSION;
+    }
+
+    if(query.result.recordset[0].XAPELLIDOALTERNATIVO){
+        let nombresalternativos;
+        nombresalternativos = query.result.recordset[0].XNOMBREALTERNATIVO + ' ' + query.result.recordset[0].XAPELLIDOALTERNATIVO;
+    }else if(query.result.recordset[0].XNOMBREALTERNATIVO){
+        nombresalternativos = query.result.recordset[0].XNOMBREALTERNATIVO;
+    }else{
+        nombresalternativos = 'NO EXISTEN NOMBRES DE ALTERNATIVOS'
+    }
+
+    let nombres = query.result.recordset[0].XNOMBRE + ' ' + query.result.recordset[0].XAPELLIDO;
+    
+    if(query.result.recordset[0].XNOMBREPROPIETARIO == query.result.recordset[0].XAPELLIDOPROPIETARIO){
+        let nombrespropietario
+        nombrespropietario = query.result.recordset[0].XNOMBREPROPIETARIO
+    }else{
+        nombrespropietario = query.result.recordset[0].XNOMBREPROPIETARIO + ' ' + query.result.recordset[0].XAPELLIDOPROPIETARIO
+    }
     let jsonArray = [];
     //for(let i = 0; i < query.result.recordset.length; i++){
-        jsonArray.push({ cnotificacion: query.result.recordset[0].CNOTIFICACION, ccontratoflota: query.result.recordset[0].CCONTRATOFLOTA, xnombre: query.result.recordset[0].XNOMBRE, xapellido: query.result.recordset[0].XAPELLIDO, xnombrealternativo: query.result.recordset[0].XNOMBREALTERNATIVO, xapellidoalternativo: query.result.recordset[0].XAPELLIDOALTERNATIVO, fcreacion: query.result.recordset[0].FCREACION, xmarca: query.result.recordset[0].XMARCA, xdescripcion: query.result.recordset[0].XDESCRIPCION, xdanos: query.result.recordset[0].XDANOS, xfecha: query.result.recordset[0].XFECHA, xnombrepropietario: query.result.recordset[0].XNOMBREPROPIETARIO, xapellidopropietario: query.result.recordset[0].XAPELLIDOPROPIETARIO, xapellidopropietario: query.result.recordset[0].XAPELLIDOPROPIETARIO, xdocidentidad: query.result.recordset[0].XDOCIDENTIDAD, xtelefonocelular: query.result.recordset[0].XTELEFONOCELULAR, xplaca: query.result.recordset[0].XPLACA, xcolor: query.result.recordset[0].XCOLOR, xmodelo: query.result.recordset[0].XMODELO, xcliente: query.result.recordset[0].XCLIENTE, fano: query.result.recordset[0].FANO, xdocumentocliente: query.result.recordset[0].XDOCIDENTIDADCLIENTE, xdireccionfiscal: query.result.recordset[0].XDIRECCIONFISCAL, xtelefono: query.result.recordset[0].XTELEFONO });
+        jsonArray.push({ 
+                        cnotificacion: query.result.recordset[0].CNOTIFICACION, 
+                        ccontratoflota: query.result.recordset[0].CCONTRATOFLOTA, 
+                        xnombre: query.result.recordset[0].XNOMBRE, 
+                        xapellido: query.result.recordset[0].XAPELLIDO, 
+                        xnombrealternativo: query.result.recordset[0].XNOMBREALTERNATIVO, 
+                        xapellidoalternativo: query.result.recordset[0].XAPELLIDOALTERNATIVO, 
+                        fcreacion: query.result.recordset[0].FCREACION, 
+                        xmarca: query.result.recordset[0].XMARCA, 
+                        xdescripcion: query.result.recordset[0].XDESCRIPCION, 
+                        xfecha: query.result.recordset[0].XFECHA, 
+                        xnombrepropietario: query.result.recordset[0].XNOMBREPROPIETARIO, 
+                        xapellidopropietario: query.result.recordset[0].XAPELLIDOPROPIETARIO, 
+                        xapellidopropietario: query.result.recordset[0].XAPELLIDOPROPIETARIO, 
+                        xdocidentidad: query.result.recordset[0].XDOCIDENTIDAD, 
+                        xtelefonocelular: query.result.recordset[0].XTELEFONOCELULAR, 
+                        xplaca: query.result.recordset[0].XPLACA, 
+                        xcolor: query.result.recordset[0].XCOLOR, 
+                        xmodelo: query.result.recordset[0].XMODELO, 
+                        xcliente: query.result.recordset[0].XCLIENTE, 
+                        fano: query.result.recordset[0].FANO, 
+                        xdocumentocliente: query.result.recordset[0].XDOCIDENTIDADCLIENTE, 
+                        xdireccionfiscal: query.result.recordset[0].XDIRECCIONFISCAL, 
+                        xtelefono: query.result.recordset[0].XTELEFONO,
+                        xauto: auto,
+                        xnombres: nombres,
+                        xnombresalternativos: nombresalternativos,
+                        xnombrespropietario: nombrespropietario });
     //}
     return { status: true, list: jsonArray }
 }
