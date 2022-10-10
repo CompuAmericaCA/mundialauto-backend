@@ -7623,7 +7623,7 @@ module.exports = {
             let result = await pool.request()
                 .input('cpais', sql.Numeric(4, 0), searchData.cpais)
                 .input('xmodelo', sql.NVarChar, searchData.xmodelo)
-                .query('select CVERSION, XVERSION, BACTIVO from VWBUSCARMARCAMODELOVERSION where CPAIS = @cpais and XMODELO = @xmodelo');
+                .query('select DISTINCT CVERSION, XVERSION, BACTIVO  from VWBUSCARMARCAMODELOVERSION where CPAIS = @cpais and XMODELO = @xmodelo');
             //sql.close();
             return { result: result };
         }catch(err){
@@ -8470,7 +8470,7 @@ module.exports = {
                 .input('xversion', sql.NVarChar, userData.xversion)
                 .input('xrif_cliente', sql.NVarChar, userData.xrif_cliente)
                 .input('email', sql.NVarChar, userData.email)
-                .input('fnac', sql.DateTime , userData.fnac)
+                .input('xtelefono_prop', sql.NVarChar , userData.xtelefono_prop)
                 .input('xdireccionfiscal', sql.NVarChar, userData.xdireccionfiscal)
                 .input('xserialmotor', sql.NVarChar, userData.xserialmotor)
                 .input('xserialcarroceria', sql.NVarChar, userData.xserialcarroceria)
@@ -8484,7 +8484,14 @@ module.exports = {
                 .input('xcobertura', sql.NVarChar, userData.xcobertura)
                 .input('ncapacidad_p', sql.NVarChar, userData.ncapacidad_p)
                 .input('xtipo', sql.NVarChar, userData.xtipo)
-                .query('insert into TMEMISION_INDIVIDUAL(XNOMBRE, XAPELLIDO, CANO, XCOLOR, XMARCA, XMODELO, XVERSION, XRIF_CLIENTE, EMAIL, FNAC, XDIRECCIONFISCAL, XSERIALMOTOR, XSERIALCARROCERIA, XPLACA, XUSO, XTELEFONO_EMP, CPLAN, CCORREDOR, CMONEDA, XCEDULA, XCOBERTURA, NCAPACIDAD_P, XTIPO) values (@xnombre, @xapellido, @cano, @xcolor, @xmarca, @xmodelo, @xversion, @xrif_cliente, @email, @fnac, @xdireccionfiscal, @xserialmotor, @xserialcarroceria, @xplaca, @xuso, @xtelefono_emp, @cplan, @ccorredor, @cmoneda, @xcedula, @xcobertura, @ncapacidad_p, @xtipo)')
+                .input('finicio',  sql.DateTime, new Date())
+                .input('femision', sql.NVarChar, userData.femision)
+                .input('fdesde_pol', sql.NVarChar, userData.fdesde_pol)
+                .input('fhasta_pol', sql.NVarChar, userData.fhasta_pol)
+                .input('fdesde_rec', sql.NVarChar, userData.fdesde_rec)
+                .input('fhasta_rec', sql.NVarChar, userData.fhasta_rec)
+                .input('cmetodologiapago', sql.Numeric(11, 0), userData.cmetodologiapago)
+                .query('insert into TMEMISION_INDIVIDUAL(XNOMBRE, XAPELLIDO, CANO, XCOLOR, XMARCA, XMODELO, XVERSION, XRIF_CLIENTE, EMAIL, XTELEFONO_PROP, XDIRECCIONFISCAL, XSERIALMOTOR, XSERIALCARROCERIA, XPLACA, XUSO, XTELEFONO_EMP, CPLAN, CCORREDOR, CMONEDA, XCEDULA, XCOBERTURA, NCAPACIDAD_P, XTIPO, FINICIO, FEMISION, FDESDE_POL, FHASTA_POL, FDESDE_REC, FHASTA_REC, CMETODOLOGIAPAGO) values (@xnombre, @xapellido, @cano, @xcolor, @xmarca, @xmodelo, @xversion, @xrif_cliente, @email, @xtelefono_prop, @xdireccionfiscal, @xserialmotor, @xserialcarroceria, @xplaca, @xuso, @xtelefono_emp, @cplan, @ccorredor, @cmoneda, @xcedula, @xcobertura, @ncapacidad_p, @xtipo, @finicio, @femision, @fdesde_pol, @fhasta_pol, @fdesde_rec, @fhasta_rec, @cmetodologiapago)')
             //sql.close();
             return { result: { rowsAffected: rowsAffected, status: true } };
         }
@@ -11922,5 +11929,21 @@ module.exports = {
             return { error: err.message };
         }
     
+},
+
+    TypeMetodologia: async(searchData) => {
+        try{
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+            .input('ccompania', sql.Int, searchData.ccompania)
+            .input('cpais', sql.Int, searchData.cpais)
+            .query('select * from MAMETODOLOGIAPAGO WHERE CCOMPANIA = @ccompania AND CPAIS = @cpais AND BACTIVO = 1');
+        //sql.close();
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
 }
+
+
 }
