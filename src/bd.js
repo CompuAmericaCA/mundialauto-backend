@@ -4225,7 +4225,7 @@ module.exports = {
     },
     searchModelQuery: async(searchData) => {
         try{
-            let query = `select * from VWBUSCARMARCAMODELOVERSION where CPAIS = @cpais${ searchData.xmarca ? " and XMARCA = @xmarca" : '' }${ searchData.xmodelo ? " and XMODELO like '%" + searchData.xmodelo + "%'" : '' }`;
+            let query = `select DISTINCT XMODELO from VWBUSCARMARCAMODELOVERSION where CPAIS = @cpais and XMARCA= @xmarca`;
             let pool = await sql.connect(config);
             let result = await pool.request()
                 .input('cpais', sql.Numeric(4, 0), searchData.cpais ? searchData.cpais : 1)

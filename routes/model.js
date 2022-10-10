@@ -26,7 +26,7 @@ const operationSearchModel = async(authHeader, requestBody) => {
         cpais: requestBody.cpais,
         cmarca: requestBody.cmarca ? requestBody.cmarca : undefined,
         xmarca: requestBody.xmarca ? requestBody.xmarca : undefined,
-        xmodelo: requestBody.xmodelo ? requestBody.xmodelo.toUpperCase() : undefined
+        xmodelo: requestBody.xmodelo ? requestBody.xmodelo : undefined
     }
     let searchModel = await bd.searchModelQuery(searchData).then((res) => res);
     if(searchModel.error){ return { status: false, code: 500, message: searchModel.error }; }
