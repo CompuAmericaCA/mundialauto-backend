@@ -387,6 +387,7 @@ const operationValrepNotificationServiceOrder = async(authHeader, requestBody) =
                          xnombres: nombres,
                          xnombresalternativos: nombresalternativos,
                          xnombrespropietario: nombrespropietario});
+                         console.log(jsonArray)
     }
     return { status: true, list: jsonArray }
 }
@@ -440,6 +441,7 @@ const operationValrepNotificationOrder = async(authHeader, requestBody) => {
         nombrespropietario = query.result.recordset[0].XNOMBREPROPIETARIO + ' ' + query.result.recordset[0].XAPELLIDOPROPIETARIO
     }
     let jsonArray = [];
+    console.log(query.result.recordset[0].ccarga)
     //for(let i = 0; i < query.result.recordset.length; i++){
         jsonArray.push({ 
                         cnotificacion: query.result.recordset[0].CNOTIFICACION, 
@@ -455,7 +457,7 @@ const operationValrepNotificationOrder = async(authHeader, requestBody) => {
                         xnombrepropietario: query.result.recordset[0].XNOMBREPROPIETARIO, 
                         xapellidopropietario: query.result.recordset[0].XAPELLIDOPROPIETARIO, 
                         xapellidopropietario: query.result.recordset[0].XAPELLIDOPROPIETARIO, 
-                        xdocidentidad: query.result.recordset[0].XDOCIDENTIDAD, 
+                        xdocidentidad: query.result.recordset[0].XDOCIDENTIDADPROPIETARIO, 
                         xtelefonocelular: query.result.recordset[0].XTELEFONOCELULAR, 
                         xplaca: query.result.recordset[0].XPLACA, 
                         xcolor: query.result.recordset[0].XCOLOR, 
@@ -468,7 +470,8 @@ const operationValrepNotificationOrder = async(authHeader, requestBody) => {
                         xauto: auto,
                         xnombres: nombres,
                         xnombresalternativos: nombresalternativos,
-                        xnombrespropietario: nombrespropietario });
+                        xnombrespropietario: nombrespropietario,
+                        ccarga: query.result.recordset[0].ccarga });
     //}
     return { status: true, list: jsonArray }
 }
