@@ -508,6 +508,7 @@ router.route('/detail').post((req, res) => {
             }
             res.json({ data: result });
         }).catch((err) => {
+            console.log(err.message)
             res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationDetailFleetContractManagement' } });
         });
     }
@@ -1021,8 +1022,6 @@ const operationChargeContracts = async(authHeader, requestBody) => {
 }
 
 
-
-
 router.route('/create/individualContract').post((req, res) => {
     operationCreateIndividualContract(req.body).then((result) => {
         if(!result.status){
@@ -1038,26 +1037,36 @@ router.route('/create/individualContract').post((req, res) => {
 
 const operationCreateIndividualContract = async(requestBody) => {
     let userData = {
-        xnombre: requestBody.xnombre,
-        xapellido: requestBody.xapellido,
-        cano: requestBody.cano,
-        xcolor: requestBody.xcolor,
-        cmarca: requestBody.cmarca,
-        cmodelo: requestBody.cmodelo,
-        cversion: requestBody.cversion,
-        xrif_cliente: requestBody.xrif_cliente,
-        email: requestBody.email,
-        fnac: requestBody.fnac,
-        xdireccionfiscal: requestBody.xdireccionfiscal,
-        xserialmotor: requestBody.xserialmotor,
-        xserialcarroceria: requestBody.xserialcarroceria,
-        xplaca: requestBody.xplaca,
-        xuso: requestBody.xuso,
+        xnombre: requestBody.xnombre.toUpperCase(),
+        xapellido: requestBody.xapellido.toUpperCase(),
+        cano: requestBody.cano ? requestBody.cano : undefined,
+        xcolor: requestBody.xcolor ? requestBody.xcolor : undefined,
+        xmarca: requestBody.xmarca ? requestBody.xmarca : undefined,
+        xmodelo: requestBody.xmodelo ? requestBody.xmodelo : undefined,
+        xversion: requestBody.xversion ? requestBody.xversion : undefined,
+        xrif_cliente: requestBody.xrif_cliente ? requestBody.xrif_cliente : undefined,
+        email: requestBody.email ? requestBody.email : undefined,
+        xtelefono_prop: requestBody.xtelefono_prop ? requestBody.xtelefono_prop : undefined,
+        xdireccionfiscal: requestBody.xdireccionfiscal.toUpperCase(),
+        xserialmotor: requestBody.xserialmotor.toUpperCase(),
+        xserialcarroceria: requestBody.xserialcarroceria.toUpperCase(),
+        xplaca: requestBody.xplaca.toUpperCase(),
+        xuso: requestBody.xuso.toUpperCase() ? requestBody.xuso : undefined,
         cmoneda: requestBody.cmoneda,
-        xtelefono_prop: requestBody.xtelefono_prop,
+        xtelefono_emp: requestBody.xtelefono_emp,
         cplan: requestBody.cplan,
-        ccorredor: requestBody.ccorredor,
+        ccorredor: requestBody.ccorredor ? requestBody.ccorredor : undefined,
         xcedula:requestBody.xcedula,
+        xcobertura: requestBody.xcobertura.toUpperCase(),
+        ncapacidad_p: requestBody.ncapacidad_p,
+        xtipo: requestBody.xtipo.toUpperCase(),
+        femision:requestBody.femision,
+        fdesde_pol:requestBody.fdesde_pol,
+        fhasta_pol:requestBody.fhasta_pol,
+        fdesde_rec:requestBody.fdesde_rec,
+        fhasta_rec:requestBody.fhasta_rec,
+        cmetodologiapago: requestBody.cmetodologiapago,
+
     };
       console.log(userData)
     let operationCreateIndividualContract = await bd.createIndividualContractQuery(userData).then((res) => res);
