@@ -265,7 +265,7 @@ router.route('/search/provider').post((req, res) => {
 
 const operationSearchProvider = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
-    if(!helper.validateRequestObj(requestBody, ['cproveedor'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
+    //if(!helper.validateRequestObj(requestBody, ['cproveedor'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
     let searchData = {
         ccompania: requestBody.ccompania,
         cproveedor: requestBody.cproveedor
@@ -285,6 +285,7 @@ const operationSearchProvider = async(authHeader, requestBody) => {
                     xtelefonoproveedor: getProvidersByServicesData.result.recordset[i].XTELEFONO,
                 });
             }
+            console.log(jsonList)
             return { status: true, list: jsonList };
         }else{ return { status: false, code: 404, message: 'Provider not found.' }; }
     }else{ return { status: false, code: 404, message: 'Notification Type Services not found.' }; }
@@ -1120,12 +1121,12 @@ const operationUpdateNotification = async(authHeader, requestBody) => {
               corden: requestBody.settlement.create.corden
         }
         let createSettlementByNotification = await bd.createSettlementByNotificationQuery(settlementCreate, notificationData).then((res) => res);
-        let bactivo;
+        let cestatusgeneral;
         if(createSettlementByNotification.error){ return { status: false, code: 500, message: createSettlementByNotification.error }; }
         if(createSettlementByNotification.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Settlement not found.' }; }
         if(createSettlementByNotification.result.rowsAffected > 0){
-          bactivo = 0;
-          let updateServiceOrderBySettlementUpdate = await bd.updateServiceOrderBySettlementUpdateQuery(createSettlementByNotification.result.corden, bactivo).then((res) => res);
+          cestatusgeneral = 5;
+          let updateServiceOrderBySettlementUpdate = await bd.updateServiceOrderBySettlementUpdateQuery(createSettlementByNotification.result.corden, cestatusgeneral).then((res) => res);
           if(updateServiceOrderBySettlementUpdate.error){ return { status: false, code: 500, message: updateServiceOrderBySettlementUpdate.error }; }
           if(updateServiceOrderBySettlementUpdate.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Note not found.' }; }
         }
@@ -1208,6 +1209,7 @@ const operationDetailSettlement = async(authHeader, requestBody) => {
     let detailSettlement = await bd.detailSettlementQuery(searchData).then((res) => res);
     if(detailSettlement.error){ return { status: false, code: 500, message: detailSettlement.error }; }
     if(detailSettlement.result.rowsAffected > 0){
+        let nombres = detailSettlement.result.recordset[0].XNOMBRE + ' ' + detailSettlement.result.recordset[0].XAPELLIDO;
         return {
             status: true,
             cfiniquito: detailSettlement.result.recordset[0].CFINIQUITO,
@@ -1216,20 +1218,15 @@ const operationDetailSettlement = async(authHeader, requestBody) => {
             ccotizacion: detailSettlement.result.recordset[0].CCOTIZACION,
             xobservacion: detailSettlement.result.recordset[0].XOBSERVACION,
             xdanos: detailSettlement.result.recordset[0].XDANOS,
-            crepuesto: detailSettlement.result.recordset[0].CREPUESTO,
-            xrepuesto: detailSettlement.result.recordset[0].XREPUESTO,
             ccompania: detailSettlement.result.recordset[0].CCOMPANIA,
-            mtotal: detailSettlement.result.recordset[0].MTOTAL,
+            mtotalcotizacion: detailSettlement.result.recordset[0].MTOTALCOTIZACION,
             ccontratoflota: detailSettlement.result.recordset[0].CCONTRATOFLOTA,
-            xnombre: detailSettlement.result.recordset[0].XNOMBRE,
-            xapellido: detailSettlement.result.recordset[0].XAPELLIDO,
+            xnombres: nombres,
             xdocidentidad: detailSettlement.result.recordset[0].XDOCIDENTIDAD,
             xtelefonocelular: detailSettlement.result.recordset[0].XTELEFONOCELULAR,
             cpropietario: detailSettlement.result.recordset[0].CPROPIETARIO,
             cvehiculopropietario: detailSettlement.result.recordset[0].CVEHICULOPROPIETARIO,
-            cmarca: detailSettlement.result.recordset[0].CMARCA,
             xmarca: detailSettlement.result.recordset[0].XMARCA,
-            cmodelo: detailSettlement.result.recordset[0].CMODELO,
             xmodelo: detailSettlement.result.recordset[0].XMODELO,
             xplaca: detailSettlement.result.recordset[0].XPLACA,
             fano: detailSettlement.result.recordset[0].FANO,
@@ -1237,9 +1234,47 @@ const operationDetailSettlement = async(authHeader, requestBody) => {
             xcolor: detailSettlement.result.recordset[0].XCOLOR,
             cmoneda: detailSettlement.result.recordset[0].CMONEDA,
             xmoneda: detailSettlement.result.recordset[0].xmoneda,
-            fcreacionnoti: detailSettlement.result.recordset[0].FCREACIONNOTI,
+            cservicio: detailSettlement.result.recordset[0].CSERVICIO,
+            cservicioadicional: detailSettlement.result.recordset[0].CSERVICIOADICIONAL,
+            xdesde: detailSettlement.result.recordset[0].XDESDE,
+            xhasta: detailSettlement.result.recordset[0].XHASTA,
+            mmontototalgrua: detailSettlement.result.recordset[0].MMONTOTOTALGRUA,
+            fcreacionnotificacion: detailSettlement.result.recordset[0].FCREACIONNOTIFICACION
         }
     }else{ return { status: false, code: 404, message: 'Coin not found.' }; }
+}
+
+router.route('/settlement/service-order').post((req, res) => {
+    if(!req.header('Authorization')){ 
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
+        return;
+    }else{
+        operationServiceOrderFromSettlement(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){ 
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationServiceOrderFromSettlement' } });
+        });
+    }
+});
+
+const operationServiceOrderFromSettlement = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let searchData = {
+        cnotificacion: requestBody.cnotificacion,
+        xdanos: requestBody.xdanos
+    };
+    let query = await bd.serviceOrderBySettlementQuery(searchData).then((res) => res);
+    if(query.error){ return { status: false, code: 500, message: query.error }; }
+    let jsonArray = [];
+    for(let i = 0; i < query.result.recordset.length; i++){
+        jsonArray.push({ corden: query.result.recordset[i].CORDEN, cservicio: query.result.recordset[i].CSERVICIO, xservicio: query.result.recordset[i].XSERVICIO, xdanos: query.result.recordset[i].XDANOS, xservicioadicional: query.result.recordset[i].XSERVICIOADICIONAL });
+    }
+    console.log(jsonArray)
+    return { status: true, list: jsonArray }
 }
 
 module.exports = router;

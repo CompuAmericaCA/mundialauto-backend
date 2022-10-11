@@ -881,7 +881,7 @@ const operationValrepAditionalService = async(authHeader, requestBody) => {
     let services = [];
 
     for(let i = 0; i < serviciosContratados.result.recordset.length; i++){
-        services.push({ cservicio: serviciosContratados.result.recordset[i].cservicio, xservicio: serviciosContratados.result.recordset[i].XSERVICIO, ccontratoflota: serviciosContratados.result.recordset[i].ccontratoflota , ccarga: serviciosContratados.result.recordset[i].ccarga});
+        services.push({ cservicio: serviciosContratados.result.recordset[i].cservicio, xservicio: serviciosContratados.result.recordset[i].XSERVICIO, ccarga: serviciosContratados.result.recordset[i].ccarga});
     }
 
     // Se obtienen todos los servicios que esten en la base de datos
@@ -892,7 +892,7 @@ const operationValrepAditionalService = async(authHeader, requestBody) => {
 
     // En este for solo se guardaran en jsonArray los servicios que no tengan el mismo codigo que los servicios de la lista de servicios contratados
     for(let i = 0; i < query.result.recordset.length; i++){
-
+        
         let flag = true;
 
         for(let j = 0; j < services.length; j++){
@@ -2759,6 +2759,7 @@ router.route('/settlement/service-order').post((req, res) => {
             }
             res.json({ data: result });
         }).catch((err) => {
+            console.log(err.message)
             res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationValrepServiceOrderFromSettlement' } });
         });
     }

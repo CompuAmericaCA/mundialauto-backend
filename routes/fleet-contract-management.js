@@ -45,7 +45,9 @@ const operationSearchFleetContractManagement = async(authHeader, requestBody) =>
                 cversion: searchFleetContractManagement.result.recordset[i].CVERSION,
                 xversion: searchFleetContractManagement.result.recordset[i].XVERSION,
                 xplaca: searchFleetContractManagement.result.recordset[i].XPLACA,
-                crecibo: searchFleetContractManagement.result.recordset[i].crecibo
+                crecibo: searchFleetContractManagement.result.recordset[i].crecibo,
+                xestatusgeneral: searchFleetContractManagement.result.recordset[i].XESTATUSGENERAL,
+                xpoliza: searchFleetContractManagement.result.recordset[i].xpoliza,
             });
         }
         return { status: true, list: jsonList };
