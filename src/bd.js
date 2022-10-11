@@ -10096,6 +10096,7 @@ module.exports = {
             let rowsAffected = 0;
             let pool = await sql.connect(config);
             for(let i = 0; i < serviceOrderCreateList.length; i++){
+                console.log(serviceOrderCreateList[i].cmoneda)
                 let insert = await pool.request()
                     .input('cnotificacion', sql.Int, notificationData.cnotificacion)
                     .input('ccompania', sql.Int, notificationData.ccompania)
@@ -10112,7 +10113,7 @@ module.exports = {
                     .input('mmontototaliva', sql.Numeric(18,2), serviceOrderCreateList[i].mmontototaliva)
                     .input('cimpuesto', sql.Int(), serviceOrderCreateList[i].cimpuesto)
                     .input('pimpuesto', sql.Numeric(5, 2), serviceOrderCreateList[i].pimpuesto)
-                    .input('cmoneda', sql.Int(), serviceOrderCreateList[i].cmoneda)
+                    .input('cmoneda', sql.Int, serviceOrderCreateList[i].cmoneda)
                     .input('cproveedor', sql.NVarChar, serviceOrderCreateList[i].cproveedor)
                     .input('xmensaje', sql.NVarChar, serviceOrderCreateList[i].xmensaje)
                     .input('xrutaarchivo', sql.NVarChar, serviceOrderCreateList[i].xrutaarchivo)

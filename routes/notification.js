@@ -1088,6 +1088,7 @@ const operationUpdateNotification = async(authHeader, requestBody) => {
                 cestatusgeneral: requestBody.serviceOrder.create[i].cestatusgeneral,
                 ccausaanulacion: requestBody.serviceOrder.create[i].ccausaanulacion
                 })
+                console.log(serviceOrderCreateList)
             }
 
             let createServiceOrderByNotificationUpdate = await bd.createServiceOrderByNotificationUpdateQuery(serviceOrderCreateList, notificationData).then((res) => res);
