@@ -1064,6 +1064,10 @@ const operationCreateIndividualContract = async(requestBody) => {
         fdesde_rec:requestBody.fdesde_rec,
         fhasta_rec:requestBody.fhasta_rec,
         cmetodologiapago: requestBody.cmetodologiapago,
+        msuma_aseg: requestBody.msuma_aseg,
+        mtarifa: requestBody.mtarifa,
+        mprima_casco: requestBody.mprima_casco,
+        mcatastrofico: requestBody.mcatastrofico
 
     };
       console.log(userData)
