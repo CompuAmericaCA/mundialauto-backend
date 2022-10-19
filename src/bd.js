@@ -11948,4 +11948,17 @@ module.exports = {
             return { error: err.message };
         }
     },
+    TypeMetodologia: async(searchData) => {
+        try{
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+            .input('ccompania', sql.Int, searchData.ccompania)
+            .input('cpais', sql.Int, searchData.cpais)
+            .query('select * from MAMETODOLOGIAPAGO WHERE CCOMPANIA = @ccompania AND CPAIS = @cpais AND BACTIVO = 1');
+        //sql.close();
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+}
 }
