@@ -1066,6 +1066,10 @@ const operationCreateIndividualContract = async(requestBody) => {
         fdesde_rec:requestBody.fdesde_rec,
         fhasta_rec:requestBody.fhasta_rec,
         cmetodologiapago: requestBody.cmetodologiapago,
+        msuma_aseg: requestBody.msuma_aseg ? requestBody.msuma_aseg : undefined,
+        mtarifa: requestBody.mtarifa ? requestBody.mtarifa : undefined,
+        mprima_casco: requestBody.mprima_casco ? requestBody.mprima_casco : undefined,
+        mcatastrofico: requestBody.mcatastrofico ? requestBody.mcatastrofico : undefined
 
     };
       console.log(userData)
