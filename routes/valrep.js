@@ -991,13 +991,15 @@ router.route('/service-providers').post((req, res) => {
 
 const operationValrepServiceProviders = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
-    //if(!helper.validateRequestObj(requestBody, ['ccontratoflota'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
-    let cservicio = requestBody.cservicio;
-    let query = await bd.serviceProvidersValrepQuery(cservicio).then((res) => res);
-    //if(query.error){ return { status: false, code: 500, message: query.error }; }
+    let searchData = {
+        cservicio: requestBody.cservicio,
+        cestado: requestBody.cestado
+    }
+    let query = await bd.serviceProvidersValrepQuery(searchData).then((res) => res);
+    if(query.error){ return { status: false, code: 500, message: query.error }; }
     let jsonArray = [];
     for(let i = 0; i < query.result.recordset.length; i++){
-        jsonArray.push({ cservicio: query.result.recordset[i].CSERVICIO, xservicio: query.result.recordset[i].XSERVICIO, cproveedor: query.result.recordset[i].CPROVEEDOR , xproveedor: query.result.recordset[i].XNOMBRE, xdireccionproveedor: query.result.recordset[i].XDIRECCION, xtelefonoproveedor: query.result.recordset[i].XTELEFONO });
+        jsonArray.push({ xservicio: query.result.recordset[i].XSERVICIO, cproveedor: query.result.recordset[i].CPROVEEDOR , xproveedor: query.result.recordset[i].XNOMBRE });
     }
     return { status: true, list: jsonArray }
 }
@@ -1109,12 +1111,16 @@ router.route('/service-order-providers').post((req, res) => {
 const operationValrepServiceOrderProviders = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
     //if(!helper.validateRequestObj(requestBody, ['cnotificacion'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
-
-    let query = await bd.getServiceOrderProviders().then((res) => res);
+    let searchData = {
+        cservicio: requestBody.cservicio,
+        cestado: requestBody.cestado
+    }
+    console.log(searchData)
+    let query = await bd.getServiceOrderProviders(searchData).then((res) => res);
     //if(query.error){ return { status: false, code: 500, message: query.error }; }
     let jsonArray = [];
     for(let i = 0; i < query.result.recordset.length; i++){
-        jsonArray.push({ cproveedor: query.result.recordset[i].CPROVEEDOR, xproveedor: query.result.recordset[i].XNOMBRE, xdireccionproveedor: query.result.recordset[i].XDIRECCION , xtelefonoproveedor: query.result.recordset[i].XTELEFONO});
+        jsonArray.push({ cproveedor: query.result.recordset[i].CPROVEEDOR, xproveedor: query.result.recordset[i].XNOMBRE, xservicio: query.result.recordset[i].XSERVICIO , xestado: query.result.recordset[i].XESTADO});
     }
     return { status: true, list: jsonArray }
 }

@@ -3765,7 +3765,6 @@ module.exports = {
             //sql.close();
             return { result: result };
         }catch(err){
-            console.log(err.message);
             return { error: err.message };
         }
     },
@@ -5685,23 +5684,26 @@ module.exports = {
             return { error: err.message };
         }
     },
-    serviceProvidersValrepQuery: async(cservicio) => {
+    serviceProvidersValrepQuery: async(searchData) => {
         try{
             let pool = await sql.connect(config);
             let result = await pool.request()
-                .input('cservicio', sql.Int, cservicio)
-                .query('select * from VWBUSCARPROVEEDORXSERVICIO WHERE CSERVICIO = @cservicio');
+            .input('cservicio', sql.Int, searchData.cservicio)
+            .input('cestado', sql.Int, searchData.cestado)
+            .query('select * from VWBUSCARPROVEEDORESXSERVICIOS WHERE CSERVICIO = @cservicio AND CESTADO = @cestado');
             //sql.close();
             return { result: result };
         }catch(err){
             return { error: err.message };
         }
     },
-    getServiceOrderProviders: async() => {
+    getServiceOrderProviders: async(searchData) => {
         try{
             let pool = await sql.connect(config);
             let result = await pool.request()
-                .query('select * from PRPROVEEDORES');
+                .input('cservicio', sql.Int, searchData.cservicio)
+                .input('cestado', sql.Int, searchData.cestado)
+                .query('select * from VWBUSCARPROVEEDORESXSERVICIOS WHERE CSERVICIO = @cservicio AND CESTADO = @cestado');
             //sql.close()
             return { result: result };
         }catch(err){
@@ -8497,7 +8499,6 @@ module.exports = {
             return { result: { rowsAffected: rowsAffected, status: true } };
         }
         catch(err){
-            console.log(err.message)
             return { error: err.message };
         }
     },
@@ -10096,7 +10097,6 @@ module.exports = {
             let rowsAffected = 0;
             let pool = await sql.connect(config);
             for(let i = 0; i < serviceOrderCreateList.length; i++){
-                console.log(serviceOrderCreateList[i].cmoneda)
                 let insert = await pool.request()
                     .input('cnotificacion', sql.Int, notificationData.cnotificacion)
                     .input('ccompania', sql.Int, notificationData.ccompania)
@@ -10272,7 +10272,6 @@ module.exports = {
                 //.input('cproveedor', sql.Int, cproveedor)
                 .query('select * from VWBUSCARPROVEEDORXSERVICIO');
             //sql.close();
-            console.log(result)
             return { result: result };
         }catch(err){
             return { error: err.message };
@@ -11942,6 +11941,59 @@ module.exports = {
             //sql.close();
             return { result: result };
         }catch(err){
+            return { error: err.message };
+        }
+    },
+    getRecoverageDetailData: async(searchData) => {
+        try{
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .input('ccobertura', sql.Int, searchData.ccobertura)
+                .input('ccontratoflota', sql.Int, searchData.ccontratoflota)
+                .query('select * from VWBUSCARCOBERTURASXCONTRATOFLOTA where ccontratoflota = @ccontratoflota AND CCOBERTURA = @ccobertura');
+            //sql.close();
+            return { result: result };
+        }catch(err){
+            return { error: err.message };
+        }
+    },
+    updateCoverageQuery: async(coverageData) => {
+        try{
+            let rowsAffected = 0;
+            let pool = await sql.connect(config);
+            for(let i = 0; i < coverageData.length; i++){
+                let update = await pool.request()
+                .input('ccobertura', sql.Int, coverageData[i].ccobertura)
+                .input('ccontratoflota', sql.Int, coverageData[i].ccontratoflota)
+                .input('mprima', sql.Numeric(17, 2), coverageData[i].mprima)
+                .input('msuma_aseg', sql.Numeric(17, 2), coverageData[i].msuma_aseg)
+                .query('update sucoberturas set mprima = @mprima, msuma_aseg = @msuma_aseg WHERE ccontratoflota = @ccontratoflota AND ccobertura = @ccobertura');
+                rowsAffected = rowsAffected + update.rowsAffected;
+            }
+            //sql.close();
+            return { result: { rowsAffected: rowsAffected } };
+        }
+        catch(err){
+            return { error: err.message };
+        }
+    },
+    updateReceiptQuery: async(fechaData) => {
+        try{
+            let rowsAffected = 0;
+            let pool = await sql.connect(config);
+            let update = await pool.request()
+            .input('ccarga', sql.Int, fechaData[0].ccarga)
+            .input('fdesde_pol', sql.DateTime, fechaData[0].fdesde_pol)
+            .input('fhasta_pol', sql.DateTime, fechaData[0].fhasta_pol)
+            .input('fdesde_rec', sql.DateTime, fechaData[0].fdesde_rec)
+            .input('fhasta_rec', sql.DateTime, fechaData[0].fhasta_rec)
+            .query('update SURECIBO set FDESDE_POL = @fdesde_pol, FHASTA_POL = @fhasta_pol, FDESDE_REC = @fdesde_rec, FHASTA_REC = @fhasta_rec WHERE CCARGA = @ccarga');
+            rowsAffected = rowsAffected + update.rowsAffected;
+            //sql.close();
+            return { result: { rowsAffected: rowsAffected } };
+        }
+        catch(err){
+            console.log(err.message)
             return { error: err.message };
         }
     },
