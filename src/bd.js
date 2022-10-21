@@ -6615,11 +6615,25 @@ module.exports = {
             return { error: err.message };
         }
     },
+    parentPolicyValrepQuery: async(searchData) => {
+        try{
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .input('CPAIS', sql.Numeric(4, 0), searchData.cpais)
+                .input('CCOMPANIA', sql.Int, searchData.ccompania)
+                .query('SELECT CCARGA, XDESCRIPCION_L, XPOLIZA, MPRIMAANUAL, FCREACION FROM SUPOLIZAMATRIZ WHERE CPAIS = @CPAIS AND CCOMPANIA = @CCOMPANIA');
+            //sql.close();
+            return { result: result };
+        }catch(err){
+            console.log(err.message);
+            return { error: err.message };
+        }
+    },
     chargeValrepQuery: async(searchData) => {
         try{
             let pool = await sql.connect(config);
             let result = await pool.request()
-                .query('select ccarga, xpoliza, XCLIENTE, fingreso from VWBUSCARFECHACARGAXCLIENTE');
+                .query('SELECT CCARGA, XPOLIZA, XCLIENTE, FINGRESO FROM VWBUSCARFECHACARGAXCLIENTE');
             //sql.close();
             return { result: result };
         }catch(err){
@@ -6644,7 +6658,7 @@ module.exports = {
             let result = await pool.request()
                 .input('clote', sql.Int, searchData.clote)
                 .input('ccarga', sql.Int, searchData.ccarga)
-                .query('select * from surecibo where CLOTE = @clote AND CCARGA = @ccarga ');
+                .query('select * from SURECIBO where CLOTE = @clote AND CCARGA = @ccarga ');
             //sql.close();
             return { result: result };
         }catch(err){
@@ -10716,12 +10730,13 @@ module.exports = {
             return { error: err.message };
         }
     },
-    getBatchContractsDataQuery: async(clote) => {
+    getBatchContractsDataQuery: async(ccarga, clote) => {
         try{
             let pool = await sql.connect(config);
             let result = await pool.request()
+                .input('CCARGA', sql.Int, ccarga)
                 .input('CLOTE', sql.Int, clote)
-                .query('SELECT * FROM VWBUSCARCONTRATOSXLOTE WHERE CLOTE = @CLOTE AND BACTIVO = 1');
+                .query('SELECT * FROM VWBUSCARCONTRATOSXLOTE WHERE CCARGA = @CCARGA AND CLOTE = @CLOTE AND BACTIVO = 1');
             //sql.close();
             return { result: result };
         }catch(err){

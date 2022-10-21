@@ -1,7 +1,6 @@
 const router = require('express').Router();
 const helper = require('../src/helper');
 const bd = require('../src/bd');
-const db = require('../data/db');
 
 router.route('/search').post((req, res) => {
     if(!req.header('Authorization')){
@@ -33,14 +32,14 @@ const operationSearchParentPolicy = async(authHeader, requestBody) => {
         let jsonList = [];
         for(let i = 0; i < searchParentPolicy.result.recordset.length; i++){
             jsonList.push({
-                ccarga: searchParentPolicy.result.recordset[i].ccarga,
+                ccarga: searchParentPolicy.result.recordset[i].CCARGA,
                 xmoneda: searchParentPolicy.result.recordset[i].xmoneda,
                 xmetodologiapago: searchParentPolicy.result.recordset[i].XMETODOLOGIAPAGO,
-                xdescripcion: searchParentPolicy.result.recordset[i].xdescripcion_l,
-                xpoliza: searchParentPolicy.result.recordset[i].xpoliza,
-                nrecibos: searchParentPolicy.result.recordset[i].nrecibos,
-                mprimaanual: searchParentPolicy.result.recordset[i].mprimaanual,
-                fcreacion: searchParentPolicy.result.recordset[i].fcreacion
+                xdescripcion: searchParentPolicy.result.recordset[i].XDESCRIPCION_L,
+                xpoliza: searchParentPolicy.result.recordset[i].XPOLIZA,
+                nrecibos: searchParentPolicy.result.recordset[i].NRECIBOS,
+                mprimaanual: searchParentPolicy.result.recordset[i].MPRIMAANUAL,
+                fcreacion: searchParentPolicy.result.recordset[i].FCREACION
             });
         }
         return { status: true, list: jsonList };
@@ -77,11 +76,11 @@ const operationDetailParentPolicy = async(authHeader, requestBody) => {
     if(getParentPolicyData.error){ console.log(getParentPolicyData.error);return { status: false, code: 500, message: getParentPolicyData.error }; }
     let batches = [];
     if(getParentPolicyData.result.rowsAffected > 0){
-        let getParentPolicyBatches = await db.getParentPolicyBatches(getParentPolicyData.result.recordset[0].ccarga);
+        let getParentPolicyBatches = await bd.getParentPolicyBatches(getParentPolicyData.result.recordset[0].CCARGA);
         if(getParentPolicyBatches.error){ return { status: false, code: 500, message: getFleetContractOwnerData.error }; }
         if(getParentPolicyBatches.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Parent Policy Batches not found.' }; }
         for (let i = 0; i < getParentPolicyBatches.result.recordset.length; i++) {
-            let getBatchContracts = await db.getBatchContractsDataQuery(getParentPolicyBatches.result.recordset[i].clote).then((res) => res);
+            let getBatchContracts = await bd.getBatchContractsDataQuery(getParentPolicyData.result.recordset[0].CCARGA, getParentPolicyBatches.result.recordset[i].CLOTE).then((res) => res);
             if(getBatchContracts.error){ console.log(getParentPolicyData.error);return { status: false, code: 500, message: getParentPolicyData.error }; }
             let contracts = [];
             if(getBatchContracts.result.rowsAffected > 0){
@@ -105,9 +104,9 @@ const operationDetailParentPolicy = async(authHeader, requestBody) => {
                 }
             }
             let batch = {
-                clote: getParentPolicyBatches.result.recordset[i].clote,
-                xobservacion: getParentPolicyBatches.result.recordset[i].xobservacion,
-                fcreacion: getParentPolicyBatches.result.recordset[i].fcreacion,
+                clote: getParentPolicyBatches.result.recordset[i].CLOTE,
+                xobservacion: getParentPolicyBatches.result.recordset[i].XOBSERVACION,
+                fcreacion: getParentPolicyBatches.result.recordset[i].FCREACION,
                 contratos: contracts
             }
             batches.push(batch);
@@ -115,15 +114,15 @@ const operationDetailParentPolicy = async(authHeader, requestBody) => {
     }
     return {
         status: true,
-        ccarga: getParentPolicyData.result.recordset[0].ccarga,
-        xdescripcion: getParentPolicyData.result.recordset[0].xdescripcion_l,
-        xpoliza: getParentPolicyData.result.recordset[0].xpoliza,
-        ccliente: getParentPolicyData.result.recordset[0].ccliente,
-        cmoneda: getParentPolicyData.result.recordset[0].cmoneda,
-        ccorredor: getParentPolicyData.result.recordset[0].ccorredor,
-        cmetodologiapago: getParentPolicyData.result.recordset[0].cmetodologiapago,
-        mprimaanual: getParentPolicyData.result.recordset[0].mprimaanual,
-        fcreacion: getParentPolicyData.result.recordset[0].fcreacion,
+        ccarga: getParentPolicyData.result.recordset[0].CCARGA,
+        xdescripcion: getParentPolicyData.result.recordset[0].XDESCRIPCION_L,
+        xpoliza: getParentPolicyData.result.recordset[0].XPOLIZA,
+        ccliente: getParentPolicyData.result.recordset[0].CCLIENTE,
+        cmoneda: getParentPolicyData.result.recordset[0].CMONEDA,
+        ccorredor: getParentPolicyData.result.recordset[0].CCORREDOR,
+        cmetodologiapago: getParentPolicyData.result.recordset[0].CMETODOLOGIAPAGO,
+        mprimaanual: getParentPolicyData.result.recordset[0].MPRIMAANUAL,
+        fcreacion: getParentPolicyData.result.recordset[0].FCREACION,
         batches: batches
     }
 }
