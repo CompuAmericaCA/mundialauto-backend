@@ -1638,27 +1638,10 @@ const operationValrepBatch = async(authHeader, requestBody) => {
     let query = await bd.batchValrepQuery(searchData).then((res) => res);
     if(query.error){ return { status: false, code: 500, message: query.error }; }
     let jsonArray = [];
-    //primero se modifica el formato de la primera fecha de creación antes de agregar el lote al array
-    let dateFormat = new Date(query.result.recordset[0].FCREACION);
-    let dd = dateFormat.getDate() + 1;
-    let mm = dateFormat.getMonth() + 1;
-    let yyyy = dateFormat.getFullYear();
-    let fcreacion = dd + '/' + mm + '/' + yyyy;
-
-    // se agrega el primer lote
-    jsonArray.push({ xobservacion: query.result.recordset[0].XOBSERVACION, ccarga: query.result.recordset[0].CCARGA, clote: query.result.recordset[0].CLOTE, fcreacion: fcreacion });
-    let ccarga = query.result.recordset[0].CCARGA;
-    // se busca agregar solo los lotes que tengan codigo distinto, para eliminar repetidos
     for(let i = 0; i < query.result.recordset.length; i++){
-        if (query.result.recordset[i].CCARGA != ccarga) {
-                let dateFormat = new Date(query.result.recordset[i].FCREACION);
-                let dd = dateFormat.getDate() + 1;
-                let mm = dateFormat.getMonth() + 1;
-                let yyyy = dateFormat.getFullYear();
-                let fcreacion = dd + '/' + mm + '/' + yyyy;
-            jsonArray.push({ xobservacion: query.result.recordset[i].XOBSERVACION, clote: query.result.recordset[0].CLOTE,  ccarga: query.result.recordset[i].CCARGA, fcreacion: fcreacion });
-            ccarga = query.result.recordset[i].ccarga;
-        }
+        dateToString = query.result.recordset[i].fcreacion.toISOString().substr(0,10).split("-");
+        let fcreacion = dateToString[2] + '-' + dateToString[1] + '-' + dateToString[0];
+        jsonArray.push({ xobservacion: query.result.recordset[i].xobservacion, clote: query.result.recordset[i].clote,  ccarga: query.result.recordset[i].ccarga, fcreacion: fcreacion });
     }
     return { status: true, list: jsonArray }
 }
