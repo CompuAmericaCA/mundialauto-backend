@@ -6630,8 +6630,8 @@ module.exports = {
         try{
             let pool = await sql.connect(config);
             let result = await pool.request()
-                .input('ccarga', sql.Int, searchData.ccarga)
-                .query('select * from supolizalote where CCARGA = @ccarga ');
+                .input('CCARGA', sql.Int, searchData.ccarga)
+                .query('SELECT * FROM SUPOLIZALOTE WHERE CCARGA = @CCARGA ');
             //sql.close();
             return { result: result };
         }catch(err){
@@ -8212,12 +8212,12 @@ module.exports = {
     },
     searchParentPolicyQuery: async(searchData) => {
         try{
-            let query = `select * from VWBUSCARPOLIZAMATRIZ where ccompania = @ccompania and cpais = @cpais and bactivo = 1${ searchData.ccarga ? " and ccarga = @ccarga" : '' }`;
+            let query = `SELECT * FROM VWBUSCARPOLIZAMATRIZ WHERE CCOMPANIA = @CCOMPANIA AND CPAIS = @CPAIS AND BACTIVO = 1${ searchData.ccarga ? " AND CCARGA = @CCARGA" : '' }`;
             let pool = await sql.connect(config);
             let result = await pool.request()
-                .input('ccompania', sql.Int, searchData.ccompania)
-                .input('cpais', sql.Int, searchData.cpais)
-                .input('ccarga', sql.Int, searchData.ccarga ? searchData.ccarga : undefined)
+                .input('CCOMPANIA', sql.Int, searchData.ccompania)
+                .input('CPAIS', sql.Int, searchData.cpais)
+                .input('CCARGA', sql.Int, searchData.ccarga ? searchData.ccarga : undefined)
                 .query(query);
             //sql.close();
             return { result: result };
@@ -8543,10 +8543,10 @@ module.exports = {
         try{
             let pool = await sql.connect(config);
             let result = await pool.request()
-                .input('cpais', sql.Numeric(4, 0), fleetContractData.cpais)
-                .input('ccompania', sql.Int, fleetContractData.ccompania)
-                .input('ccarga', sql.Int, fleetContractData.ccarga)
-                .query('select * from supolizamatriz where ccarga = @ccarga and cpais = @cpais and ccompania = @ccompania');
+                .input('CPAIS', sql.Numeric(4, 0), fleetContractData.cpais)
+                .input('CCOMPANIA', sql.Int, fleetContractData.ccompania)
+                .input('CCARGA', sql.Int, fleetContractData.ccarga)
+                .query('SELECT * FROM SUPOLIZAMATRIZ WHERE CCARGA = @CCARGA AND CPAIS = @CPAIS AND CCOMPANIA = @CCOMPANIA');
             //sql.close();
             return { result: result };
         }catch(err){
@@ -8924,6 +8924,27 @@ module.exports = {
                 return { result: result };
             }
         }catch(err){
+            return { error: err.message };
+        }
+    },
+    createBatchQuery: async(ccarga, cusuario, batchData) => {
+        try{
+            let rowsAffected = 0;
+            let pool = await sql.connect(config);
+            let insert = await pool.request()
+                .input('CCARGA', sql.Int, ccarga)
+                .input('XOBSERVACION', sql.NVarChar, batchData.xobservacion)
+                .input('CUSUARIOCREACION', sql.Int, cusuario)
+                .input('FCREACION', sql.DateTime, new Date())
+                .input('FMODIFICACION', sql.DateTime, new Date())
+                .input('CUSUARIOMODIFICACION', sql.Int, cusuario)
+                .query('INSERT INTO SUPOLIZALOTE (CCARGA, XOBSERVACION, BACTIVO, FCREACION, CUSUARIOCREACION, FMODIFICACION, CUSUARIOMODIFICACION) OUTPUT INSERTED.CLOTE VALUES (@CCARGA, @XOBSERVACION, 1, @FCREACION, @CUSUARIOCREACION, @FMODIFICACION, @CUSUARIOMODIFICACION)')
+            rowsAffected = rowsAffected + parseInt(insert.rowsAffected);
+            //sql.close();
+            return { result: { rowsAffected: rowsAffected, clote: insert.recordset[0].clote } };
+        }
+        catch(err){
+            console.log(err.message);
             return { error: err.message };
         }
     },
@@ -10687,8 +10708,8 @@ module.exports = {
         try{
             let pool = await sql.connect(config);
             let result = await pool.request()
-                .input('ccarga', sql.Int, ccarga)
-                .query('select * from supolizalote where ccarga = @ccarga');
+                .input('CCARGA', sql.Int, ccarga)
+                .query('SELECT * FROM SUPOLIZALOTE WHERE CCARGA = @CCARGA');
             //sql.close();
             return { result: result };
         }catch(err){
@@ -10699,8 +10720,8 @@ module.exports = {
         try{
             let pool = await sql.connect(config);
             let result = await pool.request()
-                .input('clote', sql.Int, clote)
-                .query('select * from VWBUSCARCONTRATOSXLOTE where clote = @clote and BACTIVO = 1');
+                .input('CLOTE', sql.Int, clote)
+                .query('SELECT * FROM VWBUSCARCONTRATOSXLOTE WHERE CLOTE = @CLOTE AND BACTIVO = 1');
             //sql.close();
             return { result: result };
         }catch(err){
