@@ -1693,6 +1693,7 @@ const operationValrepReceipt = async(authHeader, requestBody) => {
         clote: requestBody.clote,
         ccarga: requestBody.ccarga
     };
+    console.log(searchData)
     let query = await bd.receiptValrepQuery(searchData).then((res) => res);
     if(query.error){ return { status: false, code: 500, message: query.error }; }
     let jsonArray = [];

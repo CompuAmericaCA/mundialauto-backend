@@ -1121,6 +1121,7 @@ const operationUpdateNotification = async(authHeader, requestBody) => {
               xdanos: requestBody.settlement.create.xdanos,
               corden: requestBody.settlement.create.corden
         }
+        console.log(settlementCreate)
         let createSettlementByNotification = await bd.createSettlementByNotificationQuery(settlementCreate, notificationData).then((res) => res);
         let cestatusgeneral;
         if(createSettlementByNotification.error){ return { status: false, code: 500, message: createSettlementByNotification.error }; }
