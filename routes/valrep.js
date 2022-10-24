@@ -881,7 +881,7 @@ const operationValrepAditionalService = async(authHeader, requestBody) => {
     let services = [];
 
     for(let i = 0; i < serviciosContratados.result.recordset.length; i++){
-        services.push({ cservicio: serviciosContratados.result.recordset[i].cservicio, xservicio: serviciosContratados.result.recordset[i].XSERVICIO, ccontratoflota: serviciosContratados.result.recordset[i].ccontratoflota , ccarga: serviciosContratados.result.recordset[i].ccarga});
+        services.push({ cservicio: serviciosContratados.result.recordset[i].cservicio, xservicio: serviciosContratados.result.recordset[i].XSERVICIO, ccarga: serviciosContratados.result.recordset[i].ccarga});
     }
 
     // Se obtienen todos los servicios que esten en la base de datos
@@ -892,7 +892,7 @@ const operationValrepAditionalService = async(authHeader, requestBody) => {
 
     // En este for solo se guardaran en jsonArray los servicios que no tengan el mismo codigo que los servicios de la lista de servicios contratados
     for(let i = 0; i < query.result.recordset.length; i++){
-
+        
         let flag = true;
 
         for(let j = 0; j < services.length; j++){
@@ -2197,7 +2197,10 @@ const operationValrepClientAvilableModel = async(authHeader, requestBody) => {
     }
     let jsonArray = [];
     for(let i = 0; i < query.result.recordset.length; i++){
-        jsonArray.push({ cmodelo: query.result.recordset[i].CMODELO, xmodelo: query.result.recordset[i].XMODELO, bactivo: query.result.recordset[i].BACTIVO });
+        jsonArray.push({ 
+            cmodelo: query.result.recordset[i].CMODELO, 
+            xmodelo: query.result.recordset[i].XMODELO, 
+            bactivo: query.result.recordset[i].BACTIVO });
     }
     return { status: true, list: jsonArray }
 }
@@ -2221,12 +2224,12 @@ router.route('/version').post((req, res) => {
 
 const operationValrepVersion = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
-    if(!helper.validateRequestObj(requestBody, ['cpais', 'cmarca', 'cmodelo'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
+    if(!helper.validateRequestObj(requestBody, ['cpais', 'xmodelo'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
     let searchData = {
         cpais: requestBody.cpais,
-        cmarca: requestBody.cmarca,
-        cmodelo: requestBody.cmodelo
+        xmodelo: requestBody.xmodelo
     };
+
     let query = await bd.versionValrepQuery(searchData).then((res) => res);
     if(query.error){ return { status: false, code: 500, message: query.error }; }
     let jsonArray = [];
@@ -2772,6 +2775,7 @@ router.route('/settlement/service-order').post((req, res) => {
             }
             res.json({ data: result });
         }).catch((err) => {
+            console.log(err.message)
             res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationValrepServiceOrderFromSettlement' } });
         });
     }
@@ -2855,8 +2859,6 @@ const operationValrepTypeVehicleArysVial = async(authHeader, requestBody) => {
     return { status: true, list: jsonArray }
 }
 
-
-
 router.route('/type-vehicle').post((req, res) => {
     if(!req.header('Authorization')){ 
         res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
@@ -2878,7 +2880,7 @@ const operationTypeVehicle = async( requestBody) => {
     let searchData = {
         ccompania: requestBody.ccompania,
         cpais: requestBody.cpais,
-        xuso: requestBody.xuso
+        
     };
     let query = await bd.vehicleQuery(searchData).then((res) => res);
     if(query.error){ return { status: false, code: 500, message: query.error }; }
@@ -2906,20 +2908,59 @@ router.route('/type-planRCV').post((req, res) => {
     }
 });
 
-const operationTypePlanRCV = async( requestBody) => {
+const operationTypePlanRCV = async(authHeader,requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    if(!helper.validateRequestObj(requestBody, ['xtipo'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
     let searchData = {
-        ccompania: requestBody.ccompania,
-        cpais: requestBody.cpais
+            xtipo:requestBody.xtipo
     };
+
     let query = await bd.planRcvTypeQuery(searchData).then((res) => res);
     if(query.error){ return { status: false, code: 500, message: query.error }; }
     let jsonArray = [];
     for(let i = 0; i < query.result.recordset.length; i++){
         jsonArray.push({ 
-             cplan: query.result.recordset[i].CPLAN, cplan_rc: query.result.recordset[i].CPLAN_RC,
+             cplan: query.result.recordset[i].CPLAN, 
+             cplan_rc: query.result.recordset[i].CPLAN_RC,
              xplan_rc: query.result.recordset[i].XPLAN_RC,
-             xclase: query.result.recordset[i].XCLASE });
+              });
+    }
+
+    return { status: true, list: jsonArray }
+}
+
+router.route('/metodologia-pago').post((req, res) => {
+    if(!req.header('Authorization')){ 
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
+        return;
+    }else{
+        operationValrepTypeMetodologia(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){ 
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationValrepTypeVehicleArysVial' } });
+        });
+    }
+});
+
+const operationValrepTypeMetodologia = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let searchData = {
+        ccompania: requestBody.ccompania,
+        cpais: requestBody.cpais
+    };
+    let query = await bd.TypeMetodologia(searchData).then((res) => res);
+    if(query.error){ return { status: false, code: 500, message: query.error }; }
+    let jsonArray = [];
+    for(let i = 0; i < query.result.recordset.length; i++){
+        jsonArray.push({ 
+            cmetodologiapago: query.result.recordset[i].CMETODOLOGIAPAGO,
+            xmetodologiapago: query.result.recordset[i].XMETODOLOGIAPAGO });
     }
     return { status: true, list: jsonArray }
 }
+
 module.exports = router;

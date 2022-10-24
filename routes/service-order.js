@@ -349,8 +349,8 @@ const operationValrepNotificationServiceOrder = async(authHeader, requestBody) =
                          xdescripcion: query.result.recordset[0].XDESCRIPCION, 
                          xnombrepropietario: query.result.recordset[0].XNOMBREPROPIETARIO, 
                          xapellidopropietario: query.result.recordset[0].XAPELLIDOPROPIETARIO, 
-                         xdocidentidad: query.result.recordset[0].XDOCIDENTIDAD, 
-                         xtelefonocelular: query.result.recordset[0].XTELEFONOCELULAR, 
+                         xdocidentidad: query.result.recordset[0].XDOCIDENTIDADPROPIETARIO, 
+                         xtelefonocelular: query.result.recordset[0].XTELEFONOPROPIETARIO, 
                          xplaca: query.result.recordset[0].XPLACA, 
                          xcolor: query.result.recordset[0].XCOLOR, 
                          xmodelo: query.result.recordset[0].XMODELO, 
@@ -366,7 +366,7 @@ const operationValrepNotificationServiceOrder = async(authHeader, requestBody) =
                          xdocumentocliente: query.result.recordset[0].XDOCIDENTIDADCLIENTE, 
                          xdireccionfiscal: query.result.recordset[0].XDIRECCIONFISCAL, 
                          xtelefono: query.result.recordset[0].XTELEFONO, 
-                         xtelefonoproveedor: query.result.recordset[0].XTELEFONOPROVEEDO, 
+                         xtelefonoproveedor: query.result.recordset[0].XTELEFONOPROVEEDOR, 
                          xdocumentoproveedor: query.result.recordset[0].XDOCUMENTOPROVEEDOR, 
                          xservicio: query.result.recordset[0].XSERVICIO, 
                          xdesde: query.result.recordset[0].XDESDE, 
@@ -387,6 +387,7 @@ const operationValrepNotificationServiceOrder = async(authHeader, requestBody) =
                          xnombres: nombres,
                          xnombresalternativos: nombresalternativos,
                          xnombrespropietario: nombrespropietario});
+                         console.log(jsonArray)
     }
     return { status: true, list: jsonArray }
 }
@@ -440,6 +441,7 @@ const operationValrepNotificationOrder = async(authHeader, requestBody) => {
         nombrespropietario = query.result.recordset[0].XNOMBREPROPIETARIO + ' ' + query.result.recordset[0].XAPELLIDOPROPIETARIO
     }
     let jsonArray = [];
+    console.log(query.result.recordset[0].ccarga)
     //for(let i = 0; i < query.result.recordset.length; i++){
         jsonArray.push({ 
                         cnotificacion: query.result.recordset[0].CNOTIFICACION, 
@@ -455,7 +457,7 @@ const operationValrepNotificationOrder = async(authHeader, requestBody) => {
                         xnombrepropietario: query.result.recordset[0].XNOMBREPROPIETARIO, 
                         xapellidopropietario: query.result.recordset[0].XAPELLIDOPROPIETARIO, 
                         xapellidopropietario: query.result.recordset[0].XAPELLIDOPROPIETARIO, 
-                        xdocidentidad: query.result.recordset[0].XDOCIDENTIDAD, 
+                        xdocidentidad: query.result.recordset[0].XDOCIDENTIDADPROPIETARIO, 
                         xtelefonocelular: query.result.recordset[0].XTELEFONOCELULAR, 
                         xplaca: query.result.recordset[0].XPLACA, 
                         xcolor: query.result.recordset[0].XCOLOR, 
@@ -468,7 +470,8 @@ const operationValrepNotificationOrder = async(authHeader, requestBody) => {
                         xauto: auto,
                         xnombres: nombres,
                         xnombresalternativos: nombresalternativos,
-                        xnombrespropietario: nombrespropietario });
+                        xnombrespropietario: nombrespropietario,
+                        ccarga: query.result.recordset[0].ccarga });
     //}
     return { status: true, list: jsonArray }
 }
