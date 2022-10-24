@@ -1052,7 +1052,6 @@ const operationCreateIndividualContract = async(requestBody) => {
         xserialcarroceria: requestBody.xserialcarroceria.toUpperCase(),
         xplaca: requestBody.xplaca.toUpperCase(),
         xuso: requestBody.xuso.toUpperCase() ? requestBody.xuso : undefined,
-        cmoneda: requestBody.cmoneda,
         xtelefono_emp: requestBody.xtelefono_emp,
         cplan: requestBody.cplan,
         ccorredor: requestBody.ccorredor ? requestBody.ccorredor : undefined,
