@@ -428,5 +428,10 @@
         "name": "Collection Order Fleet Contract Route",
         "router": "../routes/v2/administration/collection-order-fleet-contract",
         "route": "/api/v2/collection-order-fleet-contract"
+    },
+    {
+        "name": "Parent Policy Route",
+        "router": "../routes/parent-policy",
+        "route": "/api/parent-policy"
     }
 ]   
