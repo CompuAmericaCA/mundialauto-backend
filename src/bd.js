@@ -6,6 +6,11 @@ const config = {
     database: process.env.NAME_BD,
 }
 
+function changeDateFormat(date) {
+    let newDateFormat = date.split("/");
+    return newDateFormat[2] + '-' + newDateFormat[1] + '-' + newDateFormat[0]
+}
+
 module.exports = {
     authQuery: async(xemail) =>{
         try{
@@ -8950,18 +8955,69 @@ module.exports = {
             return { error: err.message };
         }
     },
-    createBatchQuery: async(ccarga, cusuario, batchData) => {
+    createParentPolicyQuery: async(parentPolicyData, cpais, ccompania, cusuario) => {
+        try{
+            let rowsAffected = 0;
+            let pool = await sql.connect(config);
+            let insert = await pool.request()
+                .input('XDESCRIPCION_L', sql.NVarChar, parentPolicyData.xdescripcion_l)
+                .input('XPOLIZA', sql.NVarChar, parentPolicyData.xpoliza)
+                .input('CCLIENTE', sql.Int, parentPolicyData.ccliente)
+                .input('CCORREDOR', sql.Int, parentPolicyData.ccorredor)
+                .input('CMONEDA', sql.Int, parentPolicyData.cmoneda)
+                .input('CPAIS', sql.Int, cpais)
+                .input('CCOMPANIA', sql.Int, ccompania)
+                .input('CMETODOLOGIAPAGO', sql.Int, parentPolicyData.cmetodologiapago)
+                .input('MPRIMAANUAL', sql.Numeric(11, 2), parentPolicyData.mprimaanual)
+                .input('FINGRESO', sql.DateTime, new Date())
+                .input('IESTADO', sql.Int, 1)
+                .input('BACTIVO', sql.Int, 1)
+                .input('FCREACION', sql.DateTime, new Date())
+                .input('CUSUARIOCREACION', sql.Int, cusuario)
+                .input('FMODIFICACION', sql.DateTime, new Date())
+                .input('CUSUARIOMODIFICACION', sql.Int, cusuario)
+                .query('INSERT INTO SUPOLIZAMATRIZ (XDESCRIPCION_L, XPOLIZA, CCLIENTE, CCORREDOR, CMONEDA, CPAIS, CCOMPANIA, CMETODOLOGIAPAGO, MPRIMAANUAL, FINGRESO, IESTADO, BACTIVO, FCREACION, CUSUARIOCREACION, FMODIFICACION, CUSUARIOMODIFICACION) OUTPUT INSERTED.CCARGA VALUES (@XDESCRIPCION_L, @XPOLIZA, @CCLIENTE, @CCORREDOR, @CMONEDA, @CPAIS, @CCOMPANIA, @CMETODOLOGIAPAGO, @MPRIMAANUAL, @FINGRESO, @IESTADO, @BACTIVO, @FCREACION, @CUSUARIOCREACION, @FMODIFICACION, @CUSUARIOMODIFICACION)')
+            rowsAffected = rowsAffected + parseInt(insert.rowsAffected);
+            //sql.close();
+            return { result: { rowsAffected: rowsAffected, ccarga: insert.recordset[0].CCARGA } };
+        }
+        catch(err){
+            console.log(err.message);
+            return { error: err.message };
+        }
+    },
+    getLastParentPolicyBatchQuery: async(ccarga) => {
+        try{
+            let pool = await sql.connect(config);
+            let query = await pool.request()
+                .input('CCARGA', sql.Int, ccarga)
+                .query('SELECT CLOTE FROM SUPOLIZALOTE WHERE CCARGA = @CCARGA ORDER BY CLOTE DESC')
+            let clote = 0
+            if (query.recordset.length > 0) {
+                clote = query.recordset[0].CLOTE
+            }
+            console.log(clote);
+            return { result: {clote: clote}}
+        }
+        catch(err) {
+            console.log(err.message);
+            return { error: err.message };
+        }
+    },
+    createBatchQuery: async(ccarga, cusuario, batchData, lastBatchCode) => {
+        console.log(lastBatchCode);
         try{
             let rowsAffected = 0;
             let pool = await sql.connect(config);
             let insert = await pool.request()
                 .input('CCARGA', sql.Int, ccarga)
+                .input('CLOTE', sql.Int, lastBatchCode + 1)
                 .input('XOBSERVACION', sql.NVarChar, batchData.xobservacion)
                 .input('CUSUARIOCREACION', sql.Int, cusuario)
                 .input('FCREACION', sql.DateTime, new Date())
                 .input('FMODIFICACION', sql.DateTime, new Date())
                 .input('CUSUARIOMODIFICACION', sql.Int, cusuario)
-                .query('INSERT INTO SUPOLIZALOTE (CCARGA, XOBSERVACION, BACTIVO, FCREACION, CUSUARIOCREACION, FMODIFICACION, CUSUARIOMODIFICACION) OUTPUT INSERTED.CLOTE VALUES (@CCARGA, @XOBSERVACION, 1, @FCREACION, @CUSUARIOCREACION, @FMODIFICACION, @CUSUARIOMODIFICACION)')
+                .query('INSERT INTO SUPOLIZALOTE (CCARGA, CLOTE, XOBSERVACION, BACTIVO, FCREACION, CUSUARIOCREACION, FMODIFICACION, CUSUARIOMODIFICACION) OUTPUT INSERTED.CLOTE VALUES (@CCARGA, @CLOTE, @XOBSERVACION, 1, @FCREACION, @CUSUARIOCREACION, @FMODIFICACION, @CUSUARIOMODIFICACION)')
             rowsAffected = rowsAffected + parseInt(insert.rowsAffected);
             //sql.close();
             return { result: { rowsAffected: rowsAffected, clote: insert.recordset[0].clote } };
@@ -8972,6 +9028,7 @@ module.exports = {
         }
     },
     createBatchContractQuery: async(contractList, ccarga, clote, ccliente) => {
+        console.log(contractList);
         try{
             if(contractList){
                 let rowsAffected = 0;
@@ -9015,7 +9072,6 @@ module.exports = {
                             .input('CANO', sql.Int, contractList[i].CANO)
                             .input('XCOLOR', sql.NVarChar, contractList[i].XCOLOR)
                             .input('XTIPO', sql.NVarChar, contractList[i].XTIPO)
-                            .input('CMONEDA', sql.Int, contractList[i].CMONEDA)
                             .input('XCOBERTURA', sql.NVarChar, contractList[i].XCOBERTURA)
                             .input('MSUMA_ASEG', sql.Numeric(11, 2), contractList[i].SUMA_ASEGURADA)
                             .input('MTARIFA', sql.Numeric(11, 2), contractList[i].TARIFA)
@@ -9033,7 +9089,7 @@ module.exports = {
                             .input('MCAPACIDAD_C', sql.Numeric(11, 2), contractList[i].CAPACIDAD_CARGA ? contractList[i].CAPACIDAD_CARGA: undefined)
                             .input('XUSO', sql.NVarChar, contractList[i].USO)
                             .input('CCORREDOR', sql.Int, contractList[i].CORREDOR)
-                            .query('INSERT INTO TMEMISION_FLOTA (ID, CCLIENTE, CCARGA, CLOTE, XCLIENTE, XRIF_CLIENTE, XNOMBRE, XAPELLIDO, XCEDULA, CPLAN, XSERIALCARROCERIA, XSERIALMOTOR, XPLACA, CMARCA, XMARCA, CMODELO, XMODELO, CVERSION, XVERSION, CANO, XCOLOR, XTIPO, CMONEDA, XCOBERTURA, MSUMA_ASEG, MTARIFA, MPRIMA_CASCO, MSUMA_ACCESORIOS, MPRIMA_ACCESORIOS, MCATASTROFICO, FNAC, XDIRECCIONFISCAL, XTELEFONO_EMP, XTELEFONO_PROP, EMAIL, FEMISION, FDESDE_POL, FHASTA_POL, FDESDE_REC, FHASTA_REC, NCAPACIDAD_P, MCAPACIDAD_C, XUSO, CCORREDOR) VALUES (@ID, @CCLIENTE, @CCARGA, @CLOTE, @XCLIENTE, @XRIF_CLIENTE, @XNOMBRE, @XAPELLIDO, @XCEDULA, @CPLAN, @XSERIALCARROCERIA, @XSERIALMOTOR, @XPLACA, @CMARCA, @XMARCA, @CMODELO, @XMODELO, @CVERSION, @XVERSION, @CANO, @XCOLOR, @XTIPO, @CMONEDA, @XCOBERTURA, @MSUMA_ASEG, @MTARIFA, @MPRIMA_CASCO, @MSUMA_ACCESORIOS, @MPRIMA_ACCESORIOS, @MCATASTROFICO, @FNAC, @XDIRECCIONFISCAL, @XTELEFONO_EMP, @XTELEFONO_PROP, @EMAIL, @FEMISION, @FDESDE_POL, @FHASTA_POL, @FDESDE_REC, @FHASTA_REC, @NCAPACIDAD_P, @MCAPACIDAD_C, @XUSO, @CCORREDOR)')
+                            .query('INSERT INTO TMEMISION_FLOTA (ID, CCLIENTE, CCARGA, CLOTE, XCLIENTE, XRIF_CLIENTE, XNOMBRE, XAPELLIDO, XCEDULA, CPLAN, XSERIALCARROCERIA, XSERIALMOTOR, XPLACA, CMARCA, XMARCA, CMODELO, XMODELO, CVERSION, XVERSION, CANO, XCOLOR, XTIPO, XCOBERTURA, MSUMA_ASEG, MTARIFA, MPRIMA_CASCO, MSUMA_ACCESORIOS, MPRIMA_ACCESORIOS, MCATASTROFICO, FNAC, XDIRECCIONFISCAL, XTELEFONO_EMP, XTELEFONO_PROP, EMAIL, FEMISION, FDESDE_POL, FHASTA_POL, FDESDE_REC, FHASTA_REC, NCAPACIDAD_P, MCAPACIDAD_C, XUSO, CCORREDOR) VALUES (@ID, @CCLIENTE, @CCARGA, @CLOTE, @XCLIENTE, @XRIF_CLIENTE, @XNOMBRE, @XAPELLIDO, @XCEDULA, @CPLAN, @XSERIALCARROCERIA, @XSERIALMOTOR, @XPLACA, @CMARCA, @XMARCA, @CMODELO, @XMODELO, @CVERSION, @XVERSION, @CANO, @XCOLOR, @XTIPO, @XCOBERTURA, @MSUMA_ASEG, @MTARIFA, @MPRIMA_CASCO, @MSUMA_ACCESORIOS, @MPRIMA_ACCESORIOS, @MCATASTROFICO, @FNAC, @XDIRECCIONFISCAL, @XTELEFONO_EMP, @XTELEFONO_PROP, @EMAIL, @FEMISION, @FDESDE_POL, @FHASTA_POL, @FDESDE_REC, @FHASTA_REC, @NCAPACIDAD_P, @MCAPACIDAD_C, @XUSO, @CCORREDOR)')
                             rowsAffected = rowsAffected + insert.rowsAffected;
                     }
                 }
