@@ -1565,6 +1565,39 @@ const operationValrepClient = async(authHeader, requestBody) => {
     return { status: true, list: jsonArray }
 }
 
+router.route('/parent-policy').post((req, res) => {
+    if(!req.header('Authorization')){ 
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
+        return;
+    }else{
+        operationValrepParentPolicy(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){ 
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationValrepClient' } });
+        });
+    }
+});
+
+const operationValrepParentPolicy = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    if(!helper.validateRequestObj(requestBody, ['cpais', 'ccompania'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
+    let searchData = {
+        cpais: requestBody.cpais,
+        ccompania: requestBody.ccompania
+    };
+    let query = await bd.parentPolicyValrepQuery(searchData).then((res) => res);
+    if(query.error){ return { status: false, code: 500, message: query.error }; }
+    let jsonArray = [];
+    for(let i = 0; i < query.result.recordset.length; i++){
+        jsonArray.push({ ccarga: query.result.recordset[i].CCARGA, xdescripcion: query.result.recordset[i].XDESCRIPCION_L, xpoliza: query.result.recordset[i].XPOLIZA, mprimaanual: query.result.recordset[i].MPRIMAANUAL, fcreacion: query.result.recordset[i].FCREACION });
+    }
+    return { status: true, list: jsonArray }
+}
+
 router.route('/charge').post((req, res) => {
     if(!req.header('Authorization')){ 
         res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
@@ -1588,25 +1621,25 @@ const operationValrepCharge = async(authHeader, requestBody) => {
     if(query.error){ return { status: false, code: 500, message: query.error }; }
     let jsonArray = [];
     //primero se modifica el formato de la primera fecha de la carga antes de agregar la carga al array
-    let dateFormat = new Date(query.result.recordset[0].fingreso);
+    let dateFormat = new Date(query.result.recordset[0].FINGRESO);
     let dd = dateFormat.getDate() + 1;
     let mm = dateFormat.getMonth() + 1;
     let yyyy = dateFormat.getFullYear();
     let fcarga = dd + '/' + mm + '/' + yyyy;
 
     // se agrega la primera carga
-    jsonArray.push({ xcliente: query.result.recordset[0].XCLIENTE, ccliente: query.result.recordset[0].CCLIENTE,ccarga: query.result.recordset[0].ccarga, xpoliza: query.result.recordset[0].xpoliza, fingreso: fcarga });
-    let ccarga = query.result.recordset[0].ccarga;
+    jsonArray.push({ xcliente: query.result.recordset[0].XCLIENTE, ccliente: query.result.recordset[0].CCLIENTE, ccarga: query.result.recordset[0].CCARGA, xpoliza: query.result.recordset[0].XPOLIZA, fingreso: fcarga });
+    let ccarga = query.result.recordset[0].CCARGA;
     // se busca agregar solo las cargas que tengan codigo distinto, para eliminar repetidos
     for(let i = 0; i < query.result.recordset.length; i++){
-        if (query.result.recordset[i].ccarga != ccarga) {
-                let dateFormat = new Date(query.result.recordset[i].fingreso);
+        if (query.result.recordset[i].CCARGA != ccarga) {
+                let dateFormat = new Date(query.result.recordset[i].FINGRESO);
                 let dd = dateFormat.getDate() + 1;
                 let mm = dateFormat.getMonth() + 1;
                 let yyyy = dateFormat.getFullYear();
                 let fcarga = dd + '/' + mm + '/' + yyyy;
-            jsonArray.push({ xcliente: query.result.recordset[i].XCLIENTE, ccliente: query.result.recordset[0].CCLIENTE, xpoliza: query.result.recordset[i].xpoliza, ccarga: query.result.recordset[i].ccarga, fingreso: fcarga });
-            ccarga = query.result.recordset[i].ccarga;
+            jsonArray.push({ xcliente: query.result.recordset[i].XCLIENTE, ccliente: query.result.recordset[0].CCLIENTE, xpoliza: query.result.recordset[i].XPOLIZA, ccarga: query.result.recordset[i].CCARGA, fingreso: fcarga });
+            ccarga = query.result.recordset[i].CCARGA;
         }
     }
     return { status: true, list: jsonArray }
@@ -1638,27 +1671,10 @@ const operationValrepBatch = async(authHeader, requestBody) => {
     let query = await bd.batchValrepQuery(searchData).then((res) => res);
     if(query.error){ return { status: false, code: 500, message: query.error }; }
     let jsonArray = [];
-    //primero se modifica el formato de la primera fecha de creación antes de agregar el lote al array
-    let dateFormat = new Date(query.result.recordset[0].FCREACION);
-    let dd = dateFormat.getDate() + 1;
-    let mm = dateFormat.getMonth() + 1;
-    let yyyy = dateFormat.getFullYear();
-    let fcreacion = dd + '/' + mm + '/' + yyyy;
-
-    // se agrega el primer lote
-    jsonArray.push({ xobservacion: query.result.recordset[0].XOBSERVACION, ccarga: query.result.recordset[0].CCARGA, clote: query.result.recordset[0].CLOTE, fcreacion: fcreacion });
-    let ccarga = query.result.recordset[0].CCARGA;
-    // se busca agregar solo los lotes que tengan codigo distinto, para eliminar repetidos
     for(let i = 0; i < query.result.recordset.length; i++){
-        if (query.result.recordset[i].CCARGA != ccarga) {
-                let dateFormat = new Date(query.result.recordset[i].FCREACION);
-                let dd = dateFormat.getDate() + 1;
-                let mm = dateFormat.getMonth() + 1;
-                let yyyy = dateFormat.getFullYear();
-                let fcreacion = dd + '/' + mm + '/' + yyyy;
-            jsonArray.push({ xobservacion: query.result.recordset[i].XOBSERVACION, clote: query.result.recordset[0].CLOTE,  ccarga: query.result.recordset[i].CCARGA, fcreacion: fcreacion });
-            ccarga = query.result.recordset[i].ccarga;
-        }
+        dateToString = query.result.recordset[i].FCREACION.toISOString().substr(0,10).split("-");
+        let fcreacion = dateToString[2] + '-' + dateToString[1] + '-' + dateToString[0];
+        jsonArray.push({ xobservacion: query.result.recordset[i].XOBSERVACION, clote: query.result.recordset[i].CLOTE,  ccarga: query.result.recordset[i].CCARGA, fcreacion: fcreacion });
     }
     return { status: true, list: jsonArray }
 }
