@@ -8964,11 +8964,8 @@ module.exports = {
                 .input('XPOLIZA', sql.NVarChar, parentPolicyData.xpoliza)
                 .input('CCLIENTE', sql.Int, parentPolicyData.ccliente)
                 .input('CCORREDOR', sql.Int, parentPolicyData.ccorredor)
-                .input('CMONEDA', sql.Int, parentPolicyData.cmoneda)
                 .input('CPAIS', sql.Int, cpais)
                 .input('CCOMPANIA', sql.Int, ccompania)
-                .input('CMETODOLOGIAPAGO', sql.Int, parentPolicyData.cmetodologiapago)
-                .input('MPRIMAANUAL', sql.Numeric(11, 2), parentPolicyData.mprimaanual)
                 .input('FINGRESO', sql.DateTime, new Date())
                 .input('IESTADO', sql.Int, 1)
                 .input('BACTIVO', sql.Int, 1)
@@ -8976,7 +8973,7 @@ module.exports = {
                 .input('CUSUARIOCREACION', sql.Int, cusuario)
                 .input('FMODIFICACION', sql.DateTime, new Date())
                 .input('CUSUARIOMODIFICACION', sql.Int, cusuario)
-                .query('INSERT INTO SUPOLIZAMATRIZ (XDESCRIPCION_L, XPOLIZA, CCLIENTE, CCORREDOR, CMONEDA, CPAIS, CCOMPANIA, CMETODOLOGIAPAGO, MPRIMAANUAL, FINGRESO, IESTADO, BACTIVO, FCREACION, CUSUARIOCREACION, FMODIFICACION, CUSUARIOMODIFICACION) OUTPUT INSERTED.CCARGA VALUES (@XDESCRIPCION_L, @XPOLIZA, @CCLIENTE, @CCORREDOR, @CMONEDA, @CPAIS, @CCOMPANIA, @CMETODOLOGIAPAGO, @MPRIMAANUAL, @FINGRESO, @IESTADO, @BACTIVO, @FCREACION, @CUSUARIOCREACION, @FMODIFICACION, @CUSUARIOMODIFICACION)')
+                .query('INSERT INTO SUPOLIZAMATRIZ (XDESCRIPCION_L, XPOLIZA, CCLIENTE, CCORREDOR, CPAIS, CCOMPANIA, FINGRESO, IESTADO, BACTIVO, FCREACION, CUSUARIOCREACION, FMODIFICACION, CUSUARIOMODIFICACION) OUTPUT INSERTED.CCARGA VALUES (@XDESCRIPCION_L, @XPOLIZA, @CCLIENTE, @CCORREDOR, @CPAIS, @CCOMPANIA, @FINGRESO, @IESTADO, @BACTIVO, @FCREACION, @CUSUARIOCREACION, @FMODIFICACION, @CUSUARIOMODIFICACION)')
             rowsAffected = rowsAffected + parseInt(insert.rowsAffected);
             //sql.close();
             return { result: { rowsAffected: rowsAffected, ccarga: insert.recordset[0].CCARGA } };
