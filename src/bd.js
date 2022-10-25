@@ -9752,7 +9752,7 @@ module.exports = {
             let pool = await sql.connect(config);
             let result = await pool.request()
                 .input('cnotificacion', sql.Int, cnotificacion)
-                .query('select * from EVNOTANOTIFICACION where CNOTIFICACION = @cnotificacion');
+                .query('select * from VWBUSCARNOTA where CNOTIFICACION = @cnotificacion');
             //sql.close();
             return { result: result };
         }catch(err){
@@ -11414,11 +11414,12 @@ module.exports = {
             .input('cnotificacion', sql.Int, notificationData.cnotificacion)
             .input('ccompania', sql.Int, notificationData.ccompania)
             .input('xobservacion', sql.NVarChar, settlementCreate.xobservacion)
-            .input('crepuesto', sql.Int, settlementCreate.crepuesto)
             .input('xdanos', sql.NVarChar, settlementCreate.xdanos)
-            .input('corden', sql.Int, settlementCreate.corden)
+            .input('mmontofiniquito', sql.Numeric(17, 2), settlementCreate.mmontofiniquito)
+            .input('cmoneda', sql.Int, settlementCreate.cmoneda)
+            .input('ccausafiniquito', sql.Int, settlementCreate.ccausafiniquito)
             .input('fcreacion', sql.DateTime, new Date())
-            .query('insert into EVFINIQUITO (CNOTIFICACION, FCREACION, XOBSERVACION, CREPUESTO, XDANOS, CORDEN, CCOMPANIA, BACTIVO) values (@cnotificacion, @fcreacion, @xobservacion, @crepuesto, @xdanos, @corden, @ccompania, 1)');
+            .query('insert into EVFINIQUITO (CNOTIFICACION, FCREACION, XOBSERVACION, XDANOS, MMONTOFINIQUITO, CMONEDA, CCAUSAFINIQUITO, CCOMPANIA, BACTIVO) values (@cnotificacion, @fcreacion, @xobservacion, @xdanos, @mmontofiniquito, @cmoneda, @ccausafiniquito, @ccompania, 1)');
             rowsAffected = rowsAffected + update.rowsAffected;
             //sql.close();
             return { result: { rowsAffected: rowsAffected, corden: settlementCreate.corden } };
@@ -11592,7 +11593,7 @@ module.exports = {
             let result = await pool.request()
                 .input('cfiniquito', sql.Int, searchData.cfiniquito)
                 .input('ccompania', sql.Int, searchData.ccompania)
-                .query('select * from VWBUSCARCOTIZACIONXFINIQUITO WHERE CFINIQUITO = @cfiniquito AND CCOMPANIA = @ccompania');
+                .query('select * from VWBUSCARFINIQUITO WHERE CFINIQUITO = @cfiniquito AND CCOMPANIA = @ccompania');
             //sql.close();
             return { result: result };
         }catch(err){
@@ -11994,6 +11995,17 @@ module.exports = {
         }
         catch(err){
             console.log(err.message)
+            return { error: err.message };
+        }
+    },
+    causeSettlementValrepQuery: async() => {
+        try{
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .query('select * from MACAUSAFINIQUITO WHERE CESTATUSGENERAL = 13');
+            //sql.close();
+            return { result: result };
+        }catch(err){
             return { error: err.message };
         }
     },
