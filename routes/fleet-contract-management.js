@@ -688,6 +688,7 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
             ccontratoflota: getFleetContractData.result.recordset[0].CCONTRATOFLOTA,
             xrecibo: getFleetContractData.result.recordset[0].xrecibo,
             xpoliza: getFleetContractData.result.recordset[0].xpoliza,
+            xtituloreporte: getFleetContractData.result.recordset[0].XTITULO_REPORTE,
             ccliente: getFleetContractData.result.recordset[0].CCLIENTE,
             xnombrecliente: getFleetContractClientData.result.recordset[0].XCLIENTE,
             xdocidentidadcliente: getFleetContractClientData.result.recordset[0].XDOCIDENTIDAD,
