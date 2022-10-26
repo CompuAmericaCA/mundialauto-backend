@@ -6626,7 +6626,7 @@ module.exports = {
             let result = await pool.request()
                 .input('CPAIS', sql.Numeric(4, 0), searchData.cpais)
                 .input('CCOMPANIA', sql.Int, searchData.ccompania)
-                .query('SELECT CCARGA, XDESCRIPCION_L, XPOLIZA, MPRIMAANUAL, FCREACION FROM SUPOLIZAMATRIZ WHERE CPAIS = @CPAIS AND CCOMPANIA = @CCOMPANIA');
+                .query('SELECT CCARGA, XDESCRIPCION_L, XPOLIZA, FCREACION FROM SUPOLIZAMATRIZ WHERE CPAIS = @CPAIS AND CCOMPANIA = @CCOMPANIA');
             //sql.close();
             return { result: result };
         }catch(err){
