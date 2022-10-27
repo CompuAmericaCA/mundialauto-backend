@@ -2947,4 +2947,42 @@ const operationValrepTypeMetodologia = async(authHeader, requestBody) => {
     return { status: true, list: jsonArray }
 }
 
+
+router.route('/tarifa-casco').post((req, res) => {
+    if(!req.header('Authorization')){ 
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
+        return;
+    }else{
+        operationValrepTarifaCasco(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){ 
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationValrepTypeVehicleArysVial' } });
+        });
+    }
+});
+
+const operationValrepTarifaCasco = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let searchData = {
+        xtipo: requestBody.xtipo,
+        xmarca: requestBody.xmarca,
+        xmodelo: requestBody.xmodelo,
+        xclase: requestBody.xclase,
+        cano: requestBody.cano,
+    };
+    let query = await bd.SearchTarifa(searchData).then((res) => res);
+    if(query.error){ return { status: false, code: 500, message: query.error }; }
+    let jsonArray = [];
+    for(let i = 0; i < query.result.recordset.length; i++){
+        jsonArray.push({ 
+            ptasa_casco: query.result.recordset[i].PTASA_CASCO,
+             });
+    }
+    return { status: true, list: jsonArray }
+}
+
 module.exports = router;

@@ -11829,8 +11829,7 @@ module.exports = {
         try{
             let pool = await sql.connect(config);
             let result = await pool.request()
-            .input('cpais', sql.Int, searchData.cpais)
-            .query('select * from VWBUSCARPLANRC ');
+            .query('select DISTINCT XTIPO from VWBUSCARPLANRC');
             //sql.close();
             return { result: result };
         }
@@ -11959,5 +11958,32 @@ module.exports = {
     }catch(err){
         return { error: err.message };
     }
+ },
+     SearchTarifa: async(searchData) => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+        .input('xtipo', sql.NVarChar, searchData.xtipo)
+        .input('xmarca', sql.NVarChar, searchData.xmarca)
+        .input('xmodelo', sql.NVarChar, searchData.xmodelo)
+        .input('xclase', sql.NVarChar, searchData.xclase)
+        .input('cano', sql.Numeric(18, 2), searchData.cano)
+        .query('select * from VWBUSCARTARIFA WHERE XTIPO = @xtipo AND XMARCA = @xmarca AND XMODELO = @xmodelo AND XCLASE = @xclase');
+    //sql.close();
+    return { result: result };
+}catch(err){
+    return { error: err.message };
 }
+},
+getSeatchTarifaData: async() => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+            .query('select * from VWBUSCARTARIFA');
+        //sql.close();
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+},
 }

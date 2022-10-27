@@ -1130,4 +1130,33 @@ const operationCreateIndividualContract = async(requestBody) => {
     }
   })();
 
+router.route('/search-tarifa').post((req, res) => {
+    if(!req.header('Authorization')){
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } });
+        return;
+    }else{
+        operationSearchTarifa(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationSearchTarifa' } });
+        });
+    }
+});
+
+const operationSearchTarifa = async(authHeader, requestBody) => { 
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let getSeatchTarifa = await bd.getSeatchTarifaData(receiptData);
+    if(getSeatchTarifa.error){ return { status: false, code: 500, message: getSeatchTarifa.error }; }
+    if(getSeatchTarifa.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Receipt Data not found.' }; }
+    return {
+        status: true,
+            id: getSeatchTarifa.result.recordset[0].ID,
+            xmodelo: getSeatchTarifa.result.recordset[0].XMODELO
+    }
+}
+
 module.exports = router;
