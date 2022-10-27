@@ -9017,7 +9017,7 @@ module.exports = {
                 .query('INSERT INTO SUPOLIZALOTE (CCARGA, CLOTE, XOBSERVACION, BACTIVO, FCREACION, CUSUARIOCREACION, FMODIFICACION, CUSUARIOMODIFICACION) OUTPUT INSERTED.CLOTE VALUES (@CCARGA, @CLOTE, @XOBSERVACION, 1, @FCREACION, @CUSUARIOCREACION, @FMODIFICACION, @CUSUARIOMODIFICACION)')
             rowsAffected = rowsAffected + parseInt(insert.rowsAffected);
             //sql.close();
-            return { result: { rowsAffected: rowsAffected, clote: insert.recordset[0].clote } };
+            return { result: { rowsAffected: rowsAffected, clote: insert.recordset[0].CLOTE } };
         }
         catch(err){
             console.log(err.message);
@@ -9042,6 +9042,7 @@ module.exports = {
                             contractList[i].FECHA_NAC = changeDateFormat(contractList[i].FECHA_NAC);
                         }
                         else {contractList[i].TARIFA = 0}
+                        console.log('codigo lote: ' + clote);
                         let insert = await pool.request()
                             .input('ID', sql.Int, contractList[i].ID)
                             .input('CCLIENTE', sql.Int, ccliente)
