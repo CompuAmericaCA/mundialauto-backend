@@ -8327,12 +8327,11 @@ module.exports = {
             return { error: err.message };
         }
     },
-    accesoryValrepQuery: async(searchData) => {
+    accesoryValrepQuery: async() => {
         try{
             let pool = await sql.connect(config);
             let result = await pool.request()
-                .input('cpais', sql.Numeric(4, 0), searchData.cpais)
-                .query('select CACCESORIO, XACCESORIO, BACTIVO from MAACCESORIO where CPAIS = @cpais');
+                .query('select * from MAACCESORIOS');
             //sql.close();
             return { result: result };
         }catch(err){

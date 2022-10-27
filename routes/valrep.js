@@ -2272,6 +2272,7 @@ router.route('/accesory').post((req, res) => {
             }
             res.json({ data: result });
         }).catch((err) => {
+            console.log(err.message)
             res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationValrepAccesory' } });
         });
     }
@@ -2279,15 +2280,11 @@ router.route('/accesory').post((req, res) => {
 
 const operationValrepAccesory = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
-    if(!helper.validateRequestObj(requestBody, ['cpais'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
-    let searchData = {
-        cpais: requestBody.cpais
-    };
-    let query = await bd.accesoryValrepQuery(searchData).then((res) => res);
+    let query = await bd.accesoryValrepQuery().then((res) => res);
     if(query.error){ return { status: false, code: 500, message: query.error }; }
     let jsonArray = [];
     for(let i = 0; i < query.result.recordset.length; i++){
-        jsonArray.push({ caccesorio: query.result.recordset[i].CACCESORIO, xaccesorio: query.result.recordset[i].XACCESORIO, bactivo: query.result.recordset[i].BACTIVO });
+        jsonArray.push({ caccesorio: query.result.recordset[i].CACCESORIO, xaccesorio: query.result.recordset[i].XACCESORIO, mmontomax: query.result.recordset[i].MMONTOMAX, ptasa: query.result.recordset[i].PTASA});
     }
     return { status: true, list: jsonArray }
 }
