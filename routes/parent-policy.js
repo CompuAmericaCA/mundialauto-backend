@@ -142,7 +142,9 @@ const operationParentPolicy = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
     let ccarga = 0;
     if(!requestBody.polizaMatriz.ccarga){
-        let createParentPolicy = await bd.createParentPolicyQuery(requestBody.polizaMatriz, requestBody.cpais, requestBody.ccompania, requestBody.cusuario);
+        let getLastPolicyNumber = await bd.getLastPolicyNumberQuery().then((res) => res);
+        if (getLastPolicyNumber.error){ console.log(getLastPolicyNumber.error); return { status: false, code: 500, message: getLastPolicyNumber.error }; }
+        let createParentPolicy = await bd.createParentPolicyQuery(requestBody.polizaMatriz, requestBody.cpais, requestBody.ccompania, requestBody.cusuario, getLastPolicyNumber.result.cpoliza);
         if(createParentPolicy.error){ console.log(createParentPolicy.error);return { status: false, code: 500, message: createParentPolicy.error }; }
         ccarga = createParentPolicy.result.ccarga;
     }
@@ -169,7 +171,10 @@ const operationParentPolicy = async(authHeader, requestBody) => {
                     if(createBatch.error){ console.log(createBatch.error);return { status: false, code: 500, message: createBatch.error }; }
                     if(requestBody.polizaMatriz.lotes[i].contratosCSV.length > 0){
                         let createBatchContract = await bd.createBatchContractQuery(requestBody.polizaMatriz.lotes[i].contratosCSV, ccarga, createBatch.result.clote, requestBody.polizaMatriz.ccliente).then((res) => res);
-                        if(createBatchContract.error){ console.log(createBatchContract.error);return { status: false, code: 500, message: createBatchContract.error }; }
+                        if(createBatchContract.error){ 
+                            console.log(createBatchContract.error);
+                            let deleteBatchByParentPolicy = await db.deleteBatchByParentPolicyQuery(ccarga, createBatch.result.clote);
+                            return { status: false, code: 500, message: createBatchContract.error }; }
                     }
                 }
             }
