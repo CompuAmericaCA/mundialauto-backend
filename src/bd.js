@@ -8955,13 +8955,13 @@ module.exports = {
             return { error: err.message };
         }
     },
-    createParentPolicyQuery: async(parentPolicyData, cpais, ccompania, cusuario) => {
+    createParentPolicyQuery: async(parentPolicyData, cpais, ccompania, cusuario, cpoliza) => {
         try{
             let rowsAffected = 0;
             let pool = await sql.connect(config);
             let insert = await pool.request()
                 .input('XDESCRIPCION_L', sql.NVarChar, parentPolicyData.xdescripcion_l)
-                .input('XPOLIZA', sql.NVarChar, parentPolicyData.xpoliza)
+                .input('XPOLIZA', sql.NVarChar, '0000' + cpoliza)
                 .input('CCLIENTE', sql.Int, parentPolicyData.ccliente)
                 .input('CCORREDOR', sql.Int, parentPolicyData.ccorredor)
                 .input('CPAIS', sql.Int, cpais)
@@ -8979,6 +8979,26 @@ module.exports = {
             return { result: { rowsAffected: rowsAffected, ccarga: insert.recordset[0].CCARGA } };
         }
         catch(err){
+            console.log(err.message);
+            return { error: err.message };
+        }
+    },
+    getLastPolicyNumberQuery: async(ccarga) => {
+        try{
+            let pool = await sql.connect(config);
+            let query = await pool.request()
+                .query('SELECT CPOLIZA FROM MACONTADORES')
+            let cpoliza = 0
+            if (query.recordset.length > 0) {
+                cpoliza = query.recordset[0].CPOLIZA
+            }
+            console.log(cpoliza);
+            query = await pool.request()
+                .input('CPOLIZA', sql.Int, cpoliza + 1)
+                .query('UPDATE MACONTADORES SET CPOLIZA = @CPOLIZA')
+            return { result: {cpoliza: cpoliza + 1}}
+        }
+        catch(err) {
             console.log(err.message);
             return { error: err.message };
         }
@@ -9042,6 +9062,12 @@ module.exports = {
                             contractList[i].FECHA_NAC = changeDateFormat(contractList[i].FECHA_NAC);
                         }
                         else {contractList[i].TARIFA = 0}
+                        contractList[i].FECHA_EMISION = new Date(changeDateFormat(contractList[i].FECHA_EMISION));
+                        contractList[i].FDESDE_POL = new Date(changeDateFormat(contractList[i].FDESDE_POL));
+                        contractList[i].FHASTA_POL = new Date(changeDateFormat(contractList[i].FHASTA_POL));
+                        contractList[i].FDESDE_REC = new Date(changeDateFormat(contractList[i].FDESDE_REC));
+                        contractList[i].FHASTA_REC = new Date(changeDateFormat(contractList[i].FHASTA_REC));
+                        console.log(contractList[i].FDESDE_POL);
                         console.log('codigo lote: ' + clote);
                         let insert = await pool.request()
                             .input('ID', sql.Int, contractList[i].ID)
@@ -9076,18 +9102,20 @@ module.exports = {
                             .input('MPRIMA_CASCO', sql.Numeric(11, 2), contractList[i].PRIMA_CASCO)
                             .input('MSUMA_ACCESORIOS', sql.Numeric(11, 2), contractList[i].SA_ACCESORIOS)
                             .input('MPRIMA_ACCESORIOS', sql.Numeric(11, 2), contractList[i].PRIMA_ACCESORIOS)
+                            .input('MSUMA_BLINDAJE', sql.Numeric(11, 2), contractList[i].SA_BLINDAJE)
+                            .input('MPRIMA_BLINDAJE', sql.Numeric(11, 2), contractList[i].PRIMA_BLINDAJE)
                             .input('MCATASTROFICO', sql.Numeric(11, 2), contractList[i].MCATASTROFICO)
                             .input('EMAIL', sql.NVarChar, contractList[i].EMAIL ? contractList[i].EMAIL : undefined)
-                            .input('FEMISION', sql.DateTime, changeDateFormat(contractList[i].FECHA_EMISION)) //
-                            .input('FDESDE_POL', sql.DateTime, changeDateFormat(contractList[i].FDESDE_POL))
-                            .input('FHASTA_POL', sql.DateTime, changeDateFormat(contractList[i].FHASTA_POL))
-                            .input('FDESDE_REC', sql.DateTime, changeDateFormat(contractList[i].FDESDE_REC))
-                            .input('FHASTA_REC', sql.DateTime, changeDateFormat(contractList[i].FHASTA_REC))
+                            .input('FEMISION', sql.DateTime, contractList[i].FECHA_EMISION.toISOString())
+                            .input('FDESDE_POL', sql.DateTime, contractList[i].FDESDE_POL.toISOString())
+                            .input('FHASTA_POL', sql.DateTime, contractList[i].FHASTA_POL.toISOString())
+                            .input('FDESDE_REC', sql.DateTime, contractList[i].FDESDE_REC.toISOString())
+                            .input('FHASTA_REC', sql.DateTime, contractList[i].FHASTA_REC.toISOString())
                             .input('NCAPACIDAD_P', sql.Int, contractList[i].CAPACIDAD_PAS)
                             .input('MCAPACIDAD_C', sql.Numeric(11, 2), contractList[i].CAPACIDAD_CARGA ? contractList[i].CAPACIDAD_CARGA: undefined)
                             .input('XUSO', sql.NVarChar, contractList[i].USO)
                             .input('CCORREDOR', sql.Int, contractList[i].CORREDOR)
-                            .query('INSERT INTO TMEMISION_FLOTA (ID, CCLIENTE, CCARGA, CLOTE, XCLIENTE, XRIF_CLIENTE, XNOMBRE, XAPELLIDO, XCEDULA, CPLAN, XSERIALCARROCERIA, XSERIALMOTOR, XPLACA, CMARCA, XMARCA, CMODELO, XMODELO, CVERSION, XVERSION, CANO, XCOLOR, XTIPO, XCOBERTURA, MSUMA_ASEG, MTARIFA, MPRIMA_CASCO, MSUMA_ACCESORIOS, MPRIMA_ACCESORIOS, MCATASTROFICO, FNAC, XDIRECCIONFISCAL, XTELEFONO_EMP, XTELEFONO_PROP, EMAIL, FEMISION, FDESDE_POL, FHASTA_POL, FDESDE_REC, FHASTA_REC, NCAPACIDAD_P, MCAPACIDAD_C, XUSO, CCORREDOR) VALUES (@ID, @CCLIENTE, @CCARGA, @CLOTE, @XCLIENTE, @XRIF_CLIENTE, @XNOMBRE, @XAPELLIDO, @XCEDULA, @CPLAN, @XSERIALCARROCERIA, @XSERIALMOTOR, @XPLACA, @CMARCA, @XMARCA, @CMODELO, @XMODELO, @CVERSION, @XVERSION, @CANO, @XCOLOR, @XTIPO, @XCOBERTURA, @MSUMA_ASEG, @MTARIFA, @MPRIMA_CASCO, @MSUMA_ACCESORIOS, @MPRIMA_ACCESORIOS, @MCATASTROFICO, @FNAC, @XDIRECCIONFISCAL, @XTELEFONO_EMP, @XTELEFONO_PROP, @EMAIL, @FEMISION, @FDESDE_POL, @FHASTA_POL, @FDESDE_REC, @FHASTA_REC, @NCAPACIDAD_P, @MCAPACIDAD_C, @XUSO, @CCORREDOR)')
+                            .query('INSERT INTO TMEMISION_FLOTA (ID, CCLIENTE, CCARGA, CLOTE, XCLIENTE, XRIF_CLIENTE, XNOMBRE, XAPELLIDO, XCEDULA, CPLAN, XSERIALCARROCERIA, XSERIALMOTOR, XPLACA, CMARCA, XMARCA, CMODELO, XMODELO, CVERSION, XVERSION, CANO, XCOLOR, XTIPO, XCOBERTURA, MSUMA_ASEG, MTARIFA, MPRIMA_CASCO, MSUMA_ACCESORIOS, MPRIMA_ACCESORIOS, MSUMA_BLINDAJE, MPRIMA_BLINDAJE, MCATASTROFICO, FNAC, XDIRECCIONFISCAL, XTELEFONO_EMP, XTELEFONO_PROP, EMAIL, FEMISION, FDESDE_POL, FHASTA_POL, FDESDE_REC, FHASTA_REC, NCAPACIDAD_P, MCAPACIDAD_C, XUSO, CCORREDOR) VALUES (@ID, @CCLIENTE, @CCARGA, @CLOTE, @XCLIENTE, @XRIF_CLIENTE, @XNOMBRE, @XAPELLIDO, @XCEDULA, @CPLAN, @XSERIALCARROCERIA, @XSERIALMOTOR, @XPLACA, @CMARCA, @XMARCA, @CMODELO, @XMODELO, @CVERSION, @XVERSION, @CANO, @XCOLOR, @XTIPO, @XCOBERTURA, @MSUMA_ASEG, @MTARIFA, @MPRIMA_CASCO, @MSUMA_ACCESORIOS, @MPRIMA_ACCESORIOS, @MSUMA_BLINDAJE, @MPRIMA_BLINDAJE, @MCATASTROFICO, @FNAC, @XDIRECCIONFISCAL, @XTELEFONO_EMP, @XTELEFONO_PROP, @EMAIL, @FEMISION, @FDESDE_POL, @FHASTA_POL, @FDESDE_REC, @FHASTA_REC, @NCAPACIDAD_P, @MCAPACIDAD_C, @XUSO, @CCORREDOR)')
                             rowsAffected = rowsAffected + insert.rowsAffected;
                     }
                 }
@@ -9097,6 +9125,20 @@ module.exports = {
             }
         }catch(err){
             console.log(err.message);
+            return { error: err.message };
+        }
+    },
+    deleteBatchByParentPolicyQuery: async(ccarga, clote) => {
+        try{
+            let pool = await sql.connect(config);
+            let erase = await pool.request()
+                .input('CCARGA', sql.Int, ccarga)
+                .input('CLOTE', sql.Int, clote)
+                .query('DELETE FROM SUPOLIZALOTE where CCARGA = @CCARGA AND CLOTE = @CLOTE');
+            //sql.close();
+            return { result: erase };
+        }
+        catch(err){
             return { error: err.message };
         }
     },
