@@ -11651,7 +11651,7 @@ module.exports = {
                 let update = await pool.request()
                 .input('ctipovehiculo', sql.Int, vehicleTypeUpdate[i].ctipovehiculo)
                 .input('mtarifa', sql.Numeric(18,2), vehicleTypeUpdate[i].mtarifa)
-                .input('ncantidad', sql.Numeric(4,0), vehicleTypeUpdate[i].ncantidad)
+                .input('ncantidad', sql.Numeric(4, 0), vehicleTypeUpdate[i].ncantidad)
                 .input('mcoberturamax', sql.Numeric(18,2), vehicleTypeUpdate[i].mcoberturamax)
                 .input('cmoneda', sql.Int, vehicleTypeUpdate[i].cmoneda)
                 .input('cpais', sql.Int, searchdata.cpais)
@@ -11966,14 +11966,26 @@ module.exports = {
         .input('xtipo', sql.NVarChar, searchData.xtipo)
         .input('xmarca', sql.NVarChar, searchData.xmarca)
         .input('xmodelo', sql.NVarChar, searchData.xmodelo)
-        .input('xclase', sql.NVarChar, searchData.xclase)
-        .input('cano', sql.Numeric(18, 2), searchData.cano)
-        .query('select * from VWBUSCARTARIFA WHERE XTIPO = @xtipo AND XMARCA = @xmarca AND XMODELO = @xmodelo AND XCLASE = @xclase');
-    //sql.close();
-    return { result: result };
-}catch(err){
-    return { error: err.message };
-}
+        .input('cano', sql.SmallInt, searchData.cano)
+        .query('select XCLASE from MACLASIFICACION_VEH WHERE XTIPO = @xtipo AND XMARCA = @xmarca AND XMODELO = @xmodelo ');
+        if(result.rowsAffected > 0){
+            let xclase= result.recordset[0].XCLASE
+            console.log(result.recordset[0].XCLASE)
+            let query= await pool.request()
+                .input('xclase', sql.NVarchar, searchData.xclase)
+                .input('cano', sql.SmallInt, searchData.cano)
+                .input('xtipo', sql.NVarChar, searchData.xtipo)
+                .query('select PTASA_CASCO from MATARIFA_CASCO where XCLASE = @xclase AND CANO= @cano AND XTIPO = @xtipo');
+     //sql.close();
+     console.log(query)
+     return { result: query };
+    }else{
+        //sql.close();
+        return { result: result };
+       } 
+    }catch(err){
+        return { error: err.message };
+        }
 },
 getSeatchTarifaData: async() => {
     try{
@@ -11985,5 +11997,21 @@ getSeatchTarifaData: async() => {
     }catch(err){
         return { error: err.message };
     }
+},
+hola: async(searchData, xclase) => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+        .input('xclase', sql.NVarchar, xclase)
+        .input('cano', sql.SmallInt, searchData.cano)
+        .input('xtipo', sql.NVarChar, searchData.xtipo)
+        .query('select PTASA_CASCO from MATARIFA_CASCO where XCLASE = @xclase AND CANO= @cano AND XTIPO = @xtipo');
+    //sql.close();
+    console.log(result)
+    return { result: result };
+}catch(err){
+    console.log(err.message)
+    return { error: err.message };
+}
 },
 }

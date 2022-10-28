@@ -1159,4 +1159,41 @@ const operationSearchTarifa = async(authHeader, requestBody) => {
     }
 }
 
+router.route('/tarifa-casco').post((req, res) => {
+    if(!req.header('Authorization')){ 
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
+        return;
+    }else{
+        operationTarifaCasco(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){ 
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationTarifaCasco' } });
+        });
+    }
+});
+
+const operationTarifaCasco = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let searchData = {
+        xtipo: requestBody.xtipo,
+        xmarca: requestBody.xmarca,
+        xmodelo: requestBody.xmodelo,
+        cano: requestBody.cano,
+        xcobertura: requestBody.xcobertura
+    };
+
+    let query = await bd.SearchTarifa(searchData).then((res) => res);
+    if(query.error){ return { status: false, code: 500, message: query.error }; }
+    return { status: true,
+             ptasa_casco: query.result.recordset[0].PTASA_CASCO
+            }
+                // if(query.result.rowsAffected > 0){
+    //     let query2 = await bd.hola(searchData, query.result.recordset[0].XCLASE).then((res) => res);
+    //     if(query2.error){ return { status: false, code: 500, message: query.error }; }
+    // }
+}
 module.exports = router;
