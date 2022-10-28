@@ -11946,7 +11946,6 @@ module.exports = {
             return { error: err.message };
         }
     },
-<<<<<<< HEAD
     TypeMetodologia: async(searchData) => {
         try{
             let pool = await sql.connect(config);
@@ -12015,8 +12014,6 @@ hola: async(searchData, xclase) => {
     return { error: err.message };
 }
 },
-=======
->>>>>>> origin/jhon
     getRecoverageDetailData: async(searchData) => {
         try{
             let pool = await sql.connect(config);
@@ -12070,8 +12067,6 @@ hola: async(searchData, xclase) => {
             return { error: err.message };
         }
     },
-<<<<<<< HEAD
-=======
     causeSettlementValrepQuery: async() => {
         try{
             let pool = await sql.connect(config);
@@ -12116,5 +12111,4 @@ createAccesoriesFromFleetContractIndividual: async(accessory) => {
         return { error: err.message };
     }
 },
->>>>>>> origin/jhon
 }

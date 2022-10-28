@@ -2951,10 +2951,6 @@ const operationValrepTypeMetodologia = async(authHeader, requestBody) => {
     return { status: true, list: jsonArray }
 }
 
-<<<<<<< HEAD
-
-
-=======
 router.route('/cause-settlement').post((req, res) => {
     if(!req.header('Authorization')){ 
         res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
@@ -2982,6 +2978,5 @@ const operationValrepCauseSettlement = async(authHeader, requestBody) => {
     }
     return { status: true, list: jsonArray }
 }
->>>>>>> origin/jhon
 
 module.exports = router;

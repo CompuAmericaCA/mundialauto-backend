@@ -903,10 +903,7 @@ const operationUpdateFleetContractManagement = async(authHeader, requestBody) =>
         fhastarecibo: requestBody.fhastarecibo,
         cusuariomodificacion: requestBody.cusuariomodificacion
     }
-<<<<<<< HEAD
-=======
     //console.log(fleetContractData)
->>>>>>> origin/jhon
     let verifyFleetContractVehicle = await bd.verifyFleetContractVehicleToUpdateQuery(fleetContractData).then((res) => res);
     if(verifyFleetContractVehicle.error){ return { status: false, code: 500, message: verifyFleetContractVehicle.error }; }
     if(verifyFleetContractVehicle.result.rowsAffected > 0){ return { status: false, code: 200, condition: 'vehicle-contract-already-exist' }; }
@@ -1074,15 +1071,9 @@ const operationCreateIndividualContract = async(requestBody) => {
         mprima_casco: requestBody.mprima_casco ? requestBody.mprima_casco : undefined,
         mcatastrofico: requestBody.mcatastrofico ? requestBody.mcatastrofico : undefined
     };
-<<<<<<< HEAD
-      console.log(userData)
-    let operationCreateIndividualContract = await bd.createIndividualContractQuery(userData).then((res) => res);
-    //if(operationCreateIndividualContract.error){ console.log(operationCreateIndividualContract.error);return { status: true, code: 500, message: operationCreateIndividualContract.error }; }
-    if(operationCreateIndividualContract.result.rowsAffected > 0){ return { status: true}; }
-=======
     if(userData){
         let operationCreateIndividualContract = await bd.createIndividualContractQuery(userData).then((res) => res);
-        if(operationCreateIndividualContract.error){ return { status: false, code: 500, message: operationCreateIndividualContract.error }; }
+        if(operationCreateIndividualContract.error){ console.log(operationCreateIndividualContract.error);return { status: false, code: 500, message: operationCreateIndividualContract.error }; }
     }
     if(requestBody.accessory){
         if(requestBody.accessory.create){
@@ -1099,7 +1090,6 @@ const operationCreateIndividualContract = async(requestBody) => {
             if(createAccesories.error){ return { status: false, code: 500, message: createAccesories.error }; }
         }
     }
->>>>>>> origin/jhon
     else{ return { status: true, code: 500, message: 'Server Internal Error.', hint: 'createContract' }; }
 }
 
