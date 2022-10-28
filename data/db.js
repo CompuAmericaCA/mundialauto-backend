@@ -278,7 +278,6 @@ module.exports = {
             //sql.close();
             return { result: result };
         }catch(err){
-            console.log(err.message);
             return { error: err.message };
         }
     },
@@ -371,7 +370,6 @@ module.exports = {
                 .input('cplan', sql.Int, cplan)
                 .query('select * from PRPLAN_RC where CPLAN_RC = @cplan');
             //sql.close();
-            console.log(result)
             return { result: result };
         }catch(err){
             return { error: err.message };
@@ -402,14 +400,12 @@ module.exports = {
         }
     },
     getPlanArys: async(cplan) => {
-        console.log(cplan)
-        try{
+       try{
             let pool = await sql.connect(config);
             let result = await pool.request()
                 .input('cplan', sql.Int, cplan)
                 .query('select * from POPLAN where CPLAN = @cplan');
             //sql.close();
-            console.log(result)
             return { result: result };
         }catch(err){
             return { error: err.message };
@@ -462,7 +458,6 @@ module.exports = {
             //sql.close();
             return { result: result };
         }catch(err){
-            console.log(err.message);
             return { error: err.message };
         }
     },
@@ -487,7 +482,6 @@ module.exports = {
             //sql.close();
             return { result: result };
         }catch(err){
-            console.log(err.message)
             return { error: err.message };
         }
     },
@@ -3178,7 +3172,6 @@ module.exports = {
             //sql.close();
             return { result: result };
         }catch(err){
-            console.log(err.message)
             return { error: err.message };
         }
     },
@@ -3689,7 +3682,6 @@ module.exports = {
             //sql.close();
             return { result: result };
         }catch(err){
-            console.log(err.message);
             return { error: err.message };
         }
     },

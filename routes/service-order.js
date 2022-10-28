@@ -295,6 +295,7 @@ router.route('/notification-service-order').post((req, res) => {
             }
             res.json({ data: result });
         }).catch((err) => {
+            console.log(err.message)
             res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationValrepNotificationServiceOrder' } });
         });
     }
@@ -306,11 +307,11 @@ const operationValrepNotificationServiceOrder = async(authHeader, requestBody) =
     let cnotificacion = requestBody.cnotificacion;
     let corden = requestBody.corden;
     let query = await bd.notificationServiceOrderDetailQuery(cnotificacion, corden).then((res) => res);
-    if(query.error){ return { status: false, code: 500, message: query.error }; }
+    if(query.error){ console.log(query.error);return { status: false, code: 500, message: query.error }; }
     let jsonArray = [];
+    let auto;
     for(let i = 0; i < query.result.recordset.length; i++){
         if(query.result.recordset[0].XCOLOR){
-            let auto;
             auto = query.result.recordset[0].XMARCA + ' ' + query.result.recordset[0].XMODELO + ' ' + query.result.recordset[0].XVERSION + ' ' + query.result.recordset[0].XCOLOR;
         }else{
             auto = query.result.recordset[0].XMARCA + ' ' + query.result.recordset[0].XMODELO + ' ' + query.result.recordset[0].XVERSION;
@@ -387,7 +388,6 @@ const operationValrepNotificationServiceOrder = async(authHeader, requestBody) =
                          xnombres: nombres,
                          xnombresalternativos: nombresalternativos,
                          xnombrespropietario: nombrespropietario});
-                         console.log(jsonArray)
     }
     return { status: true, list: jsonArray }
 }

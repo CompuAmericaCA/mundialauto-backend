@@ -1191,9 +1191,6 @@ const operationTarifaCasco = async(authHeader, requestBody) => {
     return { status: true,
              ptasa_casco: query.result.recordset[0].PTASA_CASCO
             }
-                // if(query.result.rowsAffected > 0){
-    //     let query2 = await bd.hola(searchData, query.result.recordset[0].XCLASE).then((res) => res);
-    //     if(query2.error){ return { status: false, code: 500, message: query.error }; }
-    // }
+            
 }
 module.exports = router;
