@@ -407,7 +407,6 @@ module.exports = {
             let result = await pool.request()
                 .input('CCOBERTURA', sql.Int, ccobertura)
                 .query('select * from MACOBERTURA_ANEXO WHERE CCOBERTURA = @CCOBERTURA')
-            console.log(result);
             return { result: result };
         }catch(err){
             console.log(err.message);
@@ -422,7 +421,6 @@ module.exports = {
                 .input('cplan', sql.Int, cplan)
                 .query('select * from POPLAN where CPLAN = @cplan');
             //sql.close();
-            console.log(result)
             return { result: result };
         }catch(err){
             return { error: err.message };

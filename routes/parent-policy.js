@@ -172,7 +172,6 @@ const operationParentPolicy = async(authHeader, requestBody) => {
                     if(requestBody.polizaMatriz.lotes[i].contratosCSV.length > 0){
                         let createBatchContract = await bd.createBatchContractQuery(requestBody.polizaMatriz.lotes[i].contratosCSV, ccarga, createBatch.result.clote, requestBody.polizaMatriz.ccliente, requestBody.polizaMatriz.xpoliza).then((res) => res);
                         if(createBatchContract.error){ 
-                            console.log(createBatchContract.error);
                             let deleteBatchByParentPolicy = await bd.deleteBatchByParentPolicyQuery(ccarga, createBatch.result.clote);
                             return { status: false, code: 500, message: createBatchContract.error }; }
                     }
