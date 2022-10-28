@@ -401,6 +401,19 @@ module.exports = {
             return { error: err.message };
         }
     },
+    getCoverageAnnexesQuery: async(ccobertura) => {
+        try{
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .input('CCOBERTURA', sql.Int, ccobertura)
+                .query('select * from MACOBERTURA_ANEXO WHERE CCOBERTURA = @CCOBERTURA')
+            console.log(result);
+            return { result: result };
+        }catch(err){
+            console.log(err.message);
+            return { error: err.message }
+        }
+    },
     getPlanArys: async(cplan) => {
         console.log(cplan)
         try{

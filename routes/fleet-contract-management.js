@@ -587,6 +587,7 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
         if(getPlanData.error){ return { status: false, code: 500, message: getFleetContractOwnerData.error }; }
         if(getPlanData.result.rowsAffected < 0){ console.log(getPlanData.error); return { status: false, code: 404, message: 'Fleet Contract Plan not found.' }; }
         let realCoverages = [];
+        let coverageAnnexes = [];
         let getPlanCoverages = await db.getPlanCoverages(getFleetContractData.result.recordset[0].CPLAN, getFleetContractData.result.recordset[0].CCONTRATOFLOTA);
         if(getPlanCoverages.error){ console.log(getPlanCoverages.error); return { status: false, code: 500, message: getFleetContractOwnerData.error }; }
         if(getPlanCoverages.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Fleet Contract Plan Coverages not found.' }; }
@@ -606,8 +607,19 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
             if (getPlanCoverages.result.recordset[i].cmoneda == 2 && getPlanCoverages.result.recordset[i].mprimaprorrata) {
                 mprimaprorratatotal = mprimaprorratatotal + getPlanCoverages.result.recordset[i].mprimaprorrata
             }
+            let getCoverageAnnexes = await db.getCoverageAnnexesQuery(getPlanCoverages.result.recordset[i].CCOBERTURA)
+            if (getCoverageAnnexes.result) {
+                for (let i = 0; i < getCoverageAnnexes.result.recordset.length; i++) {
+                    let annex = {
+                        ccobertura: getCoverageAnnexes.result.recordset[i].CCOBERTURA,
+                        canexo: getCoverageAnnexes.result.recordset[i].CANEXO,
+                        xanexo: getCoverageAnnexes.result.recordset[i].XANEXO
+                    }
+                    coverageAnnexes.push(annex);
+                }
+            }
             let coverage = {
-                ccobertura: getPlanCoverages.result.recordset[i].ccobertura,
+                ccobertura: getPlanCoverages.result.recordset[i].CCOBERTURA,
                 xcobertura: getPlanCoverages.result.recordset[i].XCOBERTURA,
                 ptasa: getPlanCoverages.result.recordset[i].ptasa,
                 msumaasegurada: getPlanCoverages.result.recordset[i].msuma_aseg,
@@ -764,7 +776,8 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
             accesories: accesories,
             inspections: inspections,
             services:services,
-            realCoverages: realCoverages
+            realCoverages: realCoverages,
+            coverageAnnexes: coverageAnnexes
         }
     }else{ return { status: false, code: 404, message: 'Fleet Contract not found.' }; }
 }
