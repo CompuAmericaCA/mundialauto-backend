@@ -8481,7 +8481,6 @@ module.exports = {
                 .input('xtelefono_emp', sql.NVarChar, userData.xtelefono_emp)
                 .input('cplan', sql.Numeric(11, 0), userData.cplan)
                 .input('ccorredor', sql.Numeric(11, 0), userData.ccorredor)
-                .input('cmoneda', sql.Numeric(11, 0), userData.cmoneda)
                 .input('xcedula', sql.NVarChar, userData.xcedula)
                 .input('xcobertura', sql.NVarChar, userData.xcobertura)
                 .input('ncapacidad_p', sql.NVarChar, userData.ncapacidad_p)
@@ -8493,7 +8492,11 @@ module.exports = {
                 .input('fdesde_rec', sql.NVarChar, userData.fdesde_rec)
                 .input('fhasta_rec', sql.NVarChar, userData.fhasta_rec)
                 .input('cmetodologiapago', sql.Numeric(11, 0), userData.cmetodologiapago)
-                .query('insert into TMEMISION_INDIVIDUAL(XNOMBRE, XAPELLIDO, CANO, XCOLOR, XMARCA, XMODELO, XVERSION, XRIF_CLIENTE, EMAIL, XTELEFONO_PROP, XDIRECCIONFISCAL, XSERIALMOTOR, XSERIALCARROCERIA, XPLACA, XUSO, XTELEFONO_EMP, CPLAN, CCORREDOR, CMONEDA, XCEDULA, XCOBERTURA, NCAPACIDAD_P, XTIPO, FINICIO, FEMISION, FDESDE_POL, FHASTA_POL, FDESDE_REC, FHASTA_REC, CMETODOLOGIAPAGO) values (@xnombre, @xapellido, @cano, @xcolor, @xmarca, @xmodelo, @xversion, @xrif_cliente, @email, @xtelefono_prop, @xdireccionfiscal, @xserialmotor, @xserialcarroceria, @xplaca, @xuso, @xtelefono_emp, @cplan, @ccorredor, @cmoneda, @xcedula, @xcobertura, @ncapacidad_p, @xtipo, @finicio, @femision, @fdesde_pol, @fhasta_pol, @fdesde_rec, @fhasta_rec, @cmetodologiapago)')
+                .input('msuma_aseg', sql.Numeric(11, 0), userData.msuma_aseg)
+                .input('mtarifa', sql.Numeric(11, 0), userData.mtarifa)
+                .input('mprima_casco', sql.Numeric(11, 0), userData.mprima_casco)
+                .input('mcatastrofico', sql.Numeric(11, 0), userData.mcatastrofico)
+                .query('insert into TMEMISION_INDIVIDUAL(XNOMBRE, XAPELLIDO, CANO, XCOLOR, XMARCA, XMODELO, XVERSION, XRIF_CLIENTE, EMAIL, XTELEFONO_PROP, XDIRECCIONFISCAL, XSERIALMOTOR, XSERIALCARROCERIA, XPLACA, XUSO, XTELEFONO_EMP, CPLAN, CCORREDOR, XCEDULA, XCOBERTURA, NCAPACIDAD_P, XTIPO, FINICIO, FEMISION, FDESDE_POL, FHASTA_POL, FDESDE_REC, FHASTA_REC, CMETODOLOGIAPAGO, MSUMA_ASEG, MTARIFA, MPRIMA_CASCO, MCATASTROFICO) values (@xnombre, @xapellido, @cano, @xcolor, @xmarca, @xmodelo, @xversion, @xrif_cliente, @email, @xtelefono_prop, @xdireccionfiscal, @xserialmotor, @xserialcarroceria, @xplaca, @xuso, @xtelefono_emp, @cplan, @ccorredor, @xcedula, @xcobertura, @ncapacidad_p, @xtipo, @finicio, @femision, @fdesde_pol, @fhasta_pol, @fdesde_rec, @fhasta_rec, @cmetodologiapago, @msuma_aseg, @mtarifa, @mprima_casco, @mcatastrofico)')
             //sql.close();
             return { result: { rowsAffected: rowsAffected, status: true } };
         }
@@ -12008,4 +12011,37 @@ module.exports = {
             return { error: err.message };
         }
     },
+    TypeMetodologia: async(searchData) => {
+        try{
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+            .input('ccompania', sql.Int, searchData.ccompania)
+            .input('cpais', sql.Int, searchData.cpais)
+            .query('select * from MAMETODOLOGIAPAGO WHERE CCOMPANIA = @ccompania AND CPAIS = @cpais AND BACTIVO = 1');
+        //sql.close();
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+},
+createAccesoriesFromFleetContractIndividual: async(accessory) => {
+    try{
+        let rowsAffected = 0;
+        let pool = await sql.connect(config);
+        for(let i = 0; i < accessory.length; i++){
+            let insert = await pool.request()
+                .input('caccesorio', sql.Int, accessory[i].caccesorio)
+                .input('msuma_accesorio', sql.Numeric(18, 2), accessory[i].msuma_accesorio)
+                .input('mprima_accesorio', sql.Numeric(18, 2), accessory[i].mprima_accesorio)
+                .input('ptasa', sql.Numeric(18, 2), accessory[i].ptasa)
+                .query('insert into TMACCESORIOS (CACCESORIO, MSUMA_ACCESORIO, MPRIMA_ACCESORIO, PTASA) values (@caccesorio, @msuma_accesorio, @mprima_accesorio, @ptasa)')
+            rowsAffected = rowsAffected + insert.rowsAffected;
+        }
+        //sql.close();
+        return { result: { rowsAffected: rowsAffected } };
+    }
+    catch(err){
+        return { error: err.message };
+    }
+},
 }

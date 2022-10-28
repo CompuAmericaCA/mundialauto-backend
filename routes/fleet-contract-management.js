@@ -905,7 +905,6 @@ const operationUpdateFleetContractManagement = async(authHeader, requestBody) =>
         cusuariomodificacion: requestBody.cusuariomodificacion
     }
     //console.log(fleetContractData)
-    console.log(requestBody.coverage)
     let verifyFleetContractVehicle = await bd.verifyFleetContractVehicleToUpdateQuery(fleetContractData).then((res) => res);
     if(verifyFleetContractVehicle.error){ return { status: false, code: 500, message: verifyFleetContractVehicle.error }; }
     if(verifyFleetContractVehicle.result.rowsAffected > 0){ return { status: false, code: 200, condition: 'vehicle-contract-already-exist' }; }
@@ -1070,7 +1069,6 @@ const operationCreateIndividualContract = async(requestBody) => {
         xserialcarroceria: requestBody.xserialcarroceria.toUpperCase(),
         xplaca: requestBody.xplaca.toUpperCase(),
         xuso: requestBody.xuso.toUpperCase() ? requestBody.xuso : undefined,
-        cmoneda: requestBody.cmoneda,
         xtelefono_emp: requestBody.xtelefono_emp,
         cplan: requestBody.cplan,
         ccorredor: requestBody.ccorredor ? requestBody.ccorredor : undefined,
@@ -1084,11 +1082,30 @@ const operationCreateIndividualContract = async(requestBody) => {
         fdesde_rec:requestBody.fdesde_rec,
         fhasta_rec:requestBody.fhasta_rec,
         cmetodologiapago: requestBody.cmetodologiapago,
-
+        msuma_aseg: requestBody.msuma_aseg ? requestBody.msuma_aseg : undefined,
+        mtarifa: requestBody.mtarifa ? requestBody.mtarifa : undefined,
+        mprima_casco: requestBody.mprima_casco ? requestBody.mprima_casco : undefined,
+        mcatastrofico: requestBody.mcatastrofico ? requestBody.mcatastrofico : undefined
     };
-    let operationCreateIndividualContract = await bd.createIndividualContractQuery(userData).then((res) => res);
-    //if(operationCreateIndividualContract.error){ console.log(operationCreateIndividualContract.error);return { status: true, code: 500, message: operationCreateIndividualContract.error }; }
-    if(operationCreateIndividualContract.result.rowsAffected > 0){ return { status: true}; }
+    if(userData){
+        let operationCreateIndividualContract = await bd.createIndividualContractQuery(userData).then((res) => res);
+        if(operationCreateIndividualContract.error){ return { status: false, code: 500, message: operationCreateIndividualContract.error }; }
+    }
+    if(requestBody.accessory){
+        if(requestBody.accessory.create){
+            let accessory = [];
+            for(let i = 0; i < requestBody.accessory.create.length; i++){
+                accessory.push({
+                    caccesorio:  requestBody.accessory.create[i].caccesorio,
+                    msuma_accesorio:  requestBody.accessory.create[i].msuma_aseg,
+                    mprima_accesorio:  requestBody.accessory.create[i].mprima,
+                    ptasa:  requestBody.accessory.create[i].ptasa
+                })
+            }
+            let createAccesories = await bd.createAccesoriesFromFleetContractIndividual(accessory).then((res) => res);
+            if(createAccesories.error){ return { status: false, code: 500, message: createAccesories.error }; }
+        }
+    }
     else{ return { status: true, code: 500, message: 'Server Internal Error.', hint: 'createContract' }; }
 }
 
