@@ -170,10 +170,10 @@ const operationParentPolicy = async(authHeader, requestBody) => {
                     let createBatch = await bd.createBatchQuery(ccarga, requestBody.cusuario, requestBody.polizaMatriz.lotes[i], getLastBatchCode.result.clote).then((res) => res);
                     if(createBatch.error){ console.log(createBatch.error);return { status: false, code: 500, message: createBatch.error }; }
                     if(requestBody.polizaMatriz.lotes[i].contratosCSV.length > 0){
-                        let createBatchContract = await bd.createBatchContractQuery(requestBody.polizaMatriz.lotes[i].contratosCSV, ccarga, createBatch.result.clote, requestBody.polizaMatriz.ccliente).then((res) => res);
+                        let createBatchContract = await bd.createBatchContractQuery(requestBody.polizaMatriz.lotes[i].contratosCSV, ccarga, createBatch.result.clote, requestBody.polizaMatriz.ccliente, requestBody.polizaMatriz.xpoliza).then((res) => res);
                         if(createBatchContract.error){ 
                             console.log(createBatchContract.error);
-                            let deleteBatchByParentPolicy = await db.deleteBatchByParentPolicyQuery(ccarga, createBatch.result.clote);
+                            let deleteBatchByParentPolicy = await bd.deleteBatchByParentPolicyQuery(ccarga, createBatch.result.clote);
                             return { status: false, code: 500, message: createBatchContract.error }; }
                     }
                 }
