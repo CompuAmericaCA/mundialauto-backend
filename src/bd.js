@@ -8327,12 +8327,11 @@ module.exports = {
             return { error: err.message };
         }
     },
-    accesoryValrepQuery: async(searchData) => {
+    accesoryValrepQuery: async() => {
         try{
             let pool = await sql.connect(config);
             let result = await pool.request()
-                .input('cpais', sql.Numeric(4, 0), searchData.cpais)
-                .query('select CACCESORIO, XACCESORIO, BACTIVO from MAACCESORIO where CPAIS = @cpais');
+                .query('select * from MAACCESORIOS');
             //sql.close();
             return { result: result };
         }catch(err){
@@ -9755,7 +9754,7 @@ module.exports = {
             let pool = await sql.connect(config);
             let result = await pool.request()
                 .input('cnotificacion', sql.Int, cnotificacion)
-                .query('select * from EVNOTANOTIFICACION where CNOTIFICACION = @cnotificacion');
+                .query('select * from VWBUSCARNOTA where CNOTIFICACION = @cnotificacion');
             //sql.close();
             return { result: result };
         }catch(err){
@@ -11417,11 +11416,12 @@ module.exports = {
             .input('cnotificacion', sql.Int, notificationData.cnotificacion)
             .input('ccompania', sql.Int, notificationData.ccompania)
             .input('xobservacion', sql.NVarChar, settlementCreate.xobservacion)
-            .input('crepuesto', sql.Int, settlementCreate.crepuesto)
             .input('xdanos', sql.NVarChar, settlementCreate.xdanos)
-            .input('corden', sql.Int, settlementCreate.corden)
+            .input('mmontofiniquito', sql.Numeric(17, 2), settlementCreate.mmontofiniquito)
+            .input('cmoneda', sql.Int, settlementCreate.cmoneda)
+            .input('ccausafiniquito', sql.Int, settlementCreate.ccausafiniquito)
             .input('fcreacion', sql.DateTime, new Date())
-            .query('insert into EVFINIQUITO (CNOTIFICACION, FCREACION, XOBSERVACION, CREPUESTO, XDANOS, CORDEN, CCOMPANIA, BACTIVO) values (@cnotificacion, @fcreacion, @xobservacion, @crepuesto, @xdanos, @corden, @ccompania, 1)');
+            .query('insert into EVFINIQUITO (CNOTIFICACION, FCREACION, XOBSERVACION, XDANOS, MMONTOFINIQUITO, CMONEDA, CCAUSAFINIQUITO, CCOMPANIA, BACTIVO) values (@cnotificacion, @fcreacion, @xobservacion, @xdanos, @mmontofiniquito, @cmoneda, @ccausafiniquito, @ccompania, 1)');
             rowsAffected = rowsAffected + update.rowsAffected;
             //sql.close();
             return { result: { rowsAffected: rowsAffected, corden: settlementCreate.corden } };
@@ -11595,7 +11595,7 @@ module.exports = {
             let result = await pool.request()
                 .input('cfiniquito', sql.Int, searchData.cfiniquito)
                 .input('ccompania', sql.Int, searchData.ccompania)
-                .query('select * from VWBUSCARCOTIZACIONXFINIQUITO WHERE CFINIQUITO = @cfiniquito AND CCOMPANIA = @ccompania');
+                .query('select * from VWBUSCARFINIQUITO WHERE CFINIQUITO = @cfiniquito AND CCOMPANIA = @ccompania');
             //sql.close();
             return { result: result };
         }catch(err){
@@ -11946,6 +11946,7 @@ module.exports = {
             return { error: err.message };
         }
     },
+<<<<<<< HEAD
     TypeMetodologia: async(searchData) => {
         try{
             let pool = await sql.connect(config);
@@ -12014,6 +12015,8 @@ hola: async(searchData, xclase) => {
     return { error: err.message };
 }
 },
+=======
+>>>>>>> origin/jhon
     getRecoverageDetailData: async(searchData) => {
         try{
             let pool = await sql.connect(config);
@@ -12067,4 +12070,51 @@ hola: async(searchData, xclase) => {
             return { error: err.message };
         }
     },
+<<<<<<< HEAD
+=======
+    causeSettlementValrepQuery: async() => {
+        try{
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .query('select * from MACAUSAFINIQUITO WHERE CESTATUSGENERAL = 13');
+            //sql.close();
+            return { result: result };
+        }catch(err){
+            return { error: err.message };
+        }
+    },
+    TypeMetodologia: async(searchData) => {
+        try{
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+            .input('ccompania', sql.Int, searchData.ccompania)
+            .input('cpais', sql.Int, searchData.cpais)
+            .query('select * from MAMETODOLOGIAPAGO WHERE CCOMPANIA = @ccompania AND CPAIS = @cpais AND BACTIVO = 1');
+        //sql.close();
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+},
+createAccesoriesFromFleetContractIndividual: async(accessory) => {
+    try{
+        let rowsAffected = 0;
+        let pool = await sql.connect(config);
+        for(let i = 0; i < accessory.length; i++){
+            let insert = await pool.request()
+                .input('caccesorio', sql.Int, accessory[i].caccesorio)
+                .input('msuma_accesorio', sql.Numeric(18, 2), accessory[i].msuma_accesorio)
+                .input('mprima_accesorio', sql.Numeric(18, 2), accessory[i].mprima_accesorio)
+                .input('ptasa', sql.Numeric(18, 2), accessory[i].ptasa)
+                .query('insert into TMACCESORIOS (CACCESORIO, MSUMA_ACCESORIO, MPRIMA_ACCESORIO, PTASA) values (@caccesorio, @msuma_accesorio, @mprima_accesorio, @ptasa)')
+            rowsAffected = rowsAffected + insert.rowsAffected;
+        }
+        //sql.close();
+        return { result: { rowsAffected: rowsAffected } };
+    }
+    catch(err){
+        return { error: err.message };
+    }
+},
+>>>>>>> origin/jhon
 }

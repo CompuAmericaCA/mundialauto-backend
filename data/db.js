@@ -2008,13 +2008,15 @@ module.exports = {
         try{
             let pool = await sql.connect(config);
             let result = await pool.request()
-                .input('cpais', sql.Numeric(4, 0), providerData.cpais)
+                //.input('cpais', sql.Numeric(4, 0), providerData.cpais)
                 .input('ccompania', sql.Int, providerData.ccompania)
                 .input('cproveedor', sql.Int, providerData.cproveedor)
-                .query('select * from prproveedores where CPROVEEDOR = @cproveedor and CPAIS = @cpais and CCOMPANIA = @ccompania');
+                .query('select * from prproveedores where CPROVEEDOR = @cproveedor and CCOMPANIA = @ccompania');
             //sql.close();
+            console.log(result)
             return { result: result };
         }catch(err){
+            console.log(err.message)
             return { error: err.message };
         }
     },

@@ -2272,6 +2272,7 @@ router.route('/accesory').post((req, res) => {
             }
             res.json({ data: result });
         }).catch((err) => {
+            console.log(err.message)
             res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationValrepAccesory' } });
         });
     }
@@ -2279,15 +2280,11 @@ router.route('/accesory').post((req, res) => {
 
 const operationValrepAccesory = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
-    if(!helper.validateRequestObj(requestBody, ['cpais'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
-    let searchData = {
-        cpais: requestBody.cpais
-    };
-    let query = await bd.accesoryValrepQuery(searchData).then((res) => res);
+    let query = await bd.accesoryValrepQuery().then((res) => res);
     if(query.error){ return { status: false, code: 500, message: query.error }; }
     let jsonArray = [];
     for(let i = 0; i < query.result.recordset.length; i++){
-        jsonArray.push({ caccesorio: query.result.recordset[i].CACCESORIO, xaccesorio: query.result.recordset[i].XACCESORIO, bactivo: query.result.recordset[i].BACTIVO });
+        jsonArray.push({ caccesorio: query.result.recordset[i].CACCESORIO, xaccesorio: query.result.recordset[i].XACCESORIO, mmontomax: query.result.recordset[i].MMONTOMAX, ptasa: query.result.recordset[i].PTASA});
     }
     return { status: true, list: jsonArray }
 }
@@ -2954,7 +2951,37 @@ const operationValrepTypeMetodologia = async(authHeader, requestBody) => {
     return { status: true, list: jsonArray }
 }
 
+<<<<<<< HEAD
 
 
+=======
+router.route('/cause-settlement').post((req, res) => {
+    if(!req.header('Authorization')){ 
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
+        return;
+    }else{
+        operationValrepCauseSettlement(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){ 
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationValrepCauseSettlement' } });
+        });
+    }
+});
+
+const operationValrepCauseSettlement = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let query = await bd.causeSettlementValrepQuery().then((res) => res);
+    if(query.error){ return { status: false, code: 500, message: query.error }; }
+    let jsonArray = [];
+    for(let i = 0; i < query.result.recordset.length; i++){
+        jsonArray.push({ ccausafiniquito: query.result.recordset[i].CCAUSAFINIQUITO, xcausafiniquito: query.result.recordset[i].XCAUSAFINIQUITO });
+    }
+    return { status: true, list: jsonArray }
+}
+>>>>>>> origin/jhon
 
 module.exports = router;

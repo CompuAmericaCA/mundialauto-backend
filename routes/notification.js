@@ -573,7 +573,8 @@ const operationDetailNotification = async(authHeader, requestBody) => {
                     cnotanotificacion: getNotificationNotesData.result.recordset[i].CNOTANOTIFICACION,
                     xnotanotificacion: getNotificationNotesData.result.recordset[i].XNOTANOTIFICACION,
                     xrutaarchivo: getNotificationNotesData.result.recordset[i].XRUTAARCHIVO,
-                    cfiniquito: getNotificationNotesData.result.recordset[i].CFINIQUITO
+                    cfiniquito: getNotificationNotesData.result.recordset[i].CFINIQUITO,
+                    xcausafiniquito: getNotificationNotesData.result.recordset[i].XCAUSAFINIQUITO,
                 }
                 notes.push(note);
             }
@@ -1117,11 +1118,11 @@ const operationUpdateNotification = async(authHeader, requestBody) => {
 
         let settlementCreate = {
               xobservacion: requestBody.settlement.create.xobservacion,
-              crepuesto: requestBody.settlement.create.crepuesto,
               xdanos: requestBody.settlement.create.xdanos,
-              corden: requestBody.settlement.create.corden
+              mmontofiniquito: requestBody.settlement.create.mmontofiniquito,
+              cmoneda: requestBody.settlement.create.cmoneda,
+              ccausafiniquito: requestBody.settlement.create.ccausafiniquito
         }
-        console.log(settlementCreate)
         let createSettlementByNotification = await bd.createSettlementByNotificationQuery(settlementCreate, notificationData).then((res) => res);
         let cestatusgeneral;
         if(createSettlementByNotification.error){ return { status: false, code: 500, message: createSettlementByNotification.error }; }
@@ -1217,7 +1218,7 @@ const operationDetailSettlement = async(authHeader, requestBody) => {
             cfiniquito: detailSettlement.result.recordset[0].CFINIQUITO,
             cnotificacion: detailSettlement.result.recordset[0].CNOTIFICACION,
             corden: detailSettlement.result.recordset[0].CORDEN,
-            ccotizacion: detailSettlement.result.recordset[0].CCOTIZACION,
+            mmontofiniquito: detailSettlement.result.recordset[0].MMONTOFINIQUITO,
             xobservacion: detailSettlement.result.recordset[0].XOBSERVACION,
             xdanos: detailSettlement.result.recordset[0].XDANOS,
             ccompania: detailSettlement.result.recordset[0].CCOMPANIA,
@@ -1241,6 +1242,8 @@ const operationDetailSettlement = async(authHeader, requestBody) => {
             xdesde: detailSettlement.result.recordset[0].XDESDE,
             xhasta: detailSettlement.result.recordset[0].XHASTA,
             mmontototalgrua: detailSettlement.result.recordset[0].MMONTOTOTALGRUA,
+            ccausafiniquito: detailSettlement.result.recordset[0].CCAUSAFINIQUITO,
+            xcausafiniquito: detailSettlement.result.recordset[0].XCAUSAFINIQUITO,
             fcreacionnotificacion: detailSettlement.result.recordset[0].FCREACIONNOTIFICACION
         }
     }else{ return { status: false, code: 404, message: 'Coin not found.' }; }
