@@ -11970,13 +11970,14 @@ module.exports = {
         .query('select XCLASE from MACLASIFICACION_VEH WHERE XTIPO = @xtipo AND XMARCA = @xmarca AND XMODELO = @xmodelo');
         if(result.rowsAffected > 0 && searchData.clase)
         {
-            for(let i = 0; i < searchData.clase.length; i++){
+            for(let i = 0; i < searchData.clase.length; i++)
+            console.log(searchData.clases)
+            {
             let query= await pool.request()
-                .input('xclase', sql.NVarchar, result.clase[0].XCLASE)
-                .input('cano', sql.SmallInt, result.clase[i].cano)
-                .input('xtipo', sql.NVarChar, result.clase[i].xtipo)
+                .input('xclase', sql.NVarchar, result.clase[i].XCLASE)
+                .input('cano', sql.SmallInt, searchData.cano)
+                .input('xtipo', sql.NVarChar, searchData.xtipo)
                 .query('select PTASA_CASCO from MATARIFA_CASCO where XCLASE = @xclase AND CANO= @cano AND XTIPO = @xtipo');
-                console.log(result.clase[0].XCLASE)
       return { result: query }
       
             }
