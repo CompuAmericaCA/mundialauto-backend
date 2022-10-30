@@ -11967,18 +11967,21 @@ module.exports = {
         .input('xmarca', sql.NVarChar, searchData.xmarca)
         .input('xmodelo', sql.NVarChar, searchData.xmodelo)
         .input('cano', sql.SmallInt, searchData.cano)
-        .query('select XCLASE from MACLASIFICACION_VEH WHERE XTIPO = @xtipo AND XMARCA = @xmarca AND XMODELO = @xmodelo ');
-        if(result.rowsAffected > 0){
-            let xclase= result.recordset[0].XCLASE
-            console.log(result.recordset[0].XCLASE)
+        .query('select XCLASE from MACLASIFICACION_VEH WHERE XTIPO = @xtipo AND XMARCA = @xmarca AND XMODELO = @xmodelo');
+        if(result.rowsAffected > 0 && searchData.clase)
+        {
+            for(let i = 0; i < searchData.clase.length; i++){
             let query= await pool.request()
-                .input('xclase', sql.NVarchar, searchData.xclase)
-                .input('cano', sql.SmallInt, searchData.cano)
-                .input('xtipo', sql.NVarChar, searchData.xtipo)
+                .input('xclase', sql.NVarchar, result.clase[0].XCLASE)
+                .input('cano', sql.SmallInt, result.clase[i].cano)
+                .input('xtipo', sql.NVarChar, result.clase[i].xtipo)
                 .query('select PTASA_CASCO from MATARIFA_CASCO where XCLASE = @xclase AND CANO= @cano AND XTIPO = @xtipo');
+                console.log(result.clase[0].XCLASE)
+      return { result: query }
+      
+            }
      //sql.close();
-     console.log(query)
-     return { result: query };
+    ;
     }else{
         //sql.close();
         return { result: result };
