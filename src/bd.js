@@ -11969,24 +11969,23 @@ module.exports = {
         .input('xtipo', sql.NVarChar, searchData.xtipo)
         .input('xmarca', sql.NVarChar, searchData.xmarca)
         .input('xmodelo', sql.NVarChar, searchData.xmodelo)
-        .input('cano', sql.SmallInt, searchData.cano)
+        .input('cano', sql.Numeric(4, 0), searchData.cano)
         .query('select XCLASE from MACLASIFICACION_VEH WHERE XTIPO = @xtipo AND XMARCA = @xmarca AND XMODELO = @xmodelo ');
         if(result.rowsAffected > 0){
-            let xclase= result.recordset[0].XCLASE
-            console.log(result.recordset[0].XCLASE)
             let query= await pool.request()
-                .input('xclase', sql.NVarchar, searchData.xclase)
-                .input('cano', sql.SmallInt, searchData.cano)
+                .input('xclase', sql.NVarChar, result.recordset[0].XCLASE)
+                .input('cano', sql.Numeric(4, 0), searchData.cano)
                 .input('xtipo', sql.NVarChar, searchData.xtipo)
                 .query('select PTASA_CASCO from MATARIFA_CASCO where XCLASE = @xclase AND CANO= @cano AND XTIPO = @xtipo');
      //sql.close();
-     console.log(query)
+     console.log(result)
      return { result: query };
     }else{
         //sql.close();
         return { result: result };
        } 
     }catch(err){
+        console.log(err.message)
         return { error: err.message };
         }
 },

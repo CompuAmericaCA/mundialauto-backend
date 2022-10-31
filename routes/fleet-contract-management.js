@@ -1200,8 +1200,7 @@ const operationTarifaCasco = async(authHeader, requestBody) => {
         xtipo: requestBody.xtipo,
         xmarca: requestBody.xmarca,
         xmodelo: requestBody.xmodelo,
-        cano: requestBody.cano,
-        xcobertura: requestBody.xcobertura
+        cano: parseInt(requestBody.cano)
     };
 
     let query = await bd.SearchTarifa(searchData).then((res) => res);
