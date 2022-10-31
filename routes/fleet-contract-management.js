@@ -508,6 +508,7 @@ router.route('/detail').post((req, res) => {
             }
             res.json({ data: result });
         }).catch((err) => {
+            console.log(err.message)
             res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationDetailFleetContractManagement' } });
         });
     }
@@ -528,10 +529,10 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
         if(getFleetContractWorkerData.error){ return { status: false, code: 500, message: getFleetContractWorkerData.error }; }
         if(getFleetContractWorkerData.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Fleet Contract Worker not found.' }; }
         */let getFleetContractOwnerData = await bd.getFleetContractOwnerDataQuery(fleetContractData, getFleetContractData.result.recordset[0].CPROPIETARIO).then((res) => res);
-        if(getFleetContractOwnerData.error){ return { status: false, code: 500, message: getFleetContractOwnerData.error }; }
+        if(getFleetContractOwnerData.error){console.log(getFleetContractOwnerData.error); return { status: false, code: 500, message: getFleetContractOwnerData.error }; }
         if(getFleetContractOwnerData.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Fleet Contract Owner not found.' }; }
         let getFleetContractOwnerVehicleData = await bd.getFleetContractOwnerVehicleDataQuery(getFleetContractData.result.recordset[0].CPROPIETARIO, getFleetContractData.result.recordset[0].CVEHICULOPROPIETARIO).then((res) => res);
-        if(getFleetContractOwnerVehicleData.error){ return { status: false, code: 500, message: getFleetContractOwnerVehicleData.error }; }
+        if(getFleetContractOwnerVehicleData.error){ console.log(getFleetContractOwnerVehicleData.error); return { status: false, code: 500, message: getFleetContractOwnerVehicleData.error }; }
         if(getFleetContractOwnerVehicleData.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Fleet Contract Owner Vehicle not found.' }; }
         /*let searchQuoteByFleet = await bd.searchQuoteByFleetQuery(fleetContractData).then((res) => res);
         if(searchQuoteByFleet.error){ return { status: false, code: 500, message: searchQuoteByFleet.error }; }
@@ -584,11 +585,11 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
         let mprimaprorratatotal = 0; 
         let getPlanData = await db.getPlanData(getFleetContractData.result.recordset[0].CPLAN);
         if(getPlanData.error){ return { status: false, code: 500, message: getFleetContractOwnerData.error }; }
-        if(getPlanData.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Fleet Contract Plan not found.' }; }
+        if(getPlanData.result.rowsAffected < 0){ console.log(getPlanData.error); return { status: false, code: 404, message: 'Fleet Contract Plan not found.' }; }
         let realCoverages = [];
         let coverageAnnexes = [];
         let getPlanCoverages = await db.getPlanCoverages(getFleetContractData.result.recordset[0].CPLAN, getFleetContractData.result.recordset[0].CCONTRATOFLOTA);
-        if(getPlanCoverages.error){ return { status: false, code: 500, message: getFleetContractOwnerData.error }; }
+        if(getPlanCoverages.error){ console.log(getPlanCoverages.error); return { status: false, code: 500, message: getFleetContractOwnerData.error }; }
         if(getPlanCoverages.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Fleet Contract Plan Coverages not found.' }; }
         for (let i = 0; i < getPlanCoverages.result.recordset.length; i++) {
             /*let getCoverageServices = await db.getCoverageServices(getPlanCoverages.result.recordset[i].ccobertura);
@@ -618,15 +619,14 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
                 }
             }
             let coverage = {
-                ccobertura: getPlanCoverages.result.recordset[i].CCOBERTURA,
+                ccobertura: getPlanCoverages.result.recordset[i].ccobertura,
                 xcobertura: getPlanCoverages.result.recordset[i].XCOBERTURA,
                 ptasa: getPlanCoverages.result.recordset[i].ptasa,
                 msumaasegurada: getPlanCoverages.result.recordset[i].msuma_aseg,
                 mprima: getPlanCoverages.result.recordset[i].mprima,
                 mprimaprorrata: getPlanCoverages.result.recordset[i].mprimaprorrata,
                 ititulo: getPlanCoverages.result.recordset[i].ititulo,
-                xmoneda: getPlanCoverages.result.recordset[i].xmoneda,
-                ccontratoflota: getPlanCoverages.result.recordset[i].ccontratoflota
+                xmoneda: getPlanCoverages.result.recordset[i].xmoneda
             }
             realCoverages.push(coverage);
         }
@@ -637,7 +637,7 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
         }
         let services = [];
         let getFleetContractServices = await db.getFleetContractServices(getFleetContractData.result.recordset[0].ccarga);
-        if(getFleetContractServices.error){ return { status: false, code: 500, message: getFleetContractServices.error }; }
+        if(getFleetContractServices.error){ console.log(getFleetContractServices.error); return { status: false, code: 500, message: getFleetContractServices.error }; }
         if(getFleetContractServices.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Fleet Contract Service not found.' }; }
         if (getFleetContractServices.result.rowsAffected > 0) {
             for(let i = 0; i < getFleetContractServices.result.recordset.length; i++){
@@ -649,7 +649,7 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
             }
         }
         let getBroker = await bd.getBroker(getFleetContractData.result.recordset[0].ccorredor);
-        if(getBroker.error){ return { status: false, code: 500, message: getBroker.error }; }
+        if(getBroker.error){ console.log(getBroker.error); return { status: false, code: 500, message: getBroker.error }; }
         if(getBroker.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Fleet Contract Service not found.' }; }
         /*let getPlanServicesData = await db.getPlanServicesDataQuery(getFleetContractData.result.recordset[0].CPLAN).then((res) => res);
         if(getPlanServicesData.error){ return { status: false, code: 500, message: getPlanServicesData.error }; }
@@ -687,7 +687,7 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
             }
         }*/
         let getPlanArysData = await db.getPlanArys(getFleetContractData.result.recordset[0].CPLAN);
-        if(getPlanArysData.error){ return { status: false, code: 500, message: getFleetContractOwnerData.error }; }
+        if(getPlanArysData.error){ console.log(getPlanArysData.error); return { status: false, code: 500, message: getFleetContractOwnerData.error }; }
         if(getPlanArysData.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Fleet Contract Plan Arys not found.' }; }
         let xplanservicios;
         if (getPlanArysData.result.recordset[0].XPLAN) {
@@ -901,7 +901,6 @@ router.route('/update').post((req, res) => {
             }
             res.json({ data: result });
         }).catch((err) => {
-            console.log(err.message)
             res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationUpdateFleetContractManagement' } });
         });
     }
@@ -909,7 +908,7 @@ router.route('/update').post((req, res) => {
 
 const operationUpdateFleetContractManagement = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
-    //if(!helper.validateRequestObj(requestBody, ['cpais', 'ccompania', 'ccontratoflota', 'ccliente', 'casociado', 'cagrupador', 'finicio', 'fhasta' ,'cestatusgeneral', 'xcertificadoasociado', 'ctrabajador', 'cpropietario', 'cvehiculopropietario', 'cusuariomodificacion'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
+    if(!helper.validateRequestObj(requestBody, ['cpais', 'ccompania', 'ccontratoflota', 'ccliente', 'casociado', 'cagrupador', 'finicio', 'fhasta' ,'cestatusgeneral', 'xcertificadoasociado', 'ctrabajador', 'cpropietario', 'cvehiculopropietario', 'cusuariomodificacion'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
     let fleetContractData = {
         cpais: requestBody.cpais,
         ccompania: requestBody.ccompania,
@@ -1017,22 +1016,6 @@ const operationUpdateFleetContractManagement = async(authHeader, requestBody) =>
                     if(deleteInspectionsByFleetContractUpdate.result.rowsAffected < 0){ return { status: false, code: 500, message: 'Server Internal Error.', hint: 'deleteInspectionsByFleetContractUpdate' }; }
                 }
             }
-            console.log(requestBody.coverage)
-            if(requestBody.coverage){
-                console.log(requestBody.coverage)
-                if(requestBody.coverage.update){
-                    let coverageUpdate = {
-                        ccobertura: requestBody.coverage.update.ccobertura,
-                        ccontratoflota: requestBody.coverage.update.ccontratoflota,
-                        mprima: requestBody.coverage.update.xprimacobertura,
-                        msuma_aseg: requestBody.coverage.update.msuma_aseg
-                    }
-                    console.log(coverageUpdate)
-                    let createInspectonsByFleetContractUpdate = await bd.createInspectonsByFleetContractUpdateQuery(requestBody.inspections.create, fleetContractData).then((res) => res);
-                    if(createInspectonsByFleetContractUpdate.error){ return { status: false, code: 500, message: createInspectonsByFleetContractUpdate.error }; }
-                    if(createInspectonsByFleetContractUpdate.result.rowsAffected < 0){ return { status: false, code: 500, message: 'Server Internal Error.', hint: 'createInspectonsByFleetContractUpdate' }; }
-                }
-            }
             return { status: true, ccontratoflota: fleetContractData.ccontratoflota }; 
         }
         else{ return { status: false, code: 404, message: 'Fleet Contract not found.' }; }
@@ -1122,7 +1105,7 @@ const operationCreateIndividualContract = async(requestBody) => {
     };
     if(userData){
         let operationCreateIndividualContract = await bd.createIndividualContractQuery(userData).then((res) => res);
-        if(operationCreateIndividualContract.error){ return { status: false, code: 500, message: operationCreateIndividualContract.error }; }
+        if(operationCreateIndividualContract.error){ console.log(operationCreateIndividualContract.error);return { status: false, code: 500, message: operationCreateIndividualContract.error }; }
     }
     if(requestBody.accessory){
         if(requestBody.accessory.create){
@@ -1194,88 +1177,74 @@ const operationCreateIndividualContract = async(requestBody) => {
     }
   })();
 
-  router.route('/detail-recoverage').post((req, res) => {
+router.route('/search-tarifa').post((req, res) => {
     if(!req.header('Authorization')){
         res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } });
         return;
     }else{
-        operationRecoverageDetail(req.header('Authorization'), req.body).then((result) => {
+        operationSearchTarifa(req.header('Authorization'), req.body).then((result) => {
             if(!result.status){
                 res.status(result.code).json({ data: result });
                 return;
             }
             res.json({ data: result });
         }).catch((err) => {
-            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationRecoverageDetail' } });
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationSearchTarifa' } });
         });
     }
 });
 
-const operationRecoverageDetail = async(authHeader, requestBody) => { 
+const operationSearchTarifa = async(authHeader, requestBody) => { 
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
-    let searchData = {
-        ccobertura: requestBody.ccobertura,
-        ccontratoflota: requestBody.ccontratoflota
-    };
-    let getRecoverageDetailData = await bd.getRecoverageDetailData(searchData);
-    if(getRecoverageDetailData.error){ return { status: false, code: 500, message: getRecoverageDetailData.error }; }
-    if(getRecoverageDetailData.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Receipt Data not found.' }; }
+    let getSeatchTarifa = await bd.getSeatchTarifaData(receiptData);
+    if(getSeatchTarifa.error){ return { status: false, code: 500, message: getSeatchTarifa.error }; }
+    if(getSeatchTarifa.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Receipt Data not found.' }; }
     return {
         status: true,
-        ccobertura: getRecoverageDetailData.result.recordset[0].CCOBERTURA,
-        xcobertura: getRecoverageDetailData.result.recordset[0].XCOBERTURA,
-        ccontratoflota: getRecoverageDetailData.result.recordset[0].ccontratoflota,
-        mprima: getRecoverageDetailData.result.recordset[0].mprima,
-        msuma_aseg: getRecoverageDetailData.result.recordset[0].msuma_aseg
+            id: getSeatchTarifa.result.recordset[0].ID,
+            xmodelo: getSeatchTarifa.result.recordset[0].XMODELO
     }
 }
 
-router.route('/update-coverage').post((req, res) => {
-    if(!req.header('Authorization')){
-        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } });
+router.route('/tarifa-casco').post((req, res) => {
+    if(!req.header('Authorization')){ 
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
         return;
     }else{
-        operationUpdateCoverage(req.header('Authorization'), req.body).then((result) => {
-            if(!result.status){
+        operationTarifaCasco(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){ 
                 res.status(result.code).json({ data: result });
                 return;
             }
             res.json({ data: result });
         }).catch((err) => {
-            console.log(err.message)
-            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationUpdateCoverage' } })
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationTarifaCasco' } });
         });
     }
 });
 
-const operationUpdateCoverage = async(authHeader, requestBody) => {
+const operationTarifaCasco = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
-    if(requestBody.fechas){
-        let fechaData = [];
-        fechaData.push({
-            ccarga: requestBody.fechas.ccarga,
-            fdesde_pol: requestBody.fechas.fdesde_pol,
-            fhasta_pol: requestBody.fechas.fhasta_pol,
-            fdesde_rec: requestBody.fechas.fdesde_rec,
-            fhasta_rec: requestBody.fechas.fhasta_rec,
-        });
-        let updateReceipt = await bd.updateReceiptQuery(fechaData).then((res) => res);
-        if(updateReceipt.error){ return { status: false, code: 500, message: updateReceipt.error }; }
+    let searchData = {
+        xtipo: requestBody.xtipo,
+        xmarca: requestBody.xmarca,
+        xmodelo: requestBody.xmodelo,
+        cano: parseInt(requestBody.cano),
+        xcobertura:requestBody.xcobertura,
+    };
+    if(requestBody.xcobertura == 'AMPLIA'){
+    let query = await bd.SearchTarifaCasco(searchData).then((res) => res);
+    if(query.error){ return { status: false, code: 500, message: query.error }; }
+    return { status: true,
+             ptasa_casco: query.result.recordset[0].PTASA_CASCO
+            }
     }
-    if(requestBody.coverage){
-        if(requestBody.coverage.update){
-            let coverageData = [];
-            coverageData.push({
-                ccobertura: requestBody.coverage.update.ccobertura,
-                ccontratoflota: requestBody.coverage.update.ccontratoflota,
-                mprima: requestBody.coverage.update.mprima,
-                msuma_aseg: requestBody.coverage.update.msuma_aseg
-            });
-            let updateCoverage = await bd.updateCoverageQuery(coverageData).then((res) => res);
-            if(updateCoverage.error){ return { status: false, code: 500, message: updateCoverage.error }; }
-        }
-    }
-    else{ return { status: false, code: 404, message: 'Service Order not found.' }; }
-    return { status: true};
+    else if(requestBody.xcobertura == 'PERDIDA TOTAL'){
+        let query = await bd.SearchTarifaPerdida(searchData).then((res) => res);
+        if(query.error){ return { status: false, code: 500, message: query.error }; }
+        return { status: true,
+                 ptasa_casco: query.result.recordset[0].PTASA_CASCO
+                }
+    }       
 }
 module.exports = router;

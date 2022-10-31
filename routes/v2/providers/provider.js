@@ -212,22 +212,23 @@ const operationDetailProvider = async(authHeader, requestBody) => {
     let getProviderData = await db.getProviderDataQuery(providerData).then((res) => res);
     if(getProviderData.error){ return { status: false, code: 500, message: getProviderData.error }; }
     if(getProviderData.result.rowsAffected == 0){ return { status: false, code: 404, message: 'Provider not found.' }; }
-    // let banks = [];
-    // let getProviderBanksData = await db.getProviderBanksDataQuery(providerData.cproveedor).then((res) => res);
-    // if(getProviderBanksData.error){ return { status: false, code: 500, message: getProviderBanksData.error }; }
-    // if(getProviderBanksData.result.rowsAffected > 0){
-    //     for(let i = 0; i < getProviderBanksData.result.recordset.length; i++){
-    //         let bank = {
-    //             cbanco: getProviderBanksData.result.recordset[i].CBANCO,
-    //             xbanco: getProviderBanksData.result.recordset[i].XBANCO,
-    //             ctipocuentabancaria: getProviderBanksData.result.recordset[i].CTIPOCUENTABANCARIA,
-    //             xtipocuentabancaria: getProviderBanksData.result.recordset[i].XTIPOCUENTABANCARIA,
-    //             xnumerocuenta: getProviderBanksData.result.recordset[i].XNUMEROCUENTA,
-    //             bprincipal: getProviderBanksData.result.recordset[i].BPRINCIPAL,
-    //         }
-    //         banks.push(bank);
-    //     }
-    // }
+    let banks = [];
+    let getProviderBanksData = await db.getProviderBanksDataQuery(providerData.cproveedor).then((res) => res);
+    if(getProviderBanksData.error){ return { status: false, code: 500, message: getProviderBanksData.error }; }
+    if(getProviderBanksData.result.rowsAffected > 0){
+        for(let i = 0; i < getProviderBanksData.result.recordset.length; i++){
+            let bank = {
+                cbanco: getProviderBanksData.result.recordset[i].CBANCO,
+                xbanco: getProviderBanksData.result.recordset[i].XBANCO,
+                ctipocuentabancaria: getProviderBanksData.result.recordset[i].CTIPOCUENTABANCARIA,
+                xtipocuentabancaria: getProviderBanksData.result.recordset[i].XTIPOCUENTABANCARIA,
+                xnumerocuenta: getProviderBanksData.result.recordset[i].XNUMEROCUENTA,
+                bprincipal: getProviderBanksData.result.recordset[i].BPRINCIPAL,
+            }
+            console.log(bank)
+            banks.push(bank);
+        }
+    }
     // let states = [];
     // let getProviderStatesData = await db.getProviderStatesDataQuery(providerData.cproveedor).then((res) => res);
     // if(getProviderStatesData.error){ return { status: false, code: 500, message: getProviderStatesData.error }; }
@@ -308,7 +309,7 @@ const operationDetailProvider = async(authHeader, requestBody) => {
         xpaginaweb: getProviderData.result.recordset[0].XPAGINAWEB ? getProviderData.result.recordset[0].XPAGINAWEB : undefined,
         xobservacion: getProviderData.result.recordset[0].XOBSERVACION,
         bactivo: getProviderData.result.recordset[0].BACTIVO,
-        // banks: banks,
+        banks: banks,
         // states: states,
         // brands: brands,
         services: services,
@@ -317,34 +318,21 @@ const operationDetailProvider = async(authHeader, requestBody) => {
 }
 
 router.route('/production/update').post((req, res) => {
-    if(!req.header('Authorization')){
-        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } });
+    if(!req.header('Authorization')){ 
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
         return;
-    }
-    let validateSchema = helper.validateSchema('production', 'provider', req.body, 'updateProvidersProductionProviderSchema');
-    if(validateSchema.error){ 
-        res.status(401).json({ data: { status: false, code: 400, message: validateSchema.error.details[0].message } });
-        return;
-    }
-    validator.operationVerifyProductionModulePermission(req.body.permissionData, 'BEDITAR').then((response) => {
-        console.log(req.body.permissionData)
-        if(response.error){ 
-            console.log(req.body.permissionData)
-            res.status(401).json({ status: false, code: 401, condition: 'user-dont-have-permissions', expired: false });
-            return;
-        }
+    }else{
         operationUpdateProvider(req.header('Authorization'), req.body).then((result) => {
-            if(!result.status){
+            if(!result.status){ 
                 res.status(result.code).json({ data: result });
                 return;
             }
             res.json({ data: result });
         }).catch((err) => {
+            console.log(err.message)
             res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationUpdateProvider' } });
         });
-    }).catch((err) => {
-        res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationVerifyProductionModulePermission' } });
-    });
+    }
 });
 
 const operationUpdateProvider = async(authHeader, requestBody) => {
@@ -353,14 +341,14 @@ const operationUpdateProvider = async(authHeader, requestBody) => {
         cpais: requestBody.cpais,
         ccompania: requestBody.ccompania,
         cproveedor: requestBody.cproveedor,
-        xproveedor: requestBody.xproveedor.toUpperCase(),
+        xproveedor: requestBody.xproveedor ? requestBody.xproveedor.toUpperCase() : undefined,
         ctipodocidentidad: requestBody.ctipodocidentidad,
         xdocidentidad: requestBody.xdocidentidad,
-        xrazonsocial: requestBody.xrazonsocial.toUpperCase(),
+        xrazonsocial: requestBody.xrazonsocial ? requestBody.xrazonsocial.toUpperCase() : undefined,
         xtelefono: requestBody.xtelefono,
         xemail: requestBody.xemail ? requestBody.xemail.toUpperCase() : undefined,
-        xdireccion: requestBody.xdireccion.toUpperCase(),
-        xdireccioncorreo: requestBody.xdireccioncorreo.toUpperCase(),
+        xdireccion: requestBody.xdireccion ? requestBody.xdireccion.toUpperCase() : undefined,
+        xdireccioncorreo: requestBody.xdireccioncorreo ? requestBody.xdireccioncorreo.toUpperCase() : undefined,
         cestado: requestBody.cestado,
         cciudad: requestBody.cciudad,
         xfax: requestBody.xfax ? requestBody.xfax.toUpperCase() : undefined,
@@ -369,7 +357,7 @@ const operationUpdateProvider = async(authHeader, requestBody) => {
         ldiascredito: requestBody.ldiascredito,
         bafiliado: requestBody.bafiliado,
         xpaginaweb: requestBody.xpaginaweb ? requestBody.xpaginaweb.toUpperCase() : undefined,
-        xobservacion: requestBody.xobservacion.toUpperCase(),
+        xobservacion: requestBody.xobservacion ? requestBody.xobservacion.toUpperCase() : undefined,
         bactivo: requestBody.bactivo,
         cusuariomodificacion: requestBody.cusuariomodificacion
     }
@@ -389,16 +377,22 @@ const operationUpdateProvider = async(authHeader, requestBody) => {
             for(let i = 0; i < requestBody.banks.update.length; i++){
                 requestBody.banks.update[i].xnumerocuenta = requestBody.banks.update[i].xnumerocuenta;
             }
-            console.log(requestBody.banks.update)
             let updateBanksByProviderUpdate = await db.updateBanksByProviderUpdateQuery(requestBody.banks.update, providerData).then((res) => res);
             if(updateBanksByProviderUpdate.error){ return { status: false, code: 500, message: updateBanksByProviderUpdate.error }; }
             if(updateBanksByProviderUpdate.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Bank not found.' }; }
         }
         if(requestBody.banks.create && requestBody.banks.create.length > 0){
+            let bankList = [];
             for(let i = 0; i < requestBody.banks.create.length; i++){
-                requestBody.banks.create[i].xnumerocuenta = requestBody.banks.create[i].xnumerocuenta;
+                bankList.push({
+                    cbanco: requestBody.banks.create[i].cbanco,
+                    ctipocuentabancaria: requestBody.banks.create[i].ctipocuentabancaria,
+                    xnumerocuenta: requestBody.banks.create[i].xnumerocuenta,
+                    bprincipal: requestBody.banks.create[i].bprincipal
+                })
+                console.log(bankList)
             }
-            let createBanksByProviderUpdate = await db.createBanksByProviderUpdateQuery(requestBody.banks.create, providerData).then((res) => res);
+            let createBanksByProviderUpdate = await db.createBanksByProviderUpdateQuery(bankList, providerData).then((res) => res);
             if(createBanksByProviderUpdate.error){ return { status: false, code: 500, message: createBanksByProviderUpdate.error }; }
             if(createBanksByProviderUpdate.result.rowsAffected < 0){ return { status: false, code: 500, message: 'Server Internal Error.', hint: 'createBanksByProviderUpdate' }; }
         }
