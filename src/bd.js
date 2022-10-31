@@ -12196,7 +12196,7 @@ module.exports = {
             return { error: err.message };
         }
     },
-    serviceOrderBySettlementQuery: async(searchData) => {
+serviceOrderBySettlementQuery: async(searchData) => {
         try{
             let pool = await sql.connect(config);
             let result = await pool.request()
@@ -12209,7 +12209,7 @@ module.exports = {
             return { error: err.message };
         }
     },
-    TypeMetodologia: async(searchData) => {
+TypeMetodologia: async(searchData) => {
         try{
             let pool = await sql.connect(config);
             let result = await pool.request()
@@ -12222,18 +12222,15 @@ module.exports = {
         return { error: err.message };
     }
  },
-     SearchTarifa: async(searchData) => {
+ SearchTarifaCascoModelo: async(searchData) => {
     try{
-        let rowsAffected = 0;
         let pool = await sql.connect(config);
         let result = await pool.request()
         .input('xtipo', sql.NVarChar, searchData.xtipo)
         .input('xmarca', sql.NVarChar, searchData.xmarca)
-        .input('xmodelo', sql.NVarChar, searchData.xmodelo)
         .input('cano', sql.SmallInt, searchData.cano)
-        .query('select XCLASE from MACLASIFICACION_VEH WHERE XTIPO = @xtipo AND XMARCA = @xmarca AND XMODELO = @xmodelo');
-        console.log(result)
-        if(result.rowsAffected > 0){
+        .query('select XCLASE from MACLASIFICACION_VEH WHERE XTIPO = @xtipo AND XMARCA = @xmarca AND XMODELO = todos');
+        if(result.rowsAffected > 0 ) {
             let pool = await sql.connect(config);
             let query= await pool.request()
                 .input('xclase', sql.NVarChar, result.recordset[0].XCLASE)
@@ -12241,26 +12238,60 @@ module.exports = {
                 .input('xtipo', sql.NVarChar, searchData.xtipo)
                 .query('select PTASA_CASCO from MATARIFA_CASCO where XCLASE = @xclase AND CANO = @cano AND XTIPO = @xtipo');
                 return { result: query };
-    }else if(result.rowsAffected = 0){
+    }else {
+        
+       } 
+    }catch(err){
+        return { error: err.message };
+        }
+},
+SearchTarifaCasco: async(searchData) => {
+    try{
         let pool = await sql.connect(config);
         let result = await pool.request()
         .input('xtipo', sql.NVarChar, searchData.xtipo)
         .input('xmarca', sql.NVarChar, searchData.xmarca)
         .input('xmodelo', sql.NVarChar, searchData.xmodelo)
         .input('cano', sql.SmallInt, searchData.cano)
-        .query('select XCLASE from MACLASIFICACION_VEH WHERE XTIPO = @xtipo AND XMARCA = @xmarca AND XMODELO = todos ');
-        if(result.rowsAffected > 0){
+        .query('select XCLASE from MACLASIFICACION_VEH WHERE XTIPO = @xtipo AND XMARCA = @xmarca AND XMODELO = @xmodelo');
+        if(result.rowsAffected > 0 ) {
             let pool = await sql.connect(config);
             let query= await pool.request()
                 .input('xclase', sql.NVarChar, result.recordset[0].XCLASE)
                 .input('cano', sql.Int, searchData.cano)
                 .input('xtipo', sql.NVarChar, searchData.xtipo)
                 .query('select PTASA_CASCO from MATARIFA_CASCO where XCLASE = @xclase AND CANO = @cano AND XTIPO = @xtipo');
-                return { result: query }
-            }
+                return { result: query };
+    }else {
+     return{result: result}
+     
        } 
     }catch(err){
-        console.log('hola: ' + err.message)
+        return { error: err.message };
+        }
+},
+SearchTarifaPerdida: async(searchData) => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+        .input('xtipo', sql.NVarChar, searchData.xtipo)
+        .input('xmarca', sql.NVarChar, searchData.xmarca)
+        .input('xmodelo', sql.NVarChar, searchData.xmodelo)
+        .input('cano', sql.SmallInt, searchData.cano)
+        .query('select XCLASE from MACLASIFICACION_VEH WHERE XTIPO = @xtipo AND XMARCA = @xmarca AND XMODELO = @xmodelo');
+        if(result.rowsAffected > 0 ) {
+            let pool = await sql.connect(config);
+            let query= await pool.request()
+                .input('xclase', sql.NVarChar, result.recordset[0].XCLASE)
+                .input('cano', sql.Int, searchData.cano)
+                .input('xtipo', sql.NVarChar, searchData.xtipo)
+                .query('select PTASA_CASCO from MATARIFA_PERDIDA where XCLASE = @xclase AND CANO = @cano AND XTIPO = @xtipo');
+                return { result: query };
+       }else{
+        //sql.close();
+        return { result: result };
+       } 
+    }catch(err){
         return { error: err.message };
         }
 },
@@ -12275,23 +12306,7 @@ getSeatchTarifaData: async() => {
         return { error: err.message };
     }
 },
-hola: async(searchData, xclase) => {
-    try{
-        let pool = await sql.connect(config);
-        let result = await pool.request()
-        .input('xclase', sql.NVarchar, xclase)
-        .input('cano', sql.SmallInt, searchData.cano)
-        .input('xtipo', sql.NVarChar, searchData.xtipo)
-        .query('select PTASA_CASCO from MATARIFA_CASCO where XCLASE = @xclase AND CANO= @cano AND XTIPO = @xtipo');
-    //sql.close();
-    console.log(result)
-    return { result: result };
-}catch(err){
-    console.log(err.message)
-    return { error: err.message };
-}
-},
-    getRecoverageDetailData: async(searchData) => {
+getRecoverageDetailData: async(searchData) => {
         try{
             let pool = await sql.connect(config);
             let result = await pool.request()
@@ -12304,7 +12319,7 @@ hola: async(searchData, xclase) => {
             return { error: err.message };
         }
     },
-    updateCoverageQuery: async(coverageData) => {
+updateCoverageQuery: async(coverageData) => {
         try{
             let rowsAffected = 0;
             let pool = await sql.connect(config);
@@ -12324,7 +12339,7 @@ hola: async(searchData, xclase) => {
             return { error: err.message };
         }
     },
-    updateReceiptQuery: async(fechaData) => {
+updateReceiptQuery: async(fechaData) => {
         try{
             let rowsAffected = 0;
             let pool = await sql.connect(config);
@@ -12344,7 +12359,7 @@ hola: async(searchData, xclase) => {
             return { error: err.message };
         }
     },
-    causeSettlementValrepQuery: async() => {
+causeSettlementValrepQuery: async() => {
         try{
             let pool = await sql.connect(config);
             let result = await pool.request()
@@ -12355,7 +12370,7 @@ hola: async(searchData, xclase) => {
             return { error: err.message };
         }
     },
-    TypeMetodologia: async(searchData) => {
+TypeMetodologia: async(searchData) => {
         try{
             let pool = await sql.connect(config);
             let result = await pool.request()
