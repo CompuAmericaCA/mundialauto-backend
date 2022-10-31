@@ -1599,7 +1599,7 @@ const operationValrepParentPolicy = async(authHeader, requestBody) => {
     if(query.error){ return { status: false, code: 500, message: query.error }; }
     let jsonArray = [];
     for(let i = 0; i < query.result.recordset.length; i++){
-        jsonArray.push({ ccarga: query.result.recordset[i].CCARGA, xdescripcion: query.result.recordset[i].XDESCRIPCION_L, xpoliza: query.result.recordset[i].XPOLIZA, mprimaanual: query.result.recordset[i].MPRIMAANUAL, fcreacion: query.result.recordset[i].FCREACION });
+        jsonArray.push({ ccarga: query.result.recordset[i].CCARGA, xdescripcion: query.result.recordset[i].XDESCRIPCION_L, xpoliza: query.result.recordset[i].XPOLIZA, fcreacion: new Date(query.result.recordset[i].FCREACION).toLocaleDateString() });
     }
     return { status: true, list: jsonArray }
 }

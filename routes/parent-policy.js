@@ -33,13 +33,10 @@ const operationSearchParentPolicy = async(authHeader, requestBody) => {
         for(let i = 0; i < searchParentPolicy.result.recordset.length; i++){
             jsonList.push({
                 ccarga: searchParentPolicy.result.recordset[i].CCARGA,
-                xmoneda: searchParentPolicy.result.recordset[i].xmoneda,
-                xmetodologiapago: searchParentPolicy.result.recordset[i].XMETODOLOGIAPAGO,
+                xcorredor: searchParentPolicy.result.recordset[i].XCORREDOR,
                 xdescripcion: searchParentPolicy.result.recordset[i].XDESCRIPCION_L,
                 xpoliza: searchParentPolicy.result.recordset[i].XPOLIZA,
-                nrecibos: searchParentPolicy.result.recordset[i].NRECIBOS,
-                mprimaanual: searchParentPolicy.result.recordset[i].MPRIMAANUAL,
-                fcreacion: searchParentPolicy.result.recordset[i].FCREACION
+                fcreacion: new Date(searchParentPolicy.result.recordset[i].FCREACION).toLocaleDateString()
             });
         }
         return { status: true, list: jsonList };
@@ -118,10 +115,7 @@ const operationDetailParentPolicy = async(authHeader, requestBody) => {
         xdescripcion: getParentPolicyData.result.recordset[0].XDESCRIPCION_L,
         xpoliza: getParentPolicyData.result.recordset[0].XPOLIZA,
         ccliente: getParentPolicyData.result.recordset[0].CCLIENTE,
-        cmoneda: getParentPolicyData.result.recordset[0].CMONEDA,
         ccorredor: getParentPolicyData.result.recordset[0].CCORREDOR,
-        cmetodologiapago: getParentPolicyData.result.recordset[0].CMETODOLOGIAPAGO,
-        mprimaanual: getParentPolicyData.result.recordset[0].MPRIMAANUAL,
         fcreacion: getParentPolicyData.result.recordset[0].FCREACION,
         batches: batches
     }
@@ -146,29 +140,40 @@ router.route('/create').post((req, res) => {
 
 const operationParentPolicy = async(authHeader, requestBody) => { 
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let ccarga = 0;
+    if(!requestBody.polizaMatriz.ccarga){
+        let getLastPolicyNumber = await bd.getLastPolicyNumberQuery().then((res) => res);
+        if (getLastPolicyNumber.error){ console.log(getLastPolicyNumber.error); return { status: false, code: 500, message: getLastPolicyNumber.error }; }
+        let createParentPolicy = await bd.createParentPolicyQuery(requestBody.polizaMatriz, requestBody.cpais, requestBody.ccompania, requestBody.cusuario, getLastPolicyNumber.result.cpoliza);
+        if(createParentPolicy.error){ console.log(createParentPolicy.error);return { status: false, code: 500, message: createParentPolicy.error }; }
+        ccarga = createParentPolicy.result.ccarga;
+    }
+    else {
+        ccarga = requestBody.polizaMatriz.ccarga;
+    }
+    if(requestBody.polizaMatriz.lotes.length > 0) {
 
-    if(requestBody.polizaMatriz.ccarga){
+        for(i = 0; i < requestBody.polizaMatriz.lotes.length; i++) { 
 
-        if(requestBody.polizaMatriz.lotes.length > 0) {
+            if (requestBody.polizaMatriz.lotes[i].create){
+                //Temporalmente se inhabilitará el agregar más vehículos a un lote que ya haya sido previamente cargado.
+                if (requestBody.polizaMatriz.lotes[i].clote){ 
+                    /*
+                    if(requestBody.polizaMatriz.lotes[i].contratosCSV.length > 0){
+                        let createBatchContract = await bd.createBatchContractQuery(requestBody.polizaMatriz.lotes[i].contratosCSV, requestBody.polizaMatriz.ccarga, requestBody.polizaMatriz.lotes[i].clote, requestBody.polizaMatriz.ccliente).then((res) => res);
+                        if(createBatchContract.error){ console.log(createBatchContract.error);return { status: false, code: 500, message: createBatchContract.error }; }
+                    }*/
 
-            for(i = 0; i < requestBody.polizaMatriz.lotes.length; i++) { 
-
-                if (requestBody.polizaMatriz.lotes[i].create){
-                    //Temporalmente se inhabilitará el agregar más vehículos a un lote que ya haya sido previamente cargado.
-                    if (requestBody.polizaMatriz.lotes[i].clote){ 
-                        /*
-                        if(requestBody.polizaMatriz.lotes[i].contratosCSV.length > 0){
-                            let createBatchContract = await bd.createBatchContractQuery(requestBody.polizaMatriz.lotes[i].contratosCSV, requestBody.polizaMatriz.ccarga, requestBody.polizaMatriz.lotes[i].clote, requestBody.polizaMatriz.ccliente).then((res) => res);
-                            if(createBatchContract.error){ console.log(createBatchContract.error);return { status: false, code: 500, message: createBatchContract.error }; }
-                        }*/
-
-                    } else { 
-                        let createBatch = await bd.createBatchQuery(requestBody.polizaMatriz.ccarga, requestBody.cusuario, requestBody.polizaMatriz.lotes[i]).then((res) => res);
-                        if(createBatch.error){ console.log(createBatch.error);return { status: false, code: 500, message: createBatch.error }; }
-                        if(requestBody.polizaMatriz.lotes[i].contratosCSV.length > 0){
-                            let createBatchContract = await bd.createBatchContractQuery(requestBody.polizaMatriz.lotes[i].contratosCSV, requestBody.polizaMatriz.ccarga, createBatch.result.clote, requestBody.polizaMatriz.ccliente).then((res) => res);
-                            if(createBatchContract.error){ console.log(createBatchContract.error);return { status: false, code: 500, message: createBatchContract.error }; }
-                        }
+                } else { 
+                    let getLastBatchCode = await bd.getLastParentPolicyBatchQuery(ccarga).then((res) => res);
+                    if (getLastBatchCode.error){ console.log(getLastBatchCode.error); return { status: false, code: 500, message: getLastBatchCode.error }; }
+                    let createBatch = await bd.createBatchQuery(ccarga, requestBody.cusuario, requestBody.polizaMatriz.lotes[i], getLastBatchCode.result.clote).then((res) => res);
+                    if(createBatch.error){ console.log(createBatch.error);return { status: false, code: 500, message: createBatch.error }; }
+                    if(requestBody.polizaMatriz.lotes[i].contratosCSV.length > 0){
+                        let createBatchContract = await bd.createBatchContractQuery(requestBody.polizaMatriz.lotes[i].contratosCSV, ccarga, createBatch.result.clote, requestBody.polizaMatriz.ccliente, requestBody.polizaMatriz.xpoliza).then((res) => res);
+                        if(createBatchContract.error){ 
+                            let deleteBatchByParentPolicy = await bd.deleteBatchByParentPolicyQuery(ccarga, createBatch.result.clote);
+                            return { status: false, code: 500, message: createBatchContract.error }; }
                     }
                 }
             }
@@ -178,7 +183,8 @@ const operationParentPolicy = async(authHeader, requestBody) => {
     return {
         status: true,
         code: 200,
-        message: "todo bien"
+        message: "solicitud procesada",
+        ccarga: ccarga
     }
 }
 
