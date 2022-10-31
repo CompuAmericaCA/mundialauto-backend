@@ -11964,6 +11964,7 @@ module.exports = {
  },
      SearchTarifa: async(searchData) => {
     try{
+        let rowsAffected = 0;
         let pool = await sql.connect(config);
         let result = await pool.request()
         .input('xtipo', sql.NVarChar, searchData.xtipo)
@@ -11971,26 +11972,35 @@ module.exports = {
         .input('xmodelo', sql.NVarChar, searchData.xmodelo)
         .input('cano', sql.SmallInt, searchData.cano)
         .query('select XCLASE from MACLASIFICACION_VEH WHERE XTIPO = @xtipo AND XMARCA = @xmarca AND XMODELO = @xmodelo');
-        if(result.rowsAffected > 0 && searchData.clase)
-        {
-            for(let i = 0; i < searchData.clase.length; i++)
-            console.log(searchData.clases)
-            {
+        console.log(result)
+        if(result.rowsAffected > 0){
+            let pool = await sql.connect(config);
             let query= await pool.request()
-                .input('xclase', sql.NVarchar, result.clase[i].XCLASE)
-                .input('cano', sql.SmallInt, searchData.cano)
+                .input('xclase', sql.NVarChar, result.recordset[0].XCLASE)
+                .input('cano', sql.Int, searchData.cano)
                 .input('xtipo', sql.NVarChar, searchData.xtipo)
-                .query('select PTASA_CASCO from MATARIFA_CASCO where XCLASE = @xclase AND CANO= @cano AND XTIPO = @xtipo');
-      return { result: query }
-      
+                .query('select PTASA_CASCO from MATARIFA_CASCO where XCLASE = @xclase AND CANO = @cano AND XTIPO = @xtipo');
+                return { result: query };
+    }else if(result.rowsAffected = 0){
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+        .input('xtipo', sql.NVarChar, searchData.xtipo)
+        .input('xmarca', sql.NVarChar, searchData.xmarca)
+        .input('xmodelo', sql.NVarChar, searchData.xmodelo)
+        .input('cano', sql.SmallInt, searchData.cano)
+        .query('select XCLASE from MACLASIFICACION_VEH WHERE XTIPO = @xtipo AND XMARCA = @xmarca AND XMODELO = todos ');
+        if(result.rowsAffected > 0){
+            let pool = await sql.connect(config);
+            let query= await pool.request()
+                .input('xclase', sql.NVarChar, result.recordset[0].XCLASE)
+                .input('cano', sql.Int, searchData.cano)
+                .input('xtipo', sql.NVarChar, searchData.xtipo)
+                .query('select PTASA_CASCO from MATARIFA_CASCO where XCLASE = @xclase AND CANO = @cano AND XTIPO = @xtipo');
+                return { result: query }
             }
-     //sql.close();
-    ;
-    }else{
-        //sql.close();
-        return { result: result };
        } 
     }catch(err){
+        console.log('hola: ' + err.message)
         return { error: err.message };
         }
 },

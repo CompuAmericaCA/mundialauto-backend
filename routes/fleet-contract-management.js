@@ -1200,9 +1200,10 @@ const operationTarifaCasco = async(authHeader, requestBody) => {
         xtipo: requestBody.xtipo,
         xmarca: requestBody.xmarca,
         xmodelo: requestBody.xmodelo,
-        cano: requestBody.cano,
+        cano: parseInt(requestBody.cano),
+        xcobertura:requestBody.xcobertura,
     };
-
+    if(requestBody.xcobertura == 'AMPLIA'){}
     let query = await bd.SearchTarifa(searchData).then((res) => res);
     if(query.error){ return { status: false, code: 500, message: query.error }; }
     return { status: true,
