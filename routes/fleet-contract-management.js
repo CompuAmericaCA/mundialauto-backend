@@ -1069,7 +1069,10 @@ const operationCreateIndividualContract = async(requestBody) => {
         msuma_aseg: requestBody.msuma_aseg ? requestBody.msuma_aseg : undefined,
         mtarifa: requestBody.mtarifa ? requestBody.mtarifa : undefined,
         mprima_casco: requestBody.mprima_casco ? requestBody.mprima_casco : undefined,
-        mcatastrofico: requestBody.mcatastrofico ? requestBody.mcatastrofico : undefined
+        mcatastrofico: requestBody.mcatastrofico ? requestBody.mcatastrofico : undefined,
+        pdescuento: requestBody.pdescuento ? requestBody.pdescuento : undefined,
+        ifraccionamiento: requestBody.ifraccionamiento ? requestBody.ifraccionamiento : undefined,
+        ncuotas: requestBody.ncuotas ? requestBody.ncuotas : undefined
     };
     if(userData){
         let operationCreateIndividualContract = await bd.createIndividualContractQuery(userData).then((res) => res);
@@ -1090,7 +1093,7 @@ const operationCreateIndividualContract = async(requestBody) => {
             if(createAccesories.error){ return { status: false, code: 500, message: createAccesories.error }; }
         }
     }
-    else{ return { status: true, code: 500, message: 'Server Internal Error.', hint: 'createContract' }; }
+    return { status: true, code: 500, message: 'Server Internal Error.', hint: 'createContract' };
 }
 
 
