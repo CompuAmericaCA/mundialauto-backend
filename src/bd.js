@@ -11914,7 +11914,7 @@ module.exports = {
                 let update = await pool.request()
                 .input('ctipovehiculo', sql.Int, vehicleTypeUpdate[i].ctipovehiculo)
                 .input('mtarifa', sql.Numeric(18,2), vehicleTypeUpdate[i].mtarifa)
-                .input('ncantidad', sql.Numeric(4,0), vehicleTypeUpdate[i].ncantidad)
+                .input('ncantidad', sql.Numeric(4, 0), vehicleTypeUpdate[i].ncantidad)
                 .input('mcoberturamax', sql.Numeric(18,2), vehicleTypeUpdate[i].mcoberturamax)
                 .input('cmoneda', sql.Int, vehicleTypeUpdate[i].cmoneda)
                 .input('cpais', sql.Int, searchdata.cpais)
@@ -12092,8 +12092,7 @@ module.exports = {
         try{
             let pool = await sql.connect(config);
             let result = await pool.request()
-            .input('cpais', sql.Int, searchData.cpais)
-            .query('select * from VWBUSCARPLANRC ');
+            .query('select DISTINCT XTIPO from VWBUSCARPLANRC');
             //sql.close();
             return { result: result };
         }
@@ -12210,6 +12209,88 @@ module.exports = {
             return { error: err.message };
         }
     },
+    TypeMetodologia: async(searchData) => {
+        try{
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+            .input('ccompania', sql.Int, searchData.ccompania)
+            .input('cpais', sql.Int, searchData.cpais)
+            .query('select * from MAMETODOLOGIAPAGO WHERE CCOMPANIA = @ccompania AND CPAIS = @cpais AND BACTIVO = 1');
+        //sql.close();
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+ },
+     SearchTarifa: async(searchData) => {
+    try{
+        let rowsAffected = 0;
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+        .input('xtipo', sql.NVarChar, searchData.xtipo)
+        .input('xmarca', sql.NVarChar, searchData.xmarca)
+        .input('xmodelo', sql.NVarChar, searchData.xmodelo)
+        .input('cano', sql.SmallInt, searchData.cano)
+        .query('select XCLASE from MACLASIFICACION_VEH WHERE XTIPO = @xtipo AND XMARCA = @xmarca AND XMODELO = @xmodelo');
+        console.log(result)
+        if(result.rowsAffected > 0){
+            let pool = await sql.connect(config);
+            let query= await pool.request()
+                .input('xclase', sql.NVarChar, result.recordset[0].XCLASE)
+                .input('cano', sql.Int, searchData.cano)
+                .input('xtipo', sql.NVarChar, searchData.xtipo)
+                .query('select PTASA_CASCO from MATARIFA_CASCO where XCLASE = @xclase AND CANO = @cano AND XTIPO = @xtipo');
+                return { result: query };
+    }else if(result.rowsAffected = 0){
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+        .input('xtipo', sql.NVarChar, searchData.xtipo)
+        .input('xmarca', sql.NVarChar, searchData.xmarca)
+        .input('xmodelo', sql.NVarChar, searchData.xmodelo)
+        .input('cano', sql.SmallInt, searchData.cano)
+        .query('select XCLASE from MACLASIFICACION_VEH WHERE XTIPO = @xtipo AND XMARCA = @xmarca AND XMODELO = todos ');
+        if(result.rowsAffected > 0){
+            let pool = await sql.connect(config);
+            let query= await pool.request()
+                .input('xclase', sql.NVarChar, result.recordset[0].XCLASE)
+                .input('cano', sql.Int, searchData.cano)
+                .input('xtipo', sql.NVarChar, searchData.xtipo)
+                .query('select PTASA_CASCO from MATARIFA_CASCO where XCLASE = @xclase AND CANO = @cano AND XTIPO = @xtipo');
+                return { result: query }
+            }
+       } 
+    }catch(err){
+        console.log('hola: ' + err.message)
+        return { error: err.message };
+        }
+},
+getSeatchTarifaData: async() => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+            .query('select * from VWBUSCARTARIFA');
+        //sql.close();
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+},
+hola: async(searchData, xclase) => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+        .input('xclase', sql.NVarchar, xclase)
+        .input('cano', sql.SmallInt, searchData.cano)
+        .input('xtipo', sql.NVarChar, searchData.xtipo)
+        .query('select PTASA_CASCO from MATARIFA_CASCO where XCLASE = @xclase AND CANO= @cano AND XTIPO = @xtipo');
+    //sql.close();
+    console.log(result)
+    return { result: result };
+}catch(err){
+    console.log(err.message)
+    return { error: err.message };
+}
+},
     getRecoverageDetailData: async(searchData) => {
         try{
             let pool = await sql.connect(config);

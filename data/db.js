@@ -2025,10 +2025,8 @@ module.exports = {
                 .input('cproveedor', sql.Int, providerData.cproveedor)
                 .query('select * from prproveedores where CPROVEEDOR = @cproveedor and CCOMPANIA = @ccompania');
             //sql.close();
-            console.log(result)
             return { result: result };
         }catch(err){
-            console.log(err.message)
             return { error: err.message };
         }
     },
@@ -3320,47 +3318,38 @@ module.exports = {
         try{
             let pool = await sql.connect(config);
             let result = await pool.request()
-                .input('cpais', sql.Numeric(4, 0), providerData.cpais)
                 .input('ccompania', sql.Int, providerData.ccompania)
+                .input('cpais', sql.Int, providerData.cpais)
                 .input('cproveedor', sql.Int, providerData.cproveedor)
-                .input('xproveedor', sql.NVarChar, providerData.xproveedor)
-                .input('ctipodocidentidad', sql.Int, providerData.ctipodocidentidad)
+                .input('xnombre', sql.NVarChar, providerData.xproveedor)
                 .input('xdocidentidad', sql.NVarChar, providerData.xdocidentidad)
-                .input('xrazonsocial', sql.NVarChar, providerData.xrazonsocial)
                 .input('cestado', sql.Int, providerData.cestado)
                 .input('cciudad', sql.Int, providerData.cciudad)
                 .input('xdireccion', sql.NVarChar, providerData.xdireccion)
-                .input('xdireccioncorreo', sql.NVarChar, providerData.xdireccioncorreo)
                 .input('xtelefono', sql.NVarChar, providerData.xtelefono)
-                .input('xfax', sql.NVarChar, providerData.xfax ? providerData.xfax : null)
-                .input('pretencion', sql.Numeric(5, 2), providerData.pretencion ? providerData.pretencion : null)
-                .input('centeimpuesto', sql.NVarChar, providerData.centeimpuesto)
-                .input('ldiascredito', sql.Int, providerData.ldiascredito)
-                .input('xemail', sql.NVarChar, providerData.xemail ? providerData.xemail : null)
-                .input('bafiliado', sql.Bit, providerData.bafiliado)
-                .input('xpaginaweb', sql.NVarChar, providerData.xpaginaweb ? providerData.xpaginaweb : null)
+                .input('xcorreo', sql.NVarChar, providerData.xemail ? providerData.xemail : null)
                 .input('xobservacion', sql.NVarChar, providerData.xobservacion)
-                .input('bactivo', sql.Bit, providerData.bactivo)
+                .input('bactivo', sql.Bit, 1)
                 .input('cusuariomodificacion', sql.Int, providerData.cusuariomodificacion)
                 .input('fmodificacion', sql.DateTime, new Date())
-                .query('update PRPROVEEDOR set XPROVEEDOR = @xproveedor, CTIPODOCIDENTIDAD = @ctipodocidentidad, XDOCIDENTIDAD = @xdocidentidad, XRAZONSOCIAL = @xrazonsocial, CESTADO = @cestado, CCIUDAD = @cciudad, XDIRECCION = @xdireccion, XDIRECCIONCORREO = @xdireccioncorreo, XTELEFONO = @xtelefono, XFAX = @xfax, PRETENCION = @pretencion, CENTEIMPUESTO = @centeimpuesto, LDIASCREDITO = @ldiascredito, XEMAIL = @xemail, BAFILIADO = @bafiliado, XPAGINAWEB = @xpaginaweb, XOBSERVACION = @xobservacion, BACTIVO = @bactivo, CUSUARIOMODIFICACION = @cusuariomodificacion, FMODIFICACION = @fmodificacion where CPROVEEDOR = @cproveedor and CPAIS = @cpais and CCOMPANIA = @ccompania');
+                .query('update PRPROVEEDORES set XNOMBRE = @xnombre, XDOCIDENTIDAD = @xdocidentidad, CESTADO = @cestado, CCIUDAD = @cciudad, XDIRECCION = @xdireccion, XTELEFONO = @xtelefono, XCORREO = @xcorreo, XOBSERVACION = @xobservacion, BACTIVO = @bactivo, CUSUARIOMODIFICACION = @cusuariomodificacion, FMODIFICACION = @fmodificacion where CPROVEEDOR = @cproveedor and CPAIS = @cpais and CCOMPANIA = @ccompania');
             //sql.close();
             return { result: result };
         }catch(err){
             return { error: err.message };
         }
     },
-    createBanksByProviderUpdateQuery: async(banks, providerData) => {
+    createBanksByProviderUpdateQuery: async(bankList, providerData) => {
         try{
             let rowsAffected = 0;
             let pool = await sql.connect(config);
-            for(let i = 0; i < banks.length; i++){
+            for(let i = 0; i < bankList.length; i++){
                 let insert = await pool.request()
                     .input('cproveedor', sql.Int, providerData.cproveedor)
-                    .input('cbanco', sql.Int, banks[i].cbanco)
-                    .input('ctipocuentabancaria', sql.Int, banks[i].ctipocuentabancaria)
-                    .input('xnumerocuenta', sql.NVarChar, banks[i].xnumerocuenta)
-                    .input('bprincipal', sql.Bit, banks[i].bprincipal)
+                    .input('cbanco', sql.Int, bankList[i].cbanco)
+                    .input('ctipocuentabancaria', sql.Int, bankList[i].ctipocuentabancaria)
+                    .input('xnumerocuenta', sql.NVarChar, bankList[i].xnumerocuenta)
+                    .input('bprincipal', sql.Bit, bankList[i].bprincipal)
                     .input('cusuariocreacion', sql.Int, providerData.cusuariomodificacion)
                     .input('fcreacion', sql.DateTime, new Date())
                     .query('insert into PRBANCO (CPROVEEDOR, CBANCO, CTIPOCUENTABANCARIA, XNUMEROCUENTA, BPRINCIPAL, CUSUARIOCREACION, FCREACION) values (@cproveedor, @cbanco, @ctipocuentabancaria, @xnumerocuenta, @bprincipal, @cusuariocreacion, @fcreacion)')
