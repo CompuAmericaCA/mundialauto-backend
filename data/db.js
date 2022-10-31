@@ -423,6 +423,17 @@ module.exports = {
             return { error: err.message };
         }
     },
+    getFleetContractAccesoriesQuery: async(ccontratoflota) => {
+        try{
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .input('CCONTRATOFLOTA', sql.Int, ccontratoflota)
+                .query('SELECT * FROM VWBUSCARACCESORIOSXCONTRATO WHERE CCONTRATOFLOTA = @CCONTRATOFLOTA')
+        }catch(err){
+            console.log(err.message);
+            return { error: err.message };
+        }
+    },
     getPlanDataQuery: async(planData) => {
         try{
             let pool = await sql.connect(config);

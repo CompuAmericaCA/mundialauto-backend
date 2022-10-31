@@ -536,8 +536,8 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
         /*let searchQuoteByFleet = await bd.searchQuoteByFleetQuery(fleetContractData).then((res) => res);
         if(searchQuoteByFleet.error){ return { status: false, code: 500, message: searchQuoteByFleet.error }; }
         if(searchQuoteByFleet.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Quote By Fleet not found.' }; }*/
-        let accesories = [];
-        /*let getFleetContractAccesoriesData = await bd.getFleetContractAccesoriesDataQuery(fleetContractData.ccontratoflota).then((res) => res);
+        /*let accesories = [];
+        let getFleetContractAccesoriesData = await bd.getFleetContractAccesoriesDataQuery(fleetContractData.ccontratoflota).then((res) => res);
         if(getFleetContractAccesoriesData.error){ return { status: false, code: 500, message: getFleetContractAccesoriesData.error }; }
         if(getFleetContractAccesoriesData.result.rowsAffected > 0){
             for(let i = 0; i < getFleetContractAccesoriesData.result.recordset.length; i++){
@@ -694,6 +694,21 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
             let xplan = getPlanArysData.result.recordset[0].XPLAN.toLowerCase()
             xplanservicios = xplan.charAt(0).toUpperCase() + xplan.slice(1);
         }
+        let accesories = []
+        /*let getFleetContractAccesories = await db.getFleetContractAccesoriesQuery(fleetContractData.ccontratoflota);
+        if(getFleetContractAccesories.error){ return { status: false, code: 500, message: getFleetContractAccesories.error }; }
+        if (getFleetContractAccesories.result.rowsAffected > 0) {
+            for(let i = 0; i < getFleetContractAccesories.result.recordset.length; i++){
+                let accessory = {
+                    caccesorio: getFleetContractAccesories.result.recordset[i].CACCESORIO,
+                    xaccesorio: getFleetContractAccesories.result.recordset[i].XACCESORIO,
+                    msuma_accesorio: getFleetContractAccesories.result.recordset[i].MSUMA_ACCESORIO,
+                    ptasa: getFleetContractAccesories.result.recordset[i].PTASA
+                }
+                accesories.push(accessory);
+            }
+        }*/
+
         return {
             status: true,
             ccarga: getFleetContractData.result.recordset[0].ccarga,
