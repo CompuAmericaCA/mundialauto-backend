@@ -1203,12 +1203,19 @@ const operationTarifaCasco = async(authHeader, requestBody) => {
         cano: parseInt(requestBody.cano),
         xcobertura:requestBody.xcobertura,
     };
-    if(requestBody.xcobertura == 'AMPLIA'){}
-    let query = await bd.SearchTarifa(searchData).then((res) => res);
+    if(requestBody.xcobertura == 'AMPLIA'){
+    let query = await bd.SearchTarifaCasco(searchData).then((res) => res);
     if(query.error){ return { status: false, code: 500, message: query.error }; }
     return { status: true,
              ptasa_casco: query.result.recordset[0].PTASA_CASCO
             }
-            
+    }
+    else if(requestBody.xcobertura == 'PERDIDA TOTAL'){
+        let query = await bd.SearchTarifaPerdida(searchData).then((res) => res);
+        if(query.error){ return { status: false, code: 500, message: query.error }; }
+        return { status: true,
+                 ptasa_casco: query.result.recordset[0].PTASA_CASCO
+                }
+    }       
 }
 module.exports = router;
