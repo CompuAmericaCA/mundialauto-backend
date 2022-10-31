@@ -151,6 +151,7 @@ router.route('/update').post((req, res) => {
             }
             res.json({ data: result });
         }).catch((err) => {
+            console.log(err.message)
             res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationUpdateRole' } });
         });
     }
@@ -175,11 +176,12 @@ const operationUpdateRole = async(authHeader, requestBody) => {
         if(updateRole.result.rowsAffected > 0){
             if(requestBody.permissions){
                 if(requestBody.permissions.create && requestBody.permissions.create.length > 0){
+                    console.log(requestBody.permissions.create)
                     for(let i = 0; i < requestBody.permissions.create.length; i++){
                         if(!helper.validateRequestObj(requestBody.permissions.create[i], ['cgrupo','cmodulo','bindice','bcrear','bdetalle','beditar','beliminar'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
                     }
                     let createPermissionsByRoleUpdate = await bd.createPermissionsByRoleUpdateQuery(requestBody.permissions.create, roleData).then((res) => res);
-                    if(createPermissionsByRoleUpdate.error){ return { status: false, code: 500, message: createPermissionsByRoleUpdate.error }; }
+                    if(createPermissionsByRoleUpdate.error){ console.log(createPermissionsByRoleUpdate.error);return { status: false, code: 500, message: createPermissionsByRoleUpdate.error }; }
                     if(createPermissionsByRoleUpdate.result.rowsAffected < 0){ return { status: false, code: 500, message: 'Server Internal Error.', hint: 'createPermissionsByRoleUpdate' }; }
                 } 
                 if(requestBody.permissions.update && requestBody.permissions.update.length > 0){
