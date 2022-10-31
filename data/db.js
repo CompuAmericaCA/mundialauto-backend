@@ -278,7 +278,6 @@ module.exports = {
             //sql.close();
             return { result: result };
         }catch(err){
-            console.log(err.message);
             return { error: err.message };
         }
     },
@@ -371,7 +370,6 @@ module.exports = {
                 .input('cplan', sql.Int, cplan)
                 .query('select * from PRPLAN_RC where CPLAN_RC = @cplan');
             //sql.close();
-            console.log(result)
             return { result: result };
         }catch(err){
             return { error: err.message };
@@ -414,8 +412,7 @@ module.exports = {
         }
     },
     getPlanArys: async(cplan) => {
-        console.log(cplan)
-        try{
+       try{
             let pool = await sql.connect(config);
             let result = await pool.request()
                 .input('cplan', sql.Int, cplan)
@@ -473,7 +470,6 @@ module.exports = {
             //sql.close();
             return { result: result };
         }catch(err){
-            console.log(err.message);
             return { error: err.message };
         }
     },
@@ -498,7 +494,6 @@ module.exports = {
             //sql.close();
             return { result: result };
         }catch(err){
-            console.log(err.message)
             return { error: err.message };
         }
     },
@@ -2025,13 +2020,15 @@ module.exports = {
         try{
             let pool = await sql.connect(config);
             let result = await pool.request()
-                .input('cpais', sql.Numeric(4, 0), providerData.cpais)
+                //.input('cpais', sql.Numeric(4, 0), providerData.cpais)
                 .input('ccompania', sql.Int, providerData.ccompania)
                 .input('cproveedor', sql.Int, providerData.cproveedor)
-                .query('select * from prproveedores where CPROVEEDOR = @cproveedor and CPAIS = @cpais and CCOMPANIA = @ccompania');
+                .query('select * from prproveedores where CPROVEEDOR = @cproveedor and CCOMPANIA = @ccompania');
             //sql.close();
+            console.log(result)
             return { result: result };
         }catch(err){
+            console.log(err.message)
             return { error: err.message };
         }
     },
@@ -3189,7 +3186,6 @@ module.exports = {
             //sql.close();
             return { result: result };
         }catch(err){
-            console.log(err.message)
             return { error: err.message };
         }
     },
@@ -3700,7 +3696,6 @@ module.exports = {
             //sql.close();
             return { result: result };
         }catch(err){
-            console.log(err.message);
             return { error: err.message };
         }
     },

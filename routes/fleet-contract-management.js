@@ -508,7 +508,6 @@ router.route('/detail').post((req, res) => {
             }
             res.json({ data: result });
         }).catch((err) => {
-            console.log(err.message)
             res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationDetailFleetContractManagement' } });
         });
     }
@@ -529,10 +528,10 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
         if(getFleetContractWorkerData.error){ return { status: false, code: 500, message: getFleetContractWorkerData.error }; }
         if(getFleetContractWorkerData.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Fleet Contract Worker not found.' }; }
         */let getFleetContractOwnerData = await bd.getFleetContractOwnerDataQuery(fleetContractData, getFleetContractData.result.recordset[0].CPROPIETARIO).then((res) => res);
-        if(getFleetContractOwnerData.error){console.log(getFleetContractOwnerData.error); return { status: false, code: 500, message: getFleetContractOwnerData.error }; }
+        if(getFleetContractOwnerData.error){ return { status: false, code: 500, message: getFleetContractOwnerData.error }; }
         if(getFleetContractOwnerData.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Fleet Contract Owner not found.' }; }
         let getFleetContractOwnerVehicleData = await bd.getFleetContractOwnerVehicleDataQuery(getFleetContractData.result.recordset[0].CPROPIETARIO, getFleetContractData.result.recordset[0].CVEHICULOPROPIETARIO).then((res) => res);
-        if(getFleetContractOwnerVehicleData.error){ console.log(getFleetContractOwnerVehicleData.error); return { status: false, code: 500, message: getFleetContractOwnerVehicleData.error }; }
+        if(getFleetContractOwnerVehicleData.error){ return { status: false, code: 500, message: getFleetContractOwnerVehicleData.error }; }
         if(getFleetContractOwnerVehicleData.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Fleet Contract Owner Vehicle not found.' }; }
         /*let searchQuoteByFleet = await bd.searchQuoteByFleetQuery(fleetContractData).then((res) => res);
         if(searchQuoteByFleet.error){ return { status: false, code: 500, message: searchQuoteByFleet.error }; }
@@ -585,11 +584,11 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
         let mprimaprorratatotal = 0; 
         let getPlanData = await db.getPlanData(getFleetContractData.result.recordset[0].CPLAN);
         if(getPlanData.error){ return { status: false, code: 500, message: getFleetContractOwnerData.error }; }
-        if(getPlanData.result.rowsAffected < 0){ console.log(getPlanData.error); return { status: false, code: 404, message: 'Fleet Contract Plan not found.' }; }
+        if(getPlanData.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Fleet Contract Plan not found.' }; }
         let realCoverages = [];
         let coverageAnnexes = [];
         let getPlanCoverages = await db.getPlanCoverages(getFleetContractData.result.recordset[0].CPLAN, getFleetContractData.result.recordset[0].CCONTRATOFLOTA);
-        if(getPlanCoverages.error){ console.log(getPlanCoverages.error); return { status: false, code: 500, message: getFleetContractOwnerData.error }; }
+        if(getPlanCoverages.error){ return { status: false, code: 500, message: getFleetContractOwnerData.error }; }
         if(getPlanCoverages.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Fleet Contract Plan Coverages not found.' }; }
         for (let i = 0; i < getPlanCoverages.result.recordset.length; i++) {
             /*let getCoverageServices = await db.getCoverageServices(getPlanCoverages.result.recordset[i].ccobertura);
@@ -626,7 +625,8 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
                 mprima: getPlanCoverages.result.recordset[i].mprima,
                 mprimaprorrata: getPlanCoverages.result.recordset[i].mprimaprorrata,
                 ititulo: getPlanCoverages.result.recordset[i].ititulo,
-                xmoneda: getPlanCoverages.result.recordset[i].xmoneda
+                xmoneda: getPlanCoverages.result.recordset[i].xmoneda,
+                ccontratoflota: getPlanCoverages.result.recordset[i].ccontratoflota
             }
             realCoverages.push(coverage);
         }
@@ -637,7 +637,7 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
         }
         let services = [];
         let getFleetContractServices = await db.getFleetContractServices(getFleetContractData.result.recordset[0].ccarga);
-        if(getFleetContractServices.error){ console.log(getFleetContractServices.error); return { status: false, code: 500, message: getFleetContractServices.error }; }
+        if(getFleetContractServices.error){ return { status: false, code: 500, message: getFleetContractServices.error }; }
         if(getFleetContractServices.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Fleet Contract Service not found.' }; }
         if (getFleetContractServices.result.rowsAffected > 0) {
             for(let i = 0; i < getFleetContractServices.result.recordset.length; i++){
@@ -649,7 +649,7 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
             }
         }
         let getBroker = await bd.getBroker(getFleetContractData.result.recordset[0].ccorredor);
-        if(getBroker.error){ console.log(getBroker.error); return { status: false, code: 500, message: getBroker.error }; }
+        if(getBroker.error){ return { status: false, code: 500, message: getBroker.error }; }
         if(getBroker.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Fleet Contract Service not found.' }; }
         /*let getPlanServicesData = await db.getPlanServicesDataQuery(getFleetContractData.result.recordset[0].CPLAN).then((res) => res);
         if(getPlanServicesData.error){ return { status: false, code: 500, message: getPlanServicesData.error }; }
@@ -687,7 +687,7 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
             }
         }*/
         let getPlanArysData = await db.getPlanArys(getFleetContractData.result.recordset[0].CPLAN);
-        if(getPlanArysData.error){ console.log(getPlanArysData.error); return { status: false, code: 500, message: getFleetContractOwnerData.error }; }
+        if(getPlanArysData.error){ return { status: false, code: 500, message: getFleetContractOwnerData.error }; }
         if(getPlanArysData.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Fleet Contract Plan Arys not found.' }; }
         let xplanservicios;
         if (getPlanArysData.result.recordset[0].XPLAN) {
@@ -886,6 +886,7 @@ router.route('/update').post((req, res) => {
             }
             res.json({ data: result });
         }).catch((err) => {
+            console.log(err.message)
             res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationUpdateFleetContractManagement' } });
         });
     }
@@ -893,7 +894,7 @@ router.route('/update').post((req, res) => {
 
 const operationUpdateFleetContractManagement = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
-    if(!helper.validateRequestObj(requestBody, ['cpais', 'ccompania', 'ccontratoflota', 'ccliente', 'casociado', 'cagrupador', 'finicio', 'fhasta' ,'cestatusgeneral', 'xcertificadoasociado', 'ctrabajador', 'cpropietario', 'cvehiculopropietario', 'cusuariomodificacion'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
+    //if(!helper.validateRequestObj(requestBody, ['cpais', 'ccompania', 'ccontratoflota', 'ccliente', 'casociado', 'cagrupador', 'finicio', 'fhasta' ,'cestatusgeneral', 'xcertificadoasociado', 'ctrabajador', 'cpropietario', 'cvehiculopropietario', 'cusuariomodificacion'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
     let fleetContractData = {
         cpais: requestBody.cpais,
         ccompania: requestBody.ccompania,
@@ -917,6 +918,7 @@ const operationUpdateFleetContractManagement = async(authHeader, requestBody) =>
         fhastarecibo: requestBody.fhastarecibo,
         cusuariomodificacion: requestBody.cusuariomodificacion
     }
+    //console.log(fleetContractData)
     let verifyFleetContractVehicle = await bd.verifyFleetContractVehicleToUpdateQuery(fleetContractData).then((res) => res);
     if(verifyFleetContractVehicle.error){ return { status: false, code: 500, message: verifyFleetContractVehicle.error }; }
     if(verifyFleetContractVehicle.result.rowsAffected > 0){ return { status: false, code: 200, condition: 'vehicle-contract-already-exist' }; }
@@ -998,6 +1000,22 @@ const operationUpdateFleetContractManagement = async(authHeader, requestBody) =>
                     let deleteInspectionsByFleetContractUpdate = await bd.deleteInspectionsByFleetContractUpdateQuery(requestBody.inspections.delete, fleetContractData).then((res) => res);
                     if(deleteInspectionsByFleetContractUpdate.error){ return { status: false, code: 500, message: deleteInspectionsByFleetContractUpdate.error }; }
                     if(deleteInspectionsByFleetContractUpdate.result.rowsAffected < 0){ return { status: false, code: 500, message: 'Server Internal Error.', hint: 'deleteInspectionsByFleetContractUpdate' }; }
+                }
+            }
+            console.log(requestBody.coverage)
+            if(requestBody.coverage){
+                console.log(requestBody.coverage)
+                if(requestBody.coverage.update){
+                    let coverageUpdate = {
+                        ccobertura: requestBody.coverage.update.ccobertura,
+                        ccontratoflota: requestBody.coverage.update.ccontratoflota,
+                        mprima: requestBody.coverage.update.xprimacobertura,
+                        msuma_aseg: requestBody.coverage.update.msuma_aseg
+                    }
+                    console.log(coverageUpdate)
+                    let createInspectonsByFleetContractUpdate = await bd.createInspectonsByFleetContractUpdateQuery(requestBody.inspections.create, fleetContractData).then((res) => res);
+                    if(createInspectonsByFleetContractUpdate.error){ return { status: false, code: 500, message: createInspectonsByFleetContractUpdate.error }; }
+                    if(createInspectonsByFleetContractUpdate.result.rowsAffected < 0){ return { status: false, code: 500, message: 'Server Internal Error.', hint: 'createInspectonsByFleetContractUpdate' }; }
                 }
             }
             return { status: true, ccontratoflota: fleetContractData.ccontratoflota }; 
@@ -1082,14 +1100,31 @@ const operationCreateIndividualContract = async(requestBody) => {
         msuma_aseg: requestBody.msuma_aseg ? requestBody.msuma_aseg : undefined,
         mtarifa: requestBody.mtarifa ? requestBody.mtarifa : undefined,
         mprima_casco: requestBody.mprima_casco ? requestBody.mprima_casco : undefined,
-        mcatastrofico: requestBody.mcatastrofico ? requestBody.mcatastrofico : undefined
-
+        mcatastrofico: requestBody.mcatastrofico ? requestBody.mcatastrofico : undefined,
+        pdescuento: requestBody.pdescuento ? requestBody.pdescuento : undefined,
+        ifraccionamiento: requestBody.ifraccionamiento ? requestBody.ifraccionamiento : undefined,
+        ncuotas: requestBody.ncuotas ? requestBody.ncuotas : undefined
     };
-      console.log(userData)
-    let operationCreateIndividualContract = await bd.createIndividualContractQuery(userData).then((res) => res);
-    //if(operationCreateIndividualContract.error){ console.log(operationCreateIndividualContract.error);return { status: true, code: 500, message: operationCreateIndividualContract.error }; }
-    if(operationCreateIndividualContract.result.rowsAffected > 0){ return { status: true}; }
-    else{ return { status: true, code: 500, message: 'Server Internal Error.', hint: 'createContract' }; }
+    if(userData){
+        let operationCreateIndividualContract = await bd.createIndividualContractQuery(userData).then((res) => res);
+        if(operationCreateIndividualContract.error){ return { status: false, code: 500, message: operationCreateIndividualContract.error }; }
+    }
+    if(requestBody.accessory){
+        if(requestBody.accessory.create){
+            let accessory = [];
+            for(let i = 0; i < requestBody.accessory.create.length; i++){
+                accessory.push({
+                    caccesorio:  requestBody.accessory.create[i].caccesorio,
+                    msuma_accesorio:  requestBody.accessory.create[i].msuma_aseg,
+                    mprima_accesorio:  requestBody.accessory.create[i].mprima,
+                    ptasa:  requestBody.accessory.create[i].ptasa
+                })
+            }
+            let createAccesories = await bd.createAccesoriesFromFleetContractIndividual(accessory).then((res) => res);
+            if(createAccesories.error){ return { status: false, code: 500, message: createAccesories.error }; }
+        }
+    }
+    return { status: true, code: 500, message: 'Server Internal Error.', hint: 'createContract' };
 }
 
 
@@ -1144,4 +1179,88 @@ const operationCreateIndividualContract = async(requestBody) => {
     }
   })();
 
+  router.route('/detail-recoverage').post((req, res) => {
+    if(!req.header('Authorization')){
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } });
+        return;
+    }else{
+        operationRecoverageDetail(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationRecoverageDetail' } });
+        });
+    }
+});
+
+const operationRecoverageDetail = async(authHeader, requestBody) => { 
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let searchData = {
+        ccobertura: requestBody.ccobertura,
+        ccontratoflota: requestBody.ccontratoflota
+    };
+    let getRecoverageDetailData = await bd.getRecoverageDetailData(searchData);
+    if(getRecoverageDetailData.error){ return { status: false, code: 500, message: getRecoverageDetailData.error }; }
+    if(getRecoverageDetailData.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Receipt Data not found.' }; }
+    return {
+        status: true,
+        ccobertura: getRecoverageDetailData.result.recordset[0].CCOBERTURA,
+        xcobertura: getRecoverageDetailData.result.recordset[0].XCOBERTURA,
+        ccontratoflota: getRecoverageDetailData.result.recordset[0].ccontratoflota,
+        mprima: getRecoverageDetailData.result.recordset[0].mprima,
+        msuma_aseg: getRecoverageDetailData.result.recordset[0].msuma_aseg
+    }
+}
+
+router.route('/update-coverage').post((req, res) => {
+    if(!req.header('Authorization')){
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } });
+        return;
+    }else{
+        operationUpdateCoverage(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            console.log(err.message)
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationUpdateCoverage' } })
+        });
+    }
+});
+
+const operationUpdateCoverage = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    if(requestBody.fechas){
+        let fechaData = [];
+        fechaData.push({
+            ccarga: requestBody.fechas.ccarga,
+            fdesde_pol: requestBody.fechas.fdesde_pol,
+            fhasta_pol: requestBody.fechas.fhasta_pol,
+            fdesde_rec: requestBody.fechas.fdesde_rec,
+            fhasta_rec: requestBody.fechas.fhasta_rec,
+        });
+        let updateReceipt = await bd.updateReceiptQuery(fechaData).then((res) => res);
+        if(updateReceipt.error){ return { status: false, code: 500, message: updateReceipt.error }; }
+    }
+    if(requestBody.coverage){
+        if(requestBody.coverage.update){
+            let coverageData = [];
+            coverageData.push({
+                ccobertura: requestBody.coverage.update.ccobertura,
+                ccontratoflota: requestBody.coverage.update.ccontratoflota,
+                mprima: requestBody.coverage.update.mprima,
+                msuma_aseg: requestBody.coverage.update.msuma_aseg
+            });
+            let updateCoverage = await bd.updateCoverageQuery(coverageData).then((res) => res);
+            if(updateCoverage.error){ return { status: false, code: 500, message: updateCoverage.error }; }
+        }
+    }
+    else{ return { status: false, code: 404, message: 'Service Order not found.' }; }
+    return { status: true};
+}
 module.exports = router;
