@@ -1096,13 +1096,21 @@ const operationCreateIndividualContract = async(requestBody) => {
         fhasta_rec:requestBody.fhasta_rec,
         cmetodologiapago: requestBody.cmetodologiapago,
         msuma_aseg: requestBody.msuma_aseg ? requestBody.msuma_aseg : undefined,
-        mtarifa: requestBody.mtarifa ? requestBody.mtarifa : undefined,
+        pcasco: requestBody.pcasco ? requestBody.pcasco : undefined,
         mprima_casco: requestBody.mprima_casco ? requestBody.mprima_casco : undefined,
         mcatastrofico: requestBody.mcatastrofico ? requestBody.mcatastrofico : undefined,
         pdescuento: requestBody.pdescuento ? requestBody.pdescuento : undefined,
         ifraccionamiento: requestBody.ifraccionamiento ? requestBody.ifraccionamiento : undefined,
-        ncuotas: requestBody.ncuotas ? requestBody.ncuotas : undefined
+        ncuotas: requestBody.ncuotas ? requestBody.ncuotas : undefined,
+        mprima_bruta: requestBody.mprima_bruta ? requestBody.mprima_bruta : undefined,
+        mprima_blindaje: requestBody.mprima_blindaje ? requestBody.mprima_blindaje : undefined,
+        msuma_blindaje: requestBody.msuma_blindaje ? requestBody.msuma_blindaje : undefined,
+        pcatastrofico: requestBody.pcatastrofico ? requestBody.pcatastrofico : undefined,
+        pmotin: requestBody.pmotin ? requestBody.pmotin : undefined,
+        mmotin: requestBody.mmotin ? requestBody.mmotin : undefined,
+        pblindaje: requestBody.pblindaje ? requestBody.pblindaje : undefined,
     };
+    console.log(userData)
     if(userData){
         let operationCreateIndividualContract = await bd.createIndividualContractQuery(userData).then((res) => res);
         if(operationCreateIndividualContract.error){ console.log(operationCreateIndividualContract.error);return { status: false, code: 500, message: operationCreateIndividualContract.error }; }
@@ -1234,7 +1242,14 @@ const operationTarifaCasco = async(authHeader, requestBody) => {
     };
     if(requestBody.xcobertura == 'AMPLIA'){
     let query = await bd.SearchTarifaCasco(searchData).then((res) => res);
-    if(query.error){ return { status: false, code: 500, message: query.error }; }
+    if(query.error)
+    {
+        let intento= await bd.SearchTarifaCascoModelo(searchData).then((res) => res); 
+        
+    return {
+        status : true,
+        ptasa_casco: intento.result.recordset[0].PTASA_CASCO}
+         }
     return { status: true,
              ptasa_casco: query.result.recordset[0].PTASA_CASCO
             }
