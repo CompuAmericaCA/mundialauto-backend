@@ -1626,27 +1626,14 @@ const operationValrepCharge = async(authHeader, requestBody) => {
     let query = await bd.chargeValrepQuery().then((res) => res);
     if(query.error){ return { status: false, code: 500, message: query.error }; }
     let jsonArray = [];
-    //primero se modifica el formato de la primera fecha de la carga antes de agregar la carga al array
-    let dateFormat = new Date(query.result.recordset[0].FINGRESO);
-    let dd = dateFormat.getDate() + 1;
-    let mm = dateFormat.getMonth() + 1;
-    let yyyy = dateFormat.getFullYear();
-    let fcarga = dd + '/' + mm + '/' + yyyy;
 
-    // se agrega la primera carga
-    jsonArray.push({ xcliente: query.result.recordset[0].XCLIENTE, ccliente: query.result.recordset[0].CCLIENTE, ccarga: query.result.recordset[0].CCARGA, xpoliza: query.result.recordset[0].XPOLIZA, fingreso: fcarga });
-    let ccarga = query.result.recordset[0].CCARGA;
-    // se busca agregar solo las cargas que tengan codigo distinto, para eliminar repetidos
     for(let i = 0; i < query.result.recordset.length; i++){
-        if (query.result.recordset[i].CCARGA != ccarga) {
-                let dateFormat = new Date(query.result.recordset[i].FINGRESO);
-                let dd = dateFormat.getDate() + 1;
-                let mm = dateFormat.getMonth() + 1;
-                let yyyy = dateFormat.getFullYear();
-                let fcarga = dd + '/' + mm + '/' + yyyy;
-            jsonArray.push({ xcliente: query.result.recordset[i].XCLIENTE, ccliente: query.result.recordset[0].CCLIENTE, xpoliza: query.result.recordset[i].XPOLIZA, ccarga: query.result.recordset[i].CCARGA, fingreso: fcarga });
-            ccarga = query.result.recordset[i].CCARGA;
-        }
+        let dateFormat = new Date(query.result.recordset[i].FINGRESO);
+        let dd = dateFormat.getDate();
+        let mm = dateFormat.getMonth() + 1;
+        let yyyy = dateFormat.getFullYear();
+        let fingreso = dd + '/' + mm + '/' + yyyy;
+        jsonArray.push({ xcliente: query.result.recordset[i].XCLIENTE, ccliente: query.result.recordset[0].CCLIENTE, xpoliza: query.result.recordset[i].XPOLIZA, ccarga: query.result.recordset[i].CCARGA, fingreso: fingreso });
     }
     return { status: true, list: jsonArray }
 }
