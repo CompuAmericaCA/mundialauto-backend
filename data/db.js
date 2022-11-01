@@ -429,6 +429,7 @@ module.exports = {
             let result = await pool.request()
                 .input('CCONTRATOFLOTA', sql.Int, ccontratoflota)
                 .query('SELECT * FROM VWBUSCARACCESORIOSXCONTRATO WHERE CCONTRATOFLOTA = @CCONTRATOFLOTA')
+            return { result: result}
         }catch(err){
             console.log(err.message);
             return { error: err.message };

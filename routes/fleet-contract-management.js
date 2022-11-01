@@ -695,7 +695,7 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
             xplanservicios = xplan.charAt(0).toUpperCase() + xplan.slice(1);
         }
         let accesories = []
-        /*let getFleetContractAccesories = await db.getFleetContractAccesoriesQuery(fleetContractData.ccontratoflota);
+        let getFleetContractAccesories = await db.getFleetContractAccesoriesQuery(fleetContractData.ccontratoflota);
         if(getFleetContractAccesories.error){ return { status: false, code: 500, message: getFleetContractAccesories.error }; }
         if (getFleetContractAccesories.result.rowsAffected > 0) {
             for(let i = 0; i < getFleetContractAccesories.result.recordset.length; i++){
@@ -707,7 +707,7 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
                 }
                 accesories.push(accessory);
             }
-        }*/
+        }
 
         return {
             status: true,
