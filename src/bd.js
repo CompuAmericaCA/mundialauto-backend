@@ -8995,7 +8995,6 @@ module.exports = {
             if (query.recordset.length > 0) {
                 cpoliza = query.recordset[0].CPOLIZA
             }
-            console.log(cpoliza);
             query = await pool.request()
                 .input('CPOLIZA', sql.Int, cpoliza + 1)
                 .query('UPDATE MACONTADORES SET CPOLIZA = @CPOLIZA')
@@ -9016,7 +9015,6 @@ module.exports = {
             if (query.recordset.length > 0) {
                 clote = query.recordset[0].CLOTE
             }
-            console.log(clote);
             return { result: {clote: clote}}
         }
         catch(err) {
@@ -9025,7 +9023,6 @@ module.exports = {
         }
     },
     createBatchQuery: async(ccarga, cusuario, batchData, lastBatchCode) => {
-        console.log(lastBatchCode);
         try{
             let rowsAffected = 0;
             let pool = await sql.connect(config);
@@ -9069,8 +9066,6 @@ module.exports = {
                         contractList[i].FHASTA_POL = new Date(changeDateFormat(contractList[i].FHASTA_POL));
                         contractList[i].FDESDE_REC = new Date(changeDateFormat(contractList[i].FDESDE_REC));
                         contractList[i].FHASTA_REC = new Date(changeDateFormat(contractList[i].FHASTA_REC));
-                        console.log(contractList[i].FDESDE_POL);
-                        console.log('codigo lote: ' + clote);
                         let insert = await pool.request()
                             .input('ID', sql.Int, contractList[i].ID)
                             .input('CCLIENTE', sql.Int, ccliente)

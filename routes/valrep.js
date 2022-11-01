@@ -1696,43 +1696,22 @@ const operationValrepReceipt = async(authHeader, requestBody) => {
         clote: requestBody.clote,
         ccarga: requestBody.ccarga
     };
-    console.log(searchData)
     let query = await bd.receiptValrepQuery(searchData).then((res) => res);
     if(query.error){ return { status: false, code: 500, message: query.error }; }
     let jsonArray = [];
-    //primero se modifica el formato de la fecha desde y hasta del recibo antes de agregar el recibo al array
-    let dateFormatDesde = new Date(query.result.recordset[0].FDESDE_REC);
-    let ddDesde = dateFormatDesde.getDate() + 1;
-    let mmDesde = dateFormatDesde.getMonth() + 1;
-    let yyyyDesde = dateFormatDesde.getFullYear();
-    let fdesde_rec = ddDesde + '/' + mmDesde + '/' + yyyyDesde;
-
-    let dateFormatHasta = new Date(query.result.recordset[0].FHASTA_REC);
-    let ddHasta = dateFormatHasta.getDate() + 1;
-    let mmHasta = dateFormatHasta.getMonth() + 1;
-    let yyyyHasta = dateFormatHasta.getFullYear();
-    let fhasta_rec = ddHasta + '/' + mmHasta + '/' + yyyyHasta;
-
-    // se agrega el primer recibo
-    jsonArray.push({ ccarga: query.result.recordset[0].CCARGA, crecibo: query.result.recordset[0].CRECIBO, fdesde_rec: fdesde_rec, fhasta_rec: fhasta_rec });
-    let crecibo = query.result.recordset[0].crecibo;
-    // se busca agregar solo los recibos que tengan código distinto, para eliminar repetidos
     for(let i = 0; i < query.result.recordset.length; i++){
-        if (query.result.recordset[i].crecibo != crecibo) {
-            let dateFormatDesde = new Date(query.result.recordset[i].fdesde_rec);
-            let ddDesde = dateFormatDesde.getDate() + 1;
-            let mmDesde = dateFormatDesde.getMonth() + 1;
-            let yyyyDesde = dateFormatDesde.getFullYear();
-            let fdesde_rec = ddDesde + '/' + mmDesde + '/' + yyyyDesde;
-        
-            let dateFormatHasta = new Date(query.result.recordset[i].fhasta_rec);
-            let ddHasta = dateFormatHasta.getDate() + 1;
-            let mmHasta = dateFormatHasta.getMonth() + 1;
-            let yyyyHasta = dateFormatHasta.getFullYear();
-            let fhasta_rec = ddHasta + '/' + mmHasta + '/' + yyyyHasta;
-            jsonArray.push({ ccarga: query.result.recordset[i].CCARGA, crecibo: query.result.recordset[i].CRECIBO, fdesde_rec: fdesde_rec, fhasta_rec: fhasta_rec });
-            crecibo = query.result.recordset[i].crecibo;
-        }
+        let dateFormatDesde = new Date(query.result.recordset[i].FDESDE_REC);
+        let ddDesde = dateFormatDesde.getDate();
+        let mmDesde = dateFormatDesde.getMonth() + 1;
+        let yyyyDesde = dateFormatDesde.getFullYear();
+        let fdesde_rec = ddDesde + '/' + mmDesde + '/' + yyyyDesde;
+
+        let dateFormatHasta = new Date(query.result.recordset[i].FHASTA_REC);
+        let ddHasta = dateFormatHasta.getDate();
+        let mmHasta = dateFormatHasta.getMonth() + 1;
+        let yyyyHasta = dateFormatHasta.getFullYear();
+        let fhasta_rec = ddHasta + '/' + mmHasta + '/' + yyyyHasta;
+        jsonArray.push({ ccarga: query.result.recordset[i].CCARGA, crecibo: query.result.recordset[i].CRECIBO, fdesde_rec: fdesde_rec, fhasta_rec: fhasta_rec });
     }
     return { status: true, list: jsonArray }
 }
