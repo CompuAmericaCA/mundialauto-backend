@@ -703,7 +703,7 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
                     caccesorio: getFleetContractAccesories.result.recordset[i].CACCESORIO,
                     xaccesorio: getFleetContractAccesories.result.recordset[i].XACCESORIO,
                     msuma_accesorio: getFleetContractAccesories.result.recordset[i].MSUMA_ACCESORIO,
-                    ptasa: getFleetContractAccesories.result.recordset[i].PTASA
+                    mprima_accesorio: getFleetContractAccesories.result.recordset[i].MPRIMA_ACCESORIO
                 }
                 accesories.push(accessory);
             }
