@@ -87,6 +87,12 @@ const operationSearchContractVehicle = async(authHeader, requestBody) => {
         let jsonList = [];
         for(let i = 0; i < searchFleetContractManagement.result.recordset.length; i++){
             let propietario = searchFleetContractManagement.result.recordset[i].XNOMBRE + ' ' + searchFleetContractManagement.result.recordset[i].XAPELLIDO
+            let telefonopropietario;
+            if(searchFleetContractManagement.result.recordset[0].XTELEFONOCELULAR){
+                telefonopropietario = searchFleetContractManagement.result.recordset[0].XTELEFONOCELULAR;
+            }else{
+                telefonopropietario = searchFleetContractManagement.result.recordset[0].XTELEFONOCASA
+            }
             jsonList.push({
                 ccontratoflota: searchFleetContractManagement.result.recordset[i].CCONTRATOFLOTA,
                 ccliente: searchFleetContractManagement.result.recordset[i].CCLIENTE,
@@ -100,7 +106,7 @@ const operationSearchContractVehicle = async(authHeader, requestBody) => {
                 xversion: searchFleetContractManagement.result.recordset[i].XVERSION,
                 xplaca: searchFleetContractManagement.result.recordset[i].XPLACA,
                 fano: searchFleetContractManagement.result.recordset[i].FANO,
-                xcolor: searchFleetContractManagement.result.recordset[i].xcolor,
+                xcolor: searchFleetContractManagement.result.recordset[i].XCOLOR,
                 xtipo: searchFleetContractManagement.result.recordset[i].XTIPO,
                 xserialcarroceria: searchFleetContractManagement.result.recordset[i].XSERIALCARROCERIA,
                 fdesde_pol: searchFleetContractManagement.result.recordset[i].FDESDE_POL,
@@ -110,7 +116,7 @@ const operationSearchContractVehicle = async(authHeader, requestBody) => {
                 xapellidopropietario: searchFleetContractManagement.result.recordset[i].XAPELLIDO,
                 xdocidentidadpropietario: searchFleetContractManagement.result.recordset[i].XDOCIDENTIDAD,
                 xdireccionpropietario: searchFleetContractManagement.result.recordset[i].XDIRECCION,
-                xtelefonocelularpropietario: searchFleetContractManagement.result.recordset[i].XTELEFONOCELULAR,
+                xtelefonocelularpropietario: telefonopropietario,
                 xemailpropietario: searchFleetContractManagement.result.recordset[i].XEMAIL,
                 xpropietario: propietario,
                 bactivo: searchFleetContractManagement.result.recordset[i].BACTIVO
@@ -563,6 +569,13 @@ const operationDetailNotification = async(authHeader, requestBody) => {
     if(getNotificationData.result.rowsAffected > 0){
         let getFleetContractCompleteData = await bd.getFleetContractCompleteDataQuery(getNotificationData.result.recordset[0].CCONTRATOFLOTA, notificationData).then((res) => res);
         if(getFleetContractCompleteData.error){ return { status: false, code: 500, message: getFleetContractWorkerData.error }; }
+        let telefonopropietario;
+        if(getFleetContractCompleteData.result.recordset[0].XTELEFONOCELULAR){
+            telefonopropietario = getFleetContractCompleteData.result.recordset[0].XTELEFONOCELULAR;
+        }else{
+            telefonopropietario = getFleetContractCompleteData.result.recordset[0].XTELEFONOCASA
+        }
+        console.log(telefonopropietario)
         if(getFleetContractCompleteData.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Fleet Contract Data not found.' }; }
         let notes = [];
         let getNotificationNotesData = await bd.getNotificationNotesDataQuery(notificationData.cnotificacion).then((res) => res);
@@ -707,8 +720,8 @@ const operationDetailNotification = async(authHeader, requestBody) => {
                     cestado: getNotificationThirdpartyVehiclesData.result.recordset[i].CESTADO,
                     cciudad: getNotificationThirdpartyVehiclesData.result.recordset[i].CCIUDAD,
                     xdireccion: helper.decrypt(getNotificationThirdpartyVehiclesData.result.recordset[i].XDIRECCION),
-                    xtelefonocelularpropietario: helper.decrypt(getNotificationThirdpartyVehiclesData.result.recordset[i].XTELEFONOCELULARPROPIETARIO),
-                    xtelefonocasapropietario: getNotificationThirdpartyVehiclesData.result.recordset[i].XTELEFONOCASAPROPIETARIO ? helper.decrypt(getNotificationThirdpartyVehiclesData.result.recordset[i].XTELEFONOCASAPROPIETARIO) : undefined,
+                    xtelefonocelularpropietario: telefonopropietario,
+                    xtelefonocasapropietario: telefonopropietario,
                     xemailpropietario: helper.decrypt(getNotificationThirdpartyVehiclesData.result.recordset[i].XEMAILPROPIETARIO),
                     xobservacionpropietario: helper.decrypt(getNotificationThirdpartyVehiclesData.result.recordset[i].XOBSERVACIONPROPIETARIO),
                     replacements: replacements
@@ -877,7 +890,7 @@ const operationDetailNotification = async(authHeader, requestBody) => {
             xapellidopropietario: helper.decrypt(getFleetContractCompleteData.result.recordset[0].XAPELLIDO),
             xdocidentidadpropietario: helper.decrypt(getFleetContractCompleteData.result.recordset[0].XDOCIDENTIDAD),
             xdireccionpropietario: helper.decrypt(getFleetContractCompleteData.result.recordset[0].XDIRECCION),
-            xtelefonocelularpropietario: helper.decrypt(getFleetContractCompleteData.result.recordset[0].XTELEFONOCELULAR),
+            xtelefonocelularpropietario: telefonopropietario,
             xemailpropietario: helper.decrypt(getFleetContractCompleteData.result.recordset[0].XEMAIL),
             thirdpartyVehicles: thirdpartyVehicles,
             notes: notes,

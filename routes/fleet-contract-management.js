@@ -530,6 +530,12 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
         if(getFleetContractWorkerData.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Fleet Contract Worker not found.' }; }
         */let getFleetContractOwnerData = await bd.getFleetContractOwnerDataQuery(fleetContractData, getFleetContractData.result.recordset[0].CPROPIETARIO).then((res) => res);
         if(getFleetContractOwnerData.error){console.log(getFleetContractOwnerData.error); return { status: false, code: 500, message: getFleetContractOwnerData.error }; }
+        let telefonopropietario;
+        if(getFleetContractOwnerData.result.recordset[0].XTELEFONOCELULAR){
+            telefonopropietario = getFleetContractOwnerData.result.recordset[0].XTELEFONOCELULAR;
+        }else{
+            telefonopropietario = getFleetContractOwnerData.result.recordset[0].XTELEFONOCASA
+        }
         if(getFleetContractOwnerData.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Fleet Contract Owner not found.' }; }
         let getFleetContractOwnerVehicleData = await bd.getFleetContractOwnerVehicleDataQuery(getFleetContractData.result.recordset[0].CPROPIETARIO, getFleetContractData.result.recordset[0].CVEHICULOPROPIETARIO).then((res) => res);
         if(getFleetContractOwnerVehicleData.error){ console.log(getFleetContractOwnerVehicleData.error); return { status: false, code: 500, message: getFleetContractOwnerVehicleData.error }; }
@@ -753,7 +759,7 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
             xtipodocidentidadpropietario: getFleetContractOwnerData.result.recordset[0].XTIPODOCIDENTIDAD,
             xdocidentidadpropietario: getFleetContractOwnerData.result.recordset[0].XDOCIDENTIDAD,
             xdireccionpropietario: getFleetContractOwnerData.result.recordset[0].XDIRECCION,
-            xtelefonocelularpropietario: getFleetContractOwnerData.result.recordset[0].XTELEFONOCELULAR,
+            xtelefonocelularpropietario: getFleetContractOwnerData.result.recordset[0].telefonopropietario,
             xestadopropietario: getFleetContractOwnerData.result.recordset[0].XESTADO,
             xciudadpropietario: getFleetContractOwnerData.result.recordset[0].XCIUDAD,
             fnacimientopropietario: getFleetContractOwnerData.result.recordset[0].FNACIMIENTO,
@@ -763,7 +769,7 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
             xemailpropietario: getFleetContractOwnerData.result.recordset[0].XEMAIL,
             xsexopropietario: getFleetContractOwnerData.result.recordset[0].XSEXO,
             xnacionalidadpropietario: getFleetContractOwnerData.result.recordset[0].XNACIONALIDAD,
-            xtelefonopropietario: getFleetContractOwnerData.result.recordset[0].XTELEFONOCELULAR,
+            xtelefonopropietario: getFleetContractOwnerData.result.recordset[0].telefonopropietario,
             cvehiculopropietario: getFleetContractData.result.recordset[0].CVEHICULOPROPIETARIO,
             ctipoplan: getFleetContractData.result.recordset[0].CTIPOPLAN,
             cplan: getFleetContractData.result.recordset[0].CPLAN,
@@ -1096,7 +1102,7 @@ const operationCreateIndividualContract = async(requestBody) => {
         fhasta_rec:requestBody.fhasta_rec,
         cmetodologiapago: requestBody.cmetodologiapago,
         msuma_aseg: requestBody.msuma_aseg ? requestBody.msuma_aseg : undefined,
-        mtarifa: requestBody.mtarifa ? requestBody.mtarifa : undefined,
+        pcasco: requestBody.pcasco ? requestBody.pcasco : undefined,
         mprima_casco: requestBody.mprima_casco ? requestBody.mprima_casco : undefined,
         mcatastrofico: requestBody.mcatastrofico ? requestBody.mcatastrofico : undefined,
         pdescuento: requestBody.pdescuento ? requestBody.pdescuento : undefined,
