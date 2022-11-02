@@ -537,8 +537,8 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
         /*let searchQuoteByFleet = await bd.searchQuoteByFleetQuery(fleetContractData).then((res) => res);
         if(searchQuoteByFleet.error){ return { status: false, code: 500, message: searchQuoteByFleet.error }; }
         if(searchQuoteByFleet.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Quote By Fleet not found.' }; }*/
-        let accesories = [];
-        /*let getFleetContractAccesoriesData = await bd.getFleetContractAccesoriesDataQuery(fleetContractData.ccontratoflota).then((res) => res);
+        /*let accesories = [];
+        let getFleetContractAccesoriesData = await bd.getFleetContractAccesoriesDataQuery(fleetContractData.ccontratoflota).then((res) => res);
         if(getFleetContractAccesoriesData.error){ return { status: false, code: 500, message: getFleetContractAccesoriesData.error }; }
         if(getFleetContractAccesoriesData.result.rowsAffected > 0){
             for(let i = 0; i < getFleetContractAccesoriesData.result.recordset.length; i++){
@@ -587,6 +587,7 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
         if(getPlanData.error){ return { status: false, code: 500, message: getFleetContractOwnerData.error }; }
         if(getPlanData.result.rowsAffected < 0){ console.log(getPlanData.error); return { status: false, code: 404, message: 'Fleet Contract Plan not found.' }; }
         let realCoverages = [];
+        let coverageAnnexes = [];
         let getPlanCoverages = await db.getPlanCoverages(getFleetContractData.result.recordset[0].CPLAN, getFleetContractData.result.recordset[0].CCONTRATOFLOTA);
         if(getPlanCoverages.error){ console.log(getPlanCoverages.error); return { status: false, code: 500, message: getFleetContractOwnerData.error }; }
         if(getPlanCoverages.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Fleet Contract Plan Coverages not found.' }; }
@@ -605,6 +606,17 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
             } 
             if (getPlanCoverages.result.recordset[i].cmoneda == 2 && getPlanCoverages.result.recordset[i].mprimaprorrata) {
                 mprimaprorratatotal = mprimaprorratatotal + getPlanCoverages.result.recordset[i].mprimaprorrata
+            }
+            let getCoverageAnnexes = await db.getCoverageAnnexesQuery(getPlanCoverages.result.recordset[i].CCOBERTURA)
+            if (getCoverageAnnexes.result) {
+                for (let i = 0; i < getCoverageAnnexes.result.recordset.length; i++) {
+                    let annex = {
+                        ccobertura: getCoverageAnnexes.result.recordset[i].CCOBERTURA,
+                        canexo: getCoverageAnnexes.result.recordset[i].CANEXO,
+                        xanexo: getCoverageAnnexes.result.recordset[i].XANEXO
+                    }
+                    coverageAnnexes.push(annex);
+                }
             }
             let coverage = {
                 ccobertura: getPlanCoverages.result.recordset[i].ccobertura,
@@ -682,12 +694,28 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
             let xplan = getPlanArysData.result.recordset[0].XPLAN.toLowerCase()
             xplanservicios = xplan.charAt(0).toUpperCase() + xplan.slice(1);
         }
+        let accesories = []
+        let getFleetContractAccesories = await db.getFleetContractAccesoriesQuery(fleetContractData.ccontratoflota);
+        if(getFleetContractAccesories.error){ return { status: false, code: 500, message: getFleetContractAccesories.error }; }
+        if (getFleetContractAccesories.result.rowsAffected > 0) {
+            for(let i = 0; i < getFleetContractAccesories.result.recordset.length; i++){
+                let accessory = {
+                    caccesorio: getFleetContractAccesories.result.recordset[i].CACCESORIO,
+                    xaccesorio: getFleetContractAccesories.result.recordset[i].XACCESORIO,
+                    msuma_accesorio: getFleetContractAccesories.result.recordset[i].MSUMA_ACCESORIO,
+                    mprima_accesorio: getFleetContractAccesories.result.recordset[i].MPRIMA_ACCESORIO
+                }
+                accesories.push(accessory);
+            }
+        }
+
         return {
             status: true,
             ccarga: getFleetContractData.result.recordset[0].ccarga,
             ccontratoflota: getFleetContractData.result.recordset[0].CCONTRATOFLOTA,
             xrecibo: getFleetContractData.result.recordset[0].xrecibo,
             xpoliza: getFleetContractData.result.recordset[0].xpoliza,
+            xtituloreporte: getFleetContractData.result.recordset[0].XTITULO_REPORTE,
             ccliente: getFleetContractData.result.recordset[0].CCLIENTE,
             xnombrecliente: getFleetContractClientData.result.recordset[0].XCLIENTE,
             xdocidentidadcliente: getFleetContractClientData.result.recordset[0].XDOCIDENTIDAD,
@@ -763,7 +791,8 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
             accesories: accesories,
             inspections: inspections,
             services:services,
-            realCoverages: realCoverages
+            realCoverages: realCoverages,
+            coverageAnnexes: coverageAnnexes
         }
     }else{ return { status: false, code: 404, message: 'Fleet Contract not found.' }; }
 }
@@ -1203,12 +1232,19 @@ const operationTarifaCasco = async(authHeader, requestBody) => {
         cano: parseInt(requestBody.cano),
         xcobertura:requestBody.xcobertura,
     };
-    if(requestBody.xcobertura == 'AMPLIA'){}
-    let query = await bd.SearchTarifa(searchData).then((res) => res);
+    if(requestBody.xcobertura == 'AMPLIA'){
+    let query = await bd.SearchTarifaCasco(searchData).then((res) => res);
     if(query.error){ return { status: false, code: 500, message: query.error }; }
     return { status: true,
              ptasa_casco: query.result.recordset[0].PTASA_CASCO
             }
-            
+    }
+    else if(requestBody.xcobertura == 'PERDIDA TOTAL'){
+        let query = await bd.SearchTarifaPerdida(searchData).then((res) => res);
+        if(query.error){ return { status: false, code: 500, message: query.error }; }
+        return { status: true,
+                 ptasa_casco: query.result.recordset[0].PTASA_CASCO
+                }
+    }       
 }
 module.exports = router;

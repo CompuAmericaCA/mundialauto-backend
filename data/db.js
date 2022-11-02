@@ -399,6 +399,18 @@ module.exports = {
             return { error: err.message };
         }
     },
+    getCoverageAnnexesQuery: async(ccobertura) => {
+        try{
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .input('CCOBERTURA', sql.Int, ccobertura)
+                .query('select * from MACOBERTURA_ANEXO WHERE CCOBERTURA = @CCOBERTURA')
+            return { result: result };
+        }catch(err){
+            console.log(err.message);
+            return { error: err.message }
+        }
+    },
     getPlanArys: async(cplan) => {
        try{
             let pool = await sql.connect(config);
@@ -408,6 +420,18 @@ module.exports = {
             //sql.close();
             return { result: result };
         }catch(err){
+            return { error: err.message };
+        }
+    },
+    getFleetContractAccesoriesQuery: async(ccontratoflota) => {
+        try{
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .input('CCONTRATOFLOTA', sql.Int, ccontratoflota)
+                .query('SELECT * FROM VWBUSCARACCESORIOSXCONTRATO WHERE CCONTRATOFLOTA = @CCONTRATOFLOTA')
+            return { result: result}
+        }catch(err){
+            console.log(err.message);
             return { error: err.message };
         }
     },
