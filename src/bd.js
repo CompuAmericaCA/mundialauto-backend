@@ -8463,7 +8463,7 @@ module.exports = {
             let rowsAffected = 0;
             let pool = await sql.connect(config);
             let insert = await pool.request()
-                .input('xnombre', sql.NVarChar, userData.xnombre)
+                .input('xnombre', sql.NVarChar, userData.xnombre ? userData.xnombre: undefined)
                 .input('xapellido', sql.NVarChar, userData.xapellido)
                 .input('cano', sql.Numeric(11, 2), userData.cano)
                 .input('xcolor', sql.NVarChar, userData.xcolor)
@@ -8477,7 +8477,6 @@ module.exports = {
                 .input('xserialmotor', sql.NVarChar, userData.xserialmotor)
                 .input('xserialcarroceria', sql.NVarChar, userData.xserialcarroceria)
                 .input('xplaca', sql.NVarChar, userData.xplaca)
-                .input('xuso', sql.NVarChar, userData.xuso)
                 .input('xtelefono_emp', sql.NVarChar, userData.xtelefono_emp)
                 .input('cplan', sql.Numeric(11, 0), userData.cplan)
                 .input('ccorredor', sql.Numeric(11, 0), userData.ccorredor)
@@ -8486,11 +8485,6 @@ module.exports = {
                 .input('ncapacidad_p', sql.NVarChar, userData.ncapacidad_p)
                 .input('xtipo', sql.NVarChar, userData.xtipo)
                 .input('finicio',  sql.DateTime, new Date())
-                .input('femision', sql.NVarChar, userData.femision)
-                .input('fdesde_pol', sql.NVarChar, userData.fdesde_pol)
-                .input('fhasta_pol', sql.NVarChar, userData.fhasta_pol)
-                .input('fdesde_rec', sql.NVarChar, userData.fdesde_rec)
-                .input('fhasta_rec', sql.NVarChar, userData.fhasta_rec)
                 .input('cmetodologiapago', sql.Numeric(11, 0), userData.cmetodologiapago)
                 .input('msuma_aseg', sql.Numeric(11, 0), userData.msuma_aseg)
                 .input('pcasco', sql.Numeric(11, 0), userData.pcasco)
@@ -8506,7 +8500,7 @@ module.exports = {
                 .input('pmotin', sql.Numeric(11, 0), userData.pmotin)
                 .input('mmotin', sql.Numeric(11, 0), userData.mmotin)
                 .input('pblindaje', sql.Numeric(11, 0), userData.pblindaje)
-                .query('insert into TMEMISION_INDIVIDUAL(XNOMBRE, XAPELLIDO, CANO, XCOLOR, XMARCA, XMODELO, XVERSION, XRIF_CLIENTE, EMAIL, XTELEFONO_PROP, XDIRECCIONFISCAL, XSERIALMOTOR, XSERIALCARROCERIA, XPLACA, XUSO, XTELEFONO_EMP, CPLAN, CCORREDOR, XCEDULA, XCOBERTURA, NCAPACIDAD_P, XTIPO, FINICIO, FEMISION, FDESDE_POL, FHASTA_POL, FDESDE_REC, FHASTA_REC, CMETODOLOGIAPAGO, MSUMA_ASEG, PCASCO, MPRIMA_CASCO, MCATASTROFICO, PDESCUENTO, IFRACCIONAMIENTO, NCUOTAS, MPRIMA_BLINDAJE, MSUMA_BLINDAJE, MPRIMA_BRUTA, PCATASTROFICO, PMOTIN, MMOTIN) values (@xnombre, @xapellido, @cano, @xcolor, @xmarca, @xmodelo, @xversion, @xrif_cliente, @email, @xtelefono_prop, @xdireccionfiscal, @xserialmotor, @xserialcarroceria, @xplaca, @xuso, @xtelefono_emp, @cplan, @ccorredor, @xcedula, @xcobertura, @ncapacidad_p, @xtipo, @finicio, @femision, @fdesde_pol, @fhasta_pol, @fdesde_rec, @fhasta_rec, @cmetodologiapago, @msuma_aseg, @pcasco, @mprima_casco, @mcatastrofico, @pdescuento, @ifraccionamiento, @ncuotas, @mprima_blindaje, @msuma_blindaje, @mprima_bruta,@pcatastrofico ,@pmotin, @mmotin, @pblindaje)')
+                .query('insert into TMEMISION_INDIVIDUAL(XNOMBRE, XAPELLIDO, CANO, XCOLOR, XMARCA, XMODELO, XVERSION, XRIF_CLIENTE, EMAIL, XTELEFONO_PROP, XDIRECCIONFISCAL, XSERIALMOTOR, XSERIALCARROCERIA, XPLACA, XTELEFONO_EMP, CPLAN, CCORREDOR, XCEDULA, XCOBERTURA, NCAPACIDAD_P, XTIPO, FINICIO, CMETODOLOGIAPAGO, MSUMA_ASEG, PCASCO, MPRIMA_CASCO, MCATASTROFICO, PDESCUENTO, IFRACCIONAMIENTO, NCUOTAS, MPRIMA_BLINDAJE, MSUMA_BLINDAJE, MPRIMA_BRUTA, PCATASTROFICO, PMOTIN, MMOTIN, PBLINDAJE) values (@xnombre, @xapellido, @cano, @xcolor, @xmarca, @xmodelo, @xversion, @xrif_cliente, @email, @xtelefono_prop, @xdireccionfiscal, @xserialmotor, @xserialcarroceria, @xplaca, @xtelefono_emp, @cplan, @ccorredor, @xcedula, @xcobertura, @ncapacidad_p, @xtipo, @finicio, @cmetodologiapago, @msuma_aseg, @pcasco, @mprima_casco, @mcatastrofico, @pdescuento, @ifraccionamiento, @ncuotas, @mprima_blindaje, @msuma_blindaje, @mprima_bruta,@pcatastrofico ,@pmotin, @mmotin, @pblindaje)')
             //sql.close();
             return { result: { rowsAffected: rowsAffected, status: true } };
         }
@@ -11969,25 +11963,13 @@ TypeMetodologia: async(searchData) => {
         return { error: err.message };
     }
  },
- SearchTarifaCascoModelo: async(searchData) => {
+ SearchTarifas: async(searchData) => {
     try{
         let pool = await sql.connect(config);
         let result = await pool.request()
-        .input('xtipo', sql.NVarChar, searchData.xtipo)
-        .input('xmarca', sql.NVarChar, searchData.xmarca)
-        .input('cano', sql.SmallInt, searchData.cano)
-        .query('select XCLASE from MACLASIFICACION_VEH WHERE XTIPO = @xtipo AND XMARCA = @xmarca AND XMODELO = TODOS');
-        if(result.rowsAffected > 0 ) {
-            let pool = await sql.connect(config);
-            let query= await pool.request()
-                .input('xclase', sql.NVarChar, result.recordset[0].XCLASE)
-                .input('cano', sql.Int, searchData.cano)
-                .input('xtipo', sql.NVarChar, searchData.xtipo)
-                .query('select PTASA_CASCO from MATARIFA_CASCO where XCLASE = @xclase AND CANO = @cano AND XTIPO = @xtipo');
-                return { result: query };
-    }else {
-        
-       } 
+        .input('xcobertura', sql.NVarChar, searchData.xcobertura)
+        .query('select PTARIFA from MATARIFA_OTROS WHERE XCOBERTURA = @xcobertura');
+       return{ result: result }
     }catch(err){
         return { error: err.message };
         }
@@ -12009,10 +11991,9 @@ SearchTarifaCasco: async(searchData) => {
                 .input('xtipo', sql.NVarChar, searchData.xtipo)
                 .query('select PTASA_CASCO from MATARIFA_CASCO where XCLASE = @xclase AND CANO = @cano AND XTIPO = @xtipo');
                 return { result: query };
-    }else {
-     return{result: result}
-     
-       } 
+        }else {
+            return{result: result}
+             } 
     }catch(err){
         return { error: err.message };
         }
