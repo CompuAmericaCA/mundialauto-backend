@@ -8528,7 +8528,6 @@ module.exports = {
                 .input('pdescuento', sql.Numeric(17, 2), userData.pdescuento)
                 .input('ifraccionamiento', sql.Bit, userData.ifraccionamiento)
                 .input('ncuotas', sql.Int, userData.ncuotas)
-<<<<<<< HEAD
                 .input('mprima_blindaje', sql.Numeric(11, 0), userData.mprima_blindaje)
                 .input('msuma_blindaje', sql.Numeric(11, 0), userData.msuma_blindaje)
                 .input('mprima_bruta', sql.Numeric(11, 0), userData.mprima_bruta)
@@ -8537,9 +8536,6 @@ module.exports = {
                 .input('mmotin', sql.Numeric(11, 0), userData.mmotin)
                 .input('pblindaje', sql.Numeric(11, 0), userData.pblindaje)
                 .query('insert into TMEMISION_INDIVIDUAL(XNOMBRE, XAPELLIDO, CANO, XCOLOR, XMARCA, XMODELO, XVERSION, XRIF_CLIENTE, EMAIL, XTELEFONO_PROP, XDIRECCIONFISCAL, XSERIALMOTOR, XSERIALCARROCERIA, XPLACA, XTELEFONO_EMP, CPLAN, CCORREDOR, XCEDULA, XCOBERTURA, NCAPACIDAD_P, XTIPO, FINICIO, CMETODOLOGIAPAGO, MSUMA_ASEG, PCASCO, MPRIMA_CASCO, MCATASTROFICO, PDESCUENTO, IFRACCIONAMIENTO, NCUOTAS, MPRIMA_BLINDAJE, MSUMA_BLINDAJE, MPRIMA_BRUTA, PCATASTROFICO, PMOTIN, MMOTIN, PBLINDAJE) values (@xnombre, @xapellido, @cano, @xcolor, @xmarca, @xmodelo, @xversion, @xrif_cliente, @email, @xtelefono_prop, @xdireccionfiscal, @xserialmotor, @xserialcarroceria, @xplaca, @xtelefono_emp, @cplan, @ccorredor, @xcedula, @xcobertura, @ncapacidad_p, @xtipo, @finicio, @cmetodologiapago, @msuma_aseg, @pcasco, @mprima_casco, @mcatastrofico, @pdescuento, @ifraccionamiento, @ncuotas, @mprima_blindaje, @msuma_blindaje, @mprima_bruta,@pcatastrofico ,@pmotin, @mmotin, @pblindaje)')
-=======
-                .query('insert into TMEMISION_INDIVIDUAL(XNOMBRE, XAPELLIDO, CANO, XCOLOR, XMARCA, XMODELO, XVERSION, XRIF_CLIENTE, EMAIL, XTELEFONO_PROP, XDIRECCIONFISCAL, XSERIALMOTOR, XSERIALCARROCERIA, XPLACA, XUSO, XTELEFONO_EMP, CPLAN, CCORREDOR, XCEDULA, XCOBERTURA, NCAPACIDAD_P, XTIPO, FINICIO, FEMISION, FDESDE_POL, FHASTA_POL, FDESDE_REC, FHASTA_REC, CMETODOLOGIAPAGO, MSUMA_ASEG, PCASCO, MPRIMA_CASCO, MCATASTROFICO, PDESCUENTO, IFRACCIONAMIENTO, NCUOTAS) values (@xnombre, @xapellido, @cano, @xcolor, @xmarca, @xmodelo, @xversion, @xrif_cliente, @email, @xtelefono_prop, @xdireccionfiscal, @xserialmotor, @xserialcarroceria, @xplaca, @xuso, @xtelefono_emp, @cplan, @ccorredor, @xcedula, @xcobertura, @ncapacidad_p, @xtipo, @finicio, @femision, @fdesde_pol, @fhasta_pol, @fdesde_rec, @fhasta_rec, @cmetodologiapago, @msuma_aseg, @pcasco, @mprima_casco, @mcatastrofico, @pdescuento, @ifraccionamiento, @ncuotas)')
->>>>>>> origin/jhon
             //sql.close();
             return { result: { rowsAffected: rowsAffected, status: true } };
         }
