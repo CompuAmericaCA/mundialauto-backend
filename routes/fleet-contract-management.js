@@ -695,7 +695,7 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
             xplanservicios = xplan.charAt(0).toUpperCase() + xplan.slice(1);
         }
         let accesories = []
-        /*let getFleetContractAccesories = await db.getFleetContractAccesoriesQuery(fleetContractData.ccontratoflota);
+        let getFleetContractAccesories = await db.getFleetContractAccesoriesQuery(fleetContractData.ccontratoflota);
         if(getFleetContractAccesories.error){ return { status: false, code: 500, message: getFleetContractAccesories.error }; }
         if (getFleetContractAccesories.result.rowsAffected > 0) {
             for(let i = 0; i < getFleetContractAccesories.result.recordset.length; i++){
@@ -703,12 +703,13 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
                     caccesorio: getFleetContractAccesories.result.recordset[i].CACCESORIO,
                     xaccesorio: getFleetContractAccesories.result.recordset[i].XACCESORIO,
                     msuma_accesorio: getFleetContractAccesories.result.recordset[i].MSUMA_ACCESORIO,
-                    ptasa: getFleetContractAccesories.result.recordset[i].PTASA
+                    mprima_accesorio: getFleetContractAccesories.result.recordset[i].MPRIMA_ACCESORIO
                 }
                 accesories.push(accessory);
             }
-        }*/
-
+        }
+        console.log(getFleetContractData.result.recordset[0].FCREACION);
+        console.log(getFleetContractData.result.recordset[0].FDESDE_POL);
         return {
             status: true,
             ccarga: getFleetContractData.result.recordset[0].ccarga,
@@ -731,6 +732,7 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
             xsucursalemision: getFleetContractData.result.recordset[0].XSUCURSALEMISION,
             xsucursalsuscriptora: getFleetContractData.result.recordset[0].XSUCURSALSUSCRIPTORA,
             cagrupador: getFleetContractData.result.recordset[0].CAGRUPADOR,
+            fsuscripcion: getFleetContractData.result.recordset[0].FCREACION,
             finicio: getFleetContractData.result.recordset[0].FDESDE_POL,
             fhasta: getFleetContractData.result.recordset[0].FHASTA_POL,
             finiciorecibo: getFleetContractData.result.recordset[0].FDESDE_REC,
