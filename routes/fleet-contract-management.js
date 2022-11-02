@@ -708,7 +708,8 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
                 accesories.push(accessory);
             }
         }
-
+        console.log(getFleetContractData.result.recordset[0].FCREACION);
+        console.log(getFleetContractData.result.recordset[0].FDESDE_POL);
         return {
             status: true,
             ccarga: getFleetContractData.result.recordset[0].ccarga,
@@ -731,6 +732,7 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
             xsucursalemision: getFleetContractData.result.recordset[0].XSUCURSALEMISION,
             xsucursalsuscriptora: getFleetContractData.result.recordset[0].XSUCURSALSUSCRIPTORA,
             cagrupador: getFleetContractData.result.recordset[0].CAGRUPADOR,
+            fsuscripcion: getFleetContractData.result.recordset[0].FCREACION,
             finicio: getFleetContractData.result.recordset[0].FDESDE_POL,
             fhasta: getFleetContractData.result.recordset[0].FHASTA_POL,
             finiciorecibo: getFleetContractData.result.recordset[0].FDESDE_REC,
