@@ -1272,6 +1272,7 @@ const operationTarifaCasco = async(authHeader, requestBody) => {
                 jsonList.push({ptarifa: tarifa.result.recordset[i].PTARIFA});
             }
             return { status: true,
+                     ptasa_casco: query.result.recordset[0].PTASA_CASCO,
                      ptarifa: jsonList
                     }
         }
