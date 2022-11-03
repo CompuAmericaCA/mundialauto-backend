@@ -530,6 +530,12 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
         if(getFleetContractWorkerData.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Fleet Contract Worker not found.' }; }
         */let getFleetContractOwnerData = await bd.getFleetContractOwnerDataQuery(fleetContractData, getFleetContractData.result.recordset[0].CPROPIETARIO).then((res) => res);
         if(getFleetContractOwnerData.error){console.log(getFleetContractOwnerData.error); return { status: false, code: 500, message: getFleetContractOwnerData.error }; }
+        let telefonopropietario;
+        if(getFleetContractOwnerData.result.recordset[0].XTELEFONOCELULAR){
+            telefonopropietario = getFleetContractOwnerData.result.recordset[0].XTELEFONOCELULAR;
+        }else{
+            telefonopropietario = getFleetContractOwnerData.result.recordset[0].XTELEFONOCASA
+        }
         if(getFleetContractOwnerData.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Fleet Contract Owner not found.' }; }
         let getFleetContractOwnerVehicleData = await bd.getFleetContractOwnerVehicleDataQuery(getFleetContractData.result.recordset[0].CPROPIETARIO, getFleetContractData.result.recordset[0].CVEHICULOPROPIETARIO).then((res) => res);
         if(getFleetContractOwnerVehicleData.error){ console.log(getFleetContractOwnerVehicleData.error); return { status: false, code: 500, message: getFleetContractOwnerVehicleData.error }; }
@@ -755,7 +761,7 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
             xtipodocidentidadpropietario: getFleetContractOwnerData.result.recordset[0].XTIPODOCIDENTIDAD,
             xdocidentidadpropietario: getFleetContractOwnerData.result.recordset[0].XDOCIDENTIDAD,
             xdireccionpropietario: getFleetContractOwnerData.result.recordset[0].XDIRECCION,
-            xtelefonocelularpropietario: getFleetContractOwnerData.result.recordset[0].XTELEFONOCELULAR,
+            xtelefonocelularpropietario: getFleetContractOwnerData.result.recordset[0].telefonopropietario,
             xestadopropietario: getFleetContractOwnerData.result.recordset[0].XESTADO,
             xciudadpropietario: getFleetContractOwnerData.result.recordset[0].XCIUDAD,
             fnacimientopropietario: getFleetContractOwnerData.result.recordset[0].FNACIMIENTO,
@@ -765,7 +771,7 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
             xemailpropietario: getFleetContractOwnerData.result.recordset[0].XEMAIL,
             xsexopropietario: getFleetContractOwnerData.result.recordset[0].XSEXO,
             xnacionalidadpropietario: getFleetContractOwnerData.result.recordset[0].XNACIONALIDAD,
-            xtelefonopropietario: getFleetContractOwnerData.result.recordset[0].XTELEFONOCELULAR,
+            xtelefonopropietario: getFleetContractOwnerData.result.recordset[0].telefonopropietario,
             cvehiculopropietario: getFleetContractData.result.recordset[0].CVEHICULOPROPIETARIO,
             ctipoplan: getFleetContractData.result.recordset[0].CTIPOPLAN,
             cplan: getFleetContractData.result.recordset[0].CPLAN,
@@ -1083,7 +1089,6 @@ const operationCreateIndividualContract = async(requestBody) => {
         xserialmotor: requestBody.xserialmotor.toUpperCase(),
         xserialcarroceria: requestBody.xserialcarroceria.toUpperCase(),
         xplaca: requestBody.xplaca.toUpperCase(),
-        xuso: requestBody.xuso.toUpperCase() ? requestBody.xuso : undefined,
         xtelefono_emp: requestBody.xtelefono_emp,
         cplan: requestBody.cplan,
         ccorredor: requestBody.ccorredor ? requestBody.ccorredor : undefined,
@@ -1091,20 +1096,23 @@ const operationCreateIndividualContract = async(requestBody) => {
         xcobertura: requestBody.xcobertura.toUpperCase(),
         ncapacidad_p: requestBody.ncapacidad_p,
         xtipo: requestBody.xtipo.toUpperCase(),
-        femision:requestBody.femision,
-        fdesde_pol:requestBody.fdesde_pol,
-        fhasta_pol:requestBody.fhasta_pol,
-        fdesde_rec:requestBody.fdesde_rec,
-        fhasta_rec:requestBody.fhasta_rec,
         cmetodologiapago: requestBody.cmetodologiapago,
         msuma_aseg: requestBody.msuma_aseg ? requestBody.msuma_aseg : undefined,
-        mtarifa: requestBody.mtarifa ? requestBody.mtarifa : undefined,
+        pcasco: requestBody.pcasco ? requestBody.pcasco : undefined,
         mprima_casco: requestBody.mprima_casco ? requestBody.mprima_casco : undefined,
         mcatastrofico: requestBody.mcatastrofico ? requestBody.mcatastrofico : undefined,
         pdescuento: requestBody.pdescuento ? requestBody.pdescuento : undefined,
         ifraccionamiento: requestBody.ifraccionamiento ? requestBody.ifraccionamiento : undefined,
-        ncuotas: requestBody.ncuotas ? requestBody.ncuotas : undefined
+        ncuotas: requestBody.ncuotas ? requestBody.ncuotas : undefined,
+        mprima_bruta: requestBody.mprima_bruta ? requestBody.mprima_bruta : undefined,
+        mprima_blindaje: requestBody.mprima_blindaje ? requestBody.mprima_blindaje : undefined,
+        msuma_blindaje: requestBody.msuma_blindaje ? requestBody.msuma_blindaje : undefined,
+        pcatastrofico: requestBody.pcatastrofico ? requestBody.pcatastrofico : undefined,
+        pmotin: requestBody.pmotin ? requestBody.pmotin : undefined,
+        mmotin: requestBody.mmotin ? requestBody.mmotin : undefined,
+        pblindaje: requestBody.pblindaje ? requestBody.pblindaje : undefined,
     };
+    console.log(userData)
     if(userData){
         let operationCreateIndividualContract = await bd.createIndividualContractQuery(userData).then((res) => res);
         if(operationCreateIndividualContract.error){ console.log(operationCreateIndividualContract.error);return { status: false, code: 500, message: operationCreateIndividualContract.error }; }
@@ -1220,6 +1228,7 @@ router.route('/tarifa-casco').post((req, res) => {
             }
             res.json({ data: result });
         }).catch((err) => {
+            console.log(err.message)
             res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationTarifaCasco' } });
         });
     }
@@ -1236,16 +1245,40 @@ const operationTarifaCasco = async(authHeader, requestBody) => {
     };
     if(requestBody.xcobertura == 'AMPLIA'){
     let query = await bd.SearchTarifaCasco(searchData).then((res) => res);
-    if(query.error){ return { status: false, code: 500, message: query.error }; }
+    if(query.error){ return { status: false, code: 500, message: operationTarifaCasco.error };  }
+    if(query.result){
+        let tarifa = await bd.SearchTarifas(searchData).then((res) => res);
+        if(tarifa.error){ return { status: false, code: 500, message: operationTarifas.error };}
+        let jsonList = [];
+        for(let i = 0; i < tarifa.result.recordset.length; i++){
+            jsonList.push({ptarifa: tarifa.result.recordset[i].PTARIFA});
+        }
+        return { status: true,
+                  ptasa_casco: query.result.recordset[0].PTASA_CASCO,
+                 ptarifa: jsonList
+                }
+    }
     return { status: true,
              ptasa_casco: query.result.recordset[0].PTASA_CASCO
             }
     }
+    
     else if(requestBody.xcobertura == 'PERDIDA TOTAL'){
         let query = await bd.SearchTarifaPerdida(searchData).then((res) => res);
         if(query.error){ return { status: false, code: 500, message: query.error }; }
+        if(query.result){
+            let tarifa = await bd.SearchTarifas(searchData).then((res) => res);
+            if(tarifa.error){ return { status: false, code: 500, message: operationTarifas.error };}
+            let jsonList = [];
+            for(let i = 0; i < tarifa.result.recordset.length; i++){
+                jsonList.push({ptarifa: tarifa.result.recordset[i].PTARIFA});
+            }
+            return { status: true,
+                     ptarifa: jsonList
+                    }
+        }
         return { status: true,
-                 ptasa_casco: query.result.recordset[0].PTASA_CASCO
+                 ptasa_casco: query.result.recordset[0].PTASA_CASCO,
                 }
     }       
 }
