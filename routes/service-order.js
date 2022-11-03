@@ -404,6 +404,7 @@ router.route('/notification-order').post((req, res) => {
             }
             res.json({ data: result });
         }).catch((err) => {
+            console.log(err.message)
             res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationValrepNotificationOrder' } });
         });
     }
@@ -422,9 +423,9 @@ const operationValrepNotificationOrder = async(authHeader, requestBody) => {
     }else{
         auto = query.result.recordset[0].XMARCA + ' ' + query.result.recordset[0].XMODELO + ' ' + query.result.recordset[0].XVERSION;
     }
-
+    let nombresalternativos;
     if(query.result.recordset[0].XAPELLIDOALTERNATIVO){
-        let nombresalternativos;
+        
         nombresalternativos = query.result.recordset[0].XNOMBREALTERNATIVO + ' ' + query.result.recordset[0].XAPELLIDOALTERNATIVO;
     }else if(query.result.recordset[0].XNOMBREALTERNATIVO){
         nombresalternativos = query.result.recordset[0].XNOMBREALTERNATIVO;
