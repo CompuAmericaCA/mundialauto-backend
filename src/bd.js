@@ -8714,7 +8714,9 @@ module.exports = {
                 .input('fhastarecibo', sql.DateTime, fleetContractData.fhastarecibo)
                 .input('cusuariomodificacion', sql.Int, fleetContractData.cusuariomodificacion)
                 .input('fmodificacion', sql.DateTime, new Date())
-                .query('update SUCONTRATOFLOTA set CCLIENTE = @ccliente, CASOCIADO = @casociado, CAGRUPADOR = @cagrupador, FINICIO = @finicio, CESTATUSGENERAL = @cestatusgeneral, XCERTIFICADOASOCIADO = @xcertificadoasociado, CTRABAJADOR = @ctrabajador, CPROPIETARIO = @cpropietario, CVEHICULOPROPIETARIO = @cvehiculopropietario, CUSUARIOMODIFICACION = @cusuariomodificacion, FMODIFICACION = @fmodificacion, FHASTA = @fhasta, CTIPOPLAN = @ctipoplan, CPLAN = @cplan, CMETODOLOGIAPAGO = @cmetodologiapago, XSUCURSALEMISION = @xsucursalemision, XSUCURSALSUSCRIPTORA = @xsucursalsuscriptora, CTIPORECIBO = @ctiporecibo, FHASTARECIBO = @fhastarecibo where CCONTRATOFLOTA = @ccontratoflota and CPAIS = @cpais and CCOMPANIA = @ccompania');
+                .input('xobservaciones', sql.NVarChar, fleetContractData.xobservaciones)
+                .input('xanexo', sql.NVarChar, fleetContractData.xanexo)
+                .query('update SUCONTRATOFLOTA set CCLIENTE = @ccliente, CASOCIADO = @casociado, CAGRUPADOR = @cagrupador, FINICIO = @finicio, CESTATUSGENERAL = @cestatusgeneral, XCERTIFICADOASOCIADO = @xcertificadoasociado, CTRABAJADOR = @ctrabajador, CPROPIETARIO = @cpropietario, CVEHICULOPROPIETARIO = @cvehiculopropietario, CUSUARIOMODIFICACION = @cusuariomodificacion, FMODIFICACION = @fmodificacion, FHASTA = @fhasta, CTIPOPLAN = @ctipoplan, CPLAN = @cplan, CMETODOLOGIAPAGO = @cmetodologiapago, XSUCURSALEMISION = @xsucursalemision, XSUCURSALSUSCRIPTORA = @xsucursalsuscriptora, CTIPORECIBO = @ctiporecibo, FHASTARECIBO = @fhastarecibo, XANEXO = @xanexo, XOBSERVACIONES = @xobservaciones where CCONTRATOFLOTA = @ccontratoflota and CPAIS = @cpais and CCOMPANIA = @ccompania');
             //sql.close();
             return { result: result };
         }catch(err){

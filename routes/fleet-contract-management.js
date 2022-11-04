@@ -938,9 +938,11 @@ const operationUpdateFleetContractManagement = async(authHeader, requestBody) =>
         cmetodologiapago: requestBody.cmetodologiapago,
         ctiporecibo: requestBody.ctiporecibo,
         fhastarecibo: requestBody.fhastarecibo,
-        cusuariomodificacion: requestBody.cusuariomodificacion
+        cusuariomodificacion: requestBody.cusuariomodificacion,
+        xanexo: requestBody.xanexo.toUpperCase(),
+        xobservaciones: requestBody.xobservaciones.toUpperCase(),
     }
-    //console.log(fleetContractData)
+    console.log(fleetContractData)
     let verifyFleetContractVehicle = await bd.verifyFleetContractVehicleToUpdateQuery(fleetContractData).then((res) => res);
     if(verifyFleetContractVehicle.error){ return { status: false, code: 500, message: verifyFleetContractVehicle.error }; }
     if(verifyFleetContractVehicle.result.rowsAffected > 0){ return { status: false, code: 200, condition: 'vehicle-contract-already-exist' }; }
