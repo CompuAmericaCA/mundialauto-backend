@@ -12398,4 +12398,55 @@ createAccesoriesFromFleetContractIndividual: async(accessory) => {
         return { error: err.message };
     }
 },
+searchAdministrationPaymentRecordQuery: async(searchData) => {
+    try{
+        let query = `select * from VWBUSCARORDENSERVICIOXFLOTA WHERE CCOMPANIA = @ccompania${ searchData.corden ? " and CORDEN = @corden" : '' } AND MTOTAL > 0 OR MMONTOTOTAL > 0`;
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+            .input('ccompania', sql.Int, searchData.ccompania)
+            .input('corden', sql.Int, searchData.corden)
+            .query(query);
+        //sql.close();
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+},
+serviceOrderValrepQuery: async() => {
+        try{
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+            .input('cestatusgeneral', sql.Int, 13)
+            .query('select * from VWBUSCARORDENSERVICIOXFLOTA WHERE CESTATUSGENERAL = @cestatusgeneral AND MTOTAL > 0 OR MMONTOTOTAL > 0');
+        //sql.close();
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+},
+searchSettlementAdministrationPaymentRecordQuery: async(searchData) => {
+    try{
+        let query = `select * from VWBUSCARFINIQUITO WHERE CCOMPANIA = @ccompania${ searchData.cfiniquito ? " and CFINIQUITO = @cfiniquito" : '' } AND MMONTOFINIQUITO > 0`;
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+            .input('ccompania', sql.Int, searchData.ccompania)
+            .input('cfiniquito', sql.Int, searchData.cfiniquito)
+            .query(query);
+        //sql.close();
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+},
+settlementValrepQuery: async() => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+            .query('select * from VWBUSCARFINIQUITO WHERE MMONTOFINIQUITO > 0');
+        //sql.close();
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+},
 }
