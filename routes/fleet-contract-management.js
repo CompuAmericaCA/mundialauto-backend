@@ -942,7 +942,6 @@ const operationUpdateFleetContractManagement = async(authHeader, requestBody) =>
         xanexo: requestBody.xanexo.toUpperCase(),
         xobservaciones: requestBody.xobservaciones.toUpperCase(),
     }
-    console.log(fleetContractData)
     let verifyFleetContractVehicle = await bd.verifyFleetContractVehicleToUpdateQuery(fleetContractData).then((res) => res);
     if(verifyFleetContractVehicle.error){ return { status: false, code: 500, message: verifyFleetContractVehicle.error }; }
     if(verifyFleetContractVehicle.result.rowsAffected > 0){ return { status: false, code: 200, condition: 'vehicle-contract-already-exist' }; }
@@ -1113,8 +1112,11 @@ const operationCreateIndividualContract = async(requestBody) => {
         pmotin: requestBody.pmotin ? requestBody.pmotin : undefined,
         mmotin: requestBody.mmotin ? requestBody.mmotin : undefined,
         pblindaje: requestBody.pblindaje ? requestBody.pblindaje : undefined,
+        cestado: requestBody.cestado ? requestBody.cestado : undefined,
+        cciudad: requestBody.cciudad ? requestBody.cciudad : undefined,
+
     };
-    console.log(userData)
+
     if(userData){
         let operationCreateIndividualContract = await bd.createIndividualContractQuery(userData).then((res) => res);
         if(operationCreateIndividualContract.error){ console.log(operationCreateIndividualContract.error);return { status: false, code: 500, message: operationCreateIndividualContract.error }; }
@@ -1285,4 +1287,41 @@ const operationTarifaCasco = async(authHeader, requestBody) => {
                 }
     }       
 }
+
+router.route('/validation').post((req, res) => {
+    if(!req.header('Authorization')){ 
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
+        return;
+    }else{
+        operationValidationUser(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){ 
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            console.log(err.message)
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationTarifaCasco' } });
+        });
+    }
+});
+
+const operationValidationUser = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let searchData = {
+        xdocidentidad: requestBody.xdocidentidad,
+       
+    };
+    let query = await bd.ValidateCliente(searchData).then((res) => res);
+    if(query.error){ return { status: false, code: 500, message: operationTarifaCasco.error };  }
+    return { status: true,
+             xnombre: query.result.recordset[0].XNOMBRE,
+             xapellido: query.result.recordset[0].XAPELLIDO,
+             xdireccion:  query.result.recordset[0].XDIRECCION,
+             xemail:  query.result.recordset[0].XEMAIL,
+             xtelefonocelular:  query.result.recordset[0].XTELEFONOCELULAR,
+             xtelefonocasa:  query.result.recordset[0].XTELEFONOCASA,
+             ccorredor:  query.result.recordset[0].CCORREDOR,
+            }
+    }
 module.exports = router;
