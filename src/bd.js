@@ -12449,4 +12449,59 @@ settlementValrepQuery: async() => {
         return { error: err.message };
     }
 },
+updateDatesFromFleetContractQuery: async(datesList) => {
+    try{
+        let rowsAffected = 0;
+        let pool = await sql.connect(config);
+        for(let i = 0; i < datesList.length; i++){
+            let update = await pool.request()
+            .input('ccarga', sql.Int, datesList[i].ccarga)
+            .input('fdesde_pol', sql.DateTime, datesList[i].fdesde_pol)
+            .input('fhasta_pol', sql.DateTime, datesList[i].fhasta_pol)
+            .input('fdesde_rec', sql.DateTime, datesList[i].fdesde_rec)
+            .input('fhasta_rec', sql.DateTime, datesList[i].fhasta_rec)
+            .query('update SURECIBO set FDESDE_POL = @fdesde_pol, FHASTA_POL = @fhasta_pol, FDESDE_REC = @fdesde_rec, FHASTA_REC = @fhasta_rec WHERE CCARGA = @ccarga');
+            rowsAffected = rowsAffected + update.rowsAffected;
+        }
+        //sql.close();
+        return { result: { rowsAffected: rowsAffected } };
+    }
+    catch(err){
+        return { error: err.message };
+    }
+},
+updateCoverageFromFleetContractQuery: async(coverageList) => {
+    console.log(coverageList[0].ccobertura)
+    try{
+        let rowsAffected = 0;
+        let pool = await sql.connect(config);
+        
+        let update = await pool.request()
+        .input('ccobertura', sql.Int, coverageList[0].ccobertura)
+        .input('ccontratoflota', sql.Int, coverageList[0].ccontratoflota)
+        .input('mprima', sql.Numeric(17, 2), coverageList[0].mprima)
+        .input('msuma_aseg', sql.Numeric(17, 2), coverageList[0].msuma_aseg)
+        .query('update sucoberturas set mprima = @mprima, msuma_aseg = @msuma_aseg WHERE ccontratoflota = @ccontratoflota AND ccobertura = @ccobertura');
+        rowsAffected = rowsAffected + update.rowsAffected;
+        
+        //sql.close();
+        return { result: { rowsAffected: rowsAffected } };
+    }
+    catch(err){
+        return { error: err.message };
+    }
+},
+detailCoverageQuery: async(searchData) => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+            .input('ccobertura', sql.Int, searchData.ccobertura)
+            .input('ccontratoflota', sql.Int, searchData.ccontratoflota)
+            .query('select * from VWBUSCARCOBERTURASXCONTRATOFLOTA WHERE CCOBERTURA = @ccobertura and ccontratoflota = @ccontratoflota');
+        //sql.close();
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+},
 }

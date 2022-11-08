@@ -625,14 +625,15 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
                 }
             }
             let coverage = {
-                ccobertura: getPlanCoverages.result.recordset[i].ccobertura,
+                ccobertura: getPlanCoverages.result.recordset[i].CCOBERTURA,
                 xcobertura: getPlanCoverages.result.recordset[i].XCOBERTURA,
                 ptasa: getPlanCoverages.result.recordset[i].ptasa,
                 msumaasegurada: getPlanCoverages.result.recordset[i].msuma_aseg,
                 mprima: getPlanCoverages.result.recordset[i].mprima,
                 mprimaprorrata: getPlanCoverages.result.recordset[i].mprimaprorrata,
                 ititulo: getPlanCoverages.result.recordset[i].ititulo,
-                xmoneda: getPlanCoverages.result.recordset[i].xmoneda
+                xmoneda: getPlanCoverages.result.recordset[i].xmoneda,
+                ccontratoflota: getPlanCoverages.result.recordset[i].ccontratoflota,
             }
             realCoverages.push(coverage);
         }
@@ -1255,4 +1256,91 @@ const operationTarifaCasco = async(authHeader, requestBody) => {
                 }
     }       
 }
+router.route('/update-coverage').post((req, res) => {
+    if(!req.header('Authorization')){
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } });
+        return;
+    }else{
+        operationUpdateFleetContractCoverage(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            console.log(err.message)
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationUpdateFleetContractCoverage' } });
+        });
+    }
+});
+
+const operationUpdateFleetContractCoverage = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let datesList = []
+    if(requestBody.fechas){
+        datesList.push({
+            ccarga: requestBody.fechas.ccarga,
+            fdesde_pol: requestBody.fechas.fdesde_pol,
+            fhasta_pol: requestBody.fechas.fhasta_pol,
+            fdesde_rec: requestBody.fechas.fdesde_rec,
+            fhasta_rec: requestBody.fechas.fhasta_rec
+        })
+        let updateDatesFromFleetContract = await bd.updateDatesFromFleetContractQuery(datesList).then((res) => res);
+        if(updateDatesFromFleetContract.error){ return { status: false, code: 500, message: updateDatesFromFleetContract.error }; }
+    }
+    let coverageList = [];
+    if(requestBody.coverage){
+        coverageList.push({
+            ccobertura: requestBody.coverage.update.ccobertura,
+            ccontratoflota: requestBody.coverage.update.ccontratoflota,
+            mprima: requestBody.coverage.update.mprima,
+            msuma_aseg: requestBody.coverage.update.msuma_aseg
+        })
+        console.log(coverageList)
+        let updateCoverageFromFleetContract = await bd.updateCoverageFromFleetContractQuery(coverageList).then((res) => res);
+        if(updateCoverageFromFleetContract.error){ return { status: false, code: 500, message: updateCoverageFromFleetContract.error }; }
+    }
+    return { status: true, ccarga: datesList[0].ccarga }; 
+}
+
+router.route('/detail-coverage').post((req, res) => {
+    if(!req.header('Authorization')){
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } });
+        return;
+    }else{
+        operationDetailCoverage(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            console.log(err.message)
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationDetailCoverage' } });
+        });
+    }
+});
+
+const operationDetailCoverage = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let searchData = {
+        ccobertura: requestBody.ccobertura,
+        ccontratoflota: requestBody.ccontratoflota
+    }
+    console.log(searchData)
+    let detailCoverage = await bd.detailCoverageQuery(searchData).then((res) => res);
+    if(detailCoverage.error){ return { status: false, code: 500, message: detailCoverage.error }; }
+    if(detailCoverage.result.rowsAffected > 0){
+        return {    
+                status: true, 
+                ccobertura: detailCoverage.result.recordset[0].CCOBERTURA,
+                xcobertura: detailCoverage.result.recordset[0].XCOBERTURA,
+                ccontratoflota: detailCoverage.result.recordset[0].ccontratoflota,
+                mprima: detailCoverage.result.recordset[0].mprima,
+                msuma_aseg: detailCoverage.result.recordset[0].msuma_aseg,
+               };
+
+    }else{ return { status: false, code: 404, message: 'Coin not found.' }; }
+}
+
 module.exports = router;
