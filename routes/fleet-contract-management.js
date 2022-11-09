@@ -1315,8 +1315,7 @@ const operationUpdateFleetContractCoverage = async(authHeader, requestBody) => {
             fdesde_pol: requestBody.fechas.fdesde_pol,
             fhasta_pol: requestBody.fechas.fhasta_pol,
             fdesde_rec: requestBody.fechas.fdesde_rec,
-            fhasta_rec: requestBody.fechas.fhasta_rec,
-
+            fhasta_rec: requestBody.fechas.fhasta_rec
         })
         let updateDatesFromFleetContract = await bd.updateDatesFromFleetContractQuery(datesList).then((res) => res);
         if(updateDatesFromFleetContract.error){ return { status: false, code: 500, message: updateDatesFromFleetContract.error }; }

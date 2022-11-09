@@ -12517,7 +12517,7 @@ updateExtras: async(extraList) => {
             .input('ccontratoflota', sql.NVarChar, extraList[0].ccontratoflota)
             .input('xanexo', sql.NVarChar, extraList[0].xanexo)
             .input('xobservaciones', sql.NVarChar, extraList[0].xobservaciones)
-            .query('update SUPOLIZAMATRIZ set XANEXO = @xanexo, XOBSERVACIONES = @xobservaciones WHERE CCONTRATOFLOTA = @ccontratoflota');
+            .query('update SUCONTRATOFLOTA set XANEXO = @xanexo, XOBSERVACIONES = @xobservaciones WHERE CCONTRATOFLOTA = @ccontratoflota');
             rowsAffected = rowsAffected + update.rowsAffected;
         
         //sql.close();
