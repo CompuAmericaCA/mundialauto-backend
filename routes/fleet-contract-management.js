@@ -715,8 +715,6 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
                 accesories.push(accessory);
             }
         }
-        console.log(getFleetContractData.result.recordset[0].FCREACION);
-        console.log(getFleetContractData.result.recordset[0].FDESDE_POL);
         return {
             status: true,
             ccarga: getFleetContractData.result.recordset[0].ccarga,
@@ -724,6 +722,10 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
             xrecibo: getFleetContractData.result.recordset[0].xrecibo,
             xpoliza: getFleetContractData.result.recordset[0].xpoliza,
             xtituloreporte: getFleetContractData.result.recordset[0].XTITULO_REPORTE,
+            xanexo: getFleetContractData.result.recordset[0].XANEXO,
+            xobservaciones: getFleetContractData.result.recordset[0].XOBSERVACIONES,
+            xdocidentidadrepresentantelegal: getFleetContractData.result.recordset[0].XDOCIDENTIDAD,
+            xnombrerepresentantelegal: getFleetContractData.result.recordset[0].XREPRESENTANTELEGAL,
             ccliente: getFleetContractData.result.recordset[0].CCLIENTE,
             xnombrecliente: getFleetContractClientData.result.recordset[0].XCLIENTE,
             xdocidentidadcliente: getFleetContractClientData.result.recordset[0].XDOCIDENTIDAD,
