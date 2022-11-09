@@ -65,6 +65,11 @@
         "route": "/api/administration-collection"
     },
     {
+        "name": "Administration Route",
+        "router": "../routes/administration",
+        "route": "/api/administration"
+    },
+    {
         "name": "Plan RCV Route",
         "router": "../routes/plan-rcv",
         "route": "/api/plan-rcv"
