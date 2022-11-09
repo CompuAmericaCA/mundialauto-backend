@@ -1316,8 +1316,7 @@ const operationUpdateFleetContractCoverage = async(authHeader, requestBody) => {
             fhasta_pol: requestBody.fechas.fhasta_pol,
             fdesde_rec: requestBody.fechas.fdesde_rec,
             fhasta_rec: requestBody.fechas.fhasta_rec,
-            xanexo: requestBody.xanexo.toUpperCase(),
-            xobservaciones: requestBody.xobservaciones.toUpperCase(),
+
         })
         let updateDatesFromFleetContract = await bd.updateDatesFromFleetContractQuery(datesList).then((res) => res);
         if(updateDatesFromFleetContract.error){ return { status: false, code: 500, message: updateDatesFromFleetContract.error }; }
@@ -1333,6 +1332,17 @@ const operationUpdateFleetContractCoverage = async(authHeader, requestBody) => {
         console.log(coverageList)
         let updateCoverageFromFleetContract = await bd.updateCoverageFromFleetContractQuery(coverageList).then((res) => res);
         if(updateCoverageFromFleetContract.error){ return { status: false, code: 500, message: updateCoverageFromFleetContract.error }; }
+    }
+    let extraList=[]
+    if(requestBody.extras){
+        extras.push({
+            ccontratoflota: requestBody.coverage.update.ccontratoflota,
+            xanexo: requestBody.xanexo.toUpperCase(),
+            xobservaciones: requestBody.xobservaciones.toUpperCase(),
+        })
+        let udpateExtras = await bd.updateCoverageFromFleetContractQuery(extraList).then((res) => res);
+        if(udpateExtras.error){ return { status: false, code: 500, message: updateCoverageFromFleetContract.error }; }
+
     }
     return { status: true, ccarga: datesList[0].ccarga }; 
 }

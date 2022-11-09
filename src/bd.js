@@ -12509,4 +12509,22 @@ detailCoverageQuery: async(searchData) => {
         return { error: err.message };
     }
 },
+updateExtras: async(extraList) => {
+    try{
+        let rowsAffected = 0;
+        let pool = await sql.connect(config);
+        let update = await pool.request()
+            .input('ccontratoflota', sql.NVarChar, extraList[0].ccontratoflota)
+            .input('xanexo', sql.NVarChar, extraList[0].xanexo)
+            .input('xobservaciones', sql.NVarChar, extraList[0].xobservaciones)
+            .query('update SUPOLIZAMATRIZ set XANEXO = @xanexo, XOBSERVACIONES = @xobservaciones WHERE CCONTRATOFLOTA = @ccontratoflota');
+            rowsAffected = rowsAffected + update.rowsAffected;
+        
+        //sql.close();
+        return { result: { rowsAffected: rowsAffected } };
+    }
+    catch(err){
+        return { error: err.message };
+    }
+},
 }
