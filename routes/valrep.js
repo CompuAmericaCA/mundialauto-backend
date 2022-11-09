@@ -1149,7 +1149,7 @@ const operationValrepServiceOrder = async(authHeader, requestBody) => {
     if(query.error){ return { status: false, code: 500, message: query.error }; }
     let jsonArray = [];
     for(let i = 0; i < query.result.recordset.length; i++){
-        jsonArray.push({ orden: query.result.recordset[i].CORDEN, observacion: query.result.recordset[i].XOBSERVACION, fcreacion: query.result.recordset[i].FCREACION, xcliente: query.result.recordset[i].XCLIENTE});
+        jsonArray.push({ xdanos: query.result.recordset[i].XDANOS, xcliente: query.result.recordset[i].XCLIENTE, corden: query.result.recordset[i].CORDEN});
     }
     return { status: true, list: jsonArray }
 }
@@ -2957,6 +2957,34 @@ const operationValrepCauseSettlement = async(authHeader, requestBody) => {
     let jsonArray = [];
     for(let i = 0; i < query.result.recordset.length; i++){
         jsonArray.push({ ccausafiniquito: query.result.recordset[i].CCAUSAFINIQUITO, xcausafiniquito: query.result.recordset[i].XCAUSAFINIQUITO });
+    }
+    return { status: true, list: jsonArray }
+}
+
+router.route('/settlement').post((req, res) => {
+    if(!req.header('Authorization')){ 
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
+        return;
+    }else{
+        operationValrepSettlement(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){ 
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationValrepSettlement' } });
+        });
+    }
+});
+
+const operationValrepSettlement = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let query = await bd.settlementValrepQuery().then((res) => res);
+    if(query.error){ return { status: false, code: 500, message: query.error }; }
+    let jsonArray = [];
+    for(let i = 0; i < query.result.recordset.length; i++){
+        jsonArray.push({ cfiniquito: query.result.recordset[i].CFINIQUITO, xcausafiniquito: query.result.recordset[i].XCAUSAFINIQUITO, xnombre: query.result.recordset[i].XNOMBRE, xapellido: query.result.recordset[i].XAPELLIDO });
     }
     return { status: true, list: jsonArray }
 }

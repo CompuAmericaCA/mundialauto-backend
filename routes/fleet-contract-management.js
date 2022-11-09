@@ -530,6 +530,12 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
         if(getFleetContractWorkerData.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Fleet Contract Worker not found.' }; }
         */let getFleetContractOwnerData = await bd.getFleetContractOwnerDataQuery(fleetContractData, getFleetContractData.result.recordset[0].CPROPIETARIO).then((res) => res);
         if(getFleetContractOwnerData.error){console.log(getFleetContractOwnerData.error); return { status: false, code: 500, message: getFleetContractOwnerData.error }; }
+        let telefonopropietario;
+        if(getFleetContractOwnerData.result.recordset[0].XTELEFONOCELULAR){
+            telefonopropietario = getFleetContractOwnerData.result.recordset[0].XTELEFONOCELULAR;
+        }else{
+            telefonopropietario = getFleetContractOwnerData.result.recordset[0].XTELEFONOCASA
+        }
         if(getFleetContractOwnerData.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Fleet Contract Owner not found.' }; }
         let getFleetContractOwnerVehicleData = await bd.getFleetContractOwnerVehicleDataQuery(getFleetContractData.result.recordset[0].CPROPIETARIO, getFleetContractData.result.recordset[0].CVEHICULOPROPIETARIO).then((res) => res);
         if(getFleetContractOwnerVehicleData.error){ console.log(getFleetContractOwnerVehicleData.error); return { status: false, code: 500, message: getFleetContractOwnerVehicleData.error }; }
@@ -619,14 +625,15 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
                 }
             }
             let coverage = {
-                ccobertura: getPlanCoverages.result.recordset[i].ccobertura,
+                ccobertura: getPlanCoverages.result.recordset[i].CCOBERTURA,
                 xcobertura: getPlanCoverages.result.recordset[i].XCOBERTURA,
                 ptasa: getPlanCoverages.result.recordset[i].ptasa,
                 msumaasegurada: getPlanCoverages.result.recordset[i].msuma_aseg,
                 mprima: getPlanCoverages.result.recordset[i].mprima,
                 mprimaprorrata: getPlanCoverages.result.recordset[i].mprimaprorrata,
                 ititulo: getPlanCoverages.result.recordset[i].ititulo,
-                xmoneda: getPlanCoverages.result.recordset[i].xmoneda
+                xmoneda: getPlanCoverages.result.recordset[i].xmoneda,
+                ccontratoflota: getPlanCoverages.result.recordset[i].ccontratoflota,
             }
             realCoverages.push(coverage);
         }
@@ -757,7 +764,7 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
             xtipodocidentidadpropietario: getFleetContractOwnerData.result.recordset[0].XTIPODOCIDENTIDAD,
             xdocidentidadpropietario: getFleetContractOwnerData.result.recordset[0].XDOCIDENTIDAD,
             xdireccionpropietario: getFleetContractOwnerData.result.recordset[0].XDIRECCION,
-            xtelefonocelularpropietario: getFleetContractOwnerData.result.recordset[0].XTELEFONOCELULAR,
+            xtelefonocelularpropietario: getFleetContractOwnerData.result.recordset[0].telefonopropietario,
             xestadopropietario: getFleetContractOwnerData.result.recordset[0].XESTADO,
             xciudadpropietario: getFleetContractOwnerData.result.recordset[0].XCIUDAD,
             fnacimientopropietario: getFleetContractOwnerData.result.recordset[0].FNACIMIENTO,
@@ -767,7 +774,7 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
             xemailpropietario: getFleetContractOwnerData.result.recordset[0].XEMAIL,
             xsexopropietario: getFleetContractOwnerData.result.recordset[0].XSEXO,
             xnacionalidadpropietario: getFleetContractOwnerData.result.recordset[0].XNACIONALIDAD,
-            xtelefonopropietario: getFleetContractOwnerData.result.recordset[0].XTELEFONOCELULAR,
+            xtelefonopropietario: getFleetContractOwnerData.result.recordset[0].telefonopropietario,
             cvehiculopropietario: getFleetContractData.result.recordset[0].CVEHICULOPROPIETARIO,
             ctipoplan: getFleetContractData.result.recordset[0].CTIPOPLAN,
             cplan: getFleetContractData.result.recordset[0].CPLAN,
@@ -934,9 +941,10 @@ const operationUpdateFleetContractManagement = async(authHeader, requestBody) =>
         cmetodologiapago: requestBody.cmetodologiapago,
         ctiporecibo: requestBody.ctiporecibo,
         fhastarecibo: requestBody.fhastarecibo,
-        cusuariomodificacion: requestBody.cusuariomodificacion
+        cusuariomodificacion: requestBody.cusuariomodificacion,
+        xanexo: requestBody.xanexo.toUpperCase(),
+        xobservaciones: requestBody.xobservaciones.toUpperCase(),
     }
-    //console.log(fleetContractData)
     let verifyFleetContractVehicle = await bd.verifyFleetContractVehicleToUpdateQuery(fleetContractData).then((res) => res);
     if(verifyFleetContractVehicle.error){ return { status: false, code: 500, message: verifyFleetContractVehicle.error }; }
     if(verifyFleetContractVehicle.result.rowsAffected > 0){ return { status: false, code: 200, condition: 'vehicle-contract-already-exist' }; }
@@ -1085,7 +1093,6 @@ const operationCreateIndividualContract = async(requestBody) => {
         xserialmotor: requestBody.xserialmotor.toUpperCase(),
         xserialcarroceria: requestBody.xserialcarroceria.toUpperCase(),
         xplaca: requestBody.xplaca.toUpperCase(),
-        xuso: requestBody.xuso.toUpperCase() ? requestBody.xuso : undefined,
         xtelefono_emp: requestBody.xtelefono_emp,
         cplan: requestBody.cplan,
         ccorredor: requestBody.ccorredor ? requestBody.ccorredor : undefined,
@@ -1093,20 +1100,26 @@ const operationCreateIndividualContract = async(requestBody) => {
         xcobertura: requestBody.xcobertura.toUpperCase(),
         ncapacidad_p: requestBody.ncapacidad_p,
         xtipo: requestBody.xtipo.toUpperCase(),
-        femision:requestBody.femision,
-        fdesde_pol:requestBody.fdesde_pol,
-        fhasta_pol:requestBody.fhasta_pol,
-        fdesde_rec:requestBody.fdesde_rec,
-        fhasta_rec:requestBody.fhasta_rec,
         cmetodologiapago: requestBody.cmetodologiapago,
         msuma_aseg: requestBody.msuma_aseg ? requestBody.msuma_aseg : undefined,
-        mtarifa: requestBody.mtarifa ? requestBody.mtarifa : undefined,
+        pcasco: requestBody.pcasco ? requestBody.pcasco : undefined,
         mprima_casco: requestBody.mprima_casco ? requestBody.mprima_casco : undefined,
         mcatastrofico: requestBody.mcatastrofico ? requestBody.mcatastrofico : undefined,
         pdescuento: requestBody.pdescuento ? requestBody.pdescuento : undefined,
         ifraccionamiento: requestBody.ifraccionamiento ? requestBody.ifraccionamiento : undefined,
-        ncuotas: requestBody.ncuotas ? requestBody.ncuotas : undefined
+        ncuotas: requestBody.ncuotas ? requestBody.ncuotas : undefined,
+        mprima_bruta: requestBody.mprima_bruta ? requestBody.mprima_bruta : undefined,
+        mprima_blindaje: requestBody.mprima_blindaje ? requestBody.mprima_blindaje : undefined,
+        msuma_blindaje: requestBody.msuma_blindaje ? requestBody.msuma_blindaje : undefined,
+        pcatastrofico: requestBody.pcatastrofico ? requestBody.pcatastrofico : undefined,
+        pmotin: requestBody.pmotin ? requestBody.pmotin : undefined,
+        mmotin: requestBody.mmotin ? requestBody.mmotin : undefined,
+        pblindaje: requestBody.pblindaje ? requestBody.pblindaje : undefined,
+        cestado: requestBody.cestado ? requestBody.cestado : undefined,
+        cciudad: requestBody.cciudad ? requestBody.cciudad : undefined,
+        cpais: requestBody.cpais ? requestBody.cpais : undefined,
     };
+    console.log(userData)
     if(userData){
         let operationCreateIndividualContract = await bd.createIndividualContractQuery(userData).then((res) => res);
         if(operationCreateIndividualContract.error){ console.log(operationCreateIndividualContract.error);return { status: false, code: 500, message: operationCreateIndividualContract.error }; }
@@ -1222,6 +1235,7 @@ router.route('/tarifa-casco').post((req, res) => {
             }
             res.json({ data: result });
         }).catch((err) => {
+            console.log(err.message)
             res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationTarifaCasco' } });
         });
     }
@@ -1238,17 +1252,179 @@ const operationTarifaCasco = async(authHeader, requestBody) => {
     };
     if(requestBody.xcobertura == 'AMPLIA'){
     let query = await bd.SearchTarifaCasco(searchData).then((res) => res);
-    if(query.error){ return { status: false, code: 500, message: query.error }; }
+    if(query.error){ return { status: false, code: 500, message: operationTarifaCasco.error };  }
+    if(query.result){
+        let tarifa = await bd.SearchTarifas(searchData).then((res) => res);
+        if(tarifa.error){ return { status: false, code: 500, message: operationTarifas.error };}
+        let jsonList = [];
+        for(let i = 0; i < tarifa.result.recordset.length; i++){
+            jsonList.push({ptarifa: tarifa.result.recordset[i].PTARIFA});
+        }
+        return { status: true,
+                  ptasa_casco: query.result.recordset[0].PTASA_CASCO,
+                 ptarifa: jsonList
+                }
+    }
     return { status: true,
              ptasa_casco: query.result.recordset[0].PTASA_CASCO
             }
     }
+    
     else if(requestBody.xcobertura == 'PERDIDA TOTAL'){
         let query = await bd.SearchTarifaPerdida(searchData).then((res) => res);
         if(query.error){ return { status: false, code: 500, message: query.error }; }
+        if(query.result){
+            let tarifa = await bd.SearchTarifas(searchData).then((res) => res);
+            if(tarifa.error){ return { status: false, code: 500, message: operationTarifas.error };}
+            let jsonList = [];
+            for(let i = 0; i < tarifa.result.recordset.length; i++){
+                jsonList.push({ptarifa: tarifa.result.recordset[i].PTARIFA});
+            }
+            return { status: true,
+                     ptasa_casco: query.result.recordset[0].PTASA_CASCO,
+                     ptarifa: jsonList
+                    }
+        }
         return { status: true,
-                 ptasa_casco: query.result.recordset[0].PTASA_CASCO
+                 ptasa_casco: query.result.recordset[0].PTASA_CASCO,
                 }
     }       
 }
+router.route('/update-coverage').post((req, res) => {
+    if(!req.header('Authorization')){
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } });
+        return;
+    }else{
+        operationUpdateFleetContractCoverage(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            console.log(err.message)
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationUpdateFleetContractCoverage' } });
+        });
+    }
+});
+
+const operationUpdateFleetContractCoverage = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let datesList = []
+    if(requestBody.fechas){
+        datesList.push({
+            ccarga: requestBody.fechas.ccarga,
+            fdesde_pol: requestBody.fechas.fdesde_pol,
+            fhasta_pol: requestBody.fechas.fhasta_pol,
+            fdesde_rec: requestBody.fechas.fdesde_rec,
+            fhasta_rec: requestBody.fechas.fhasta_rec
+        })
+        let updateDatesFromFleetContract = await bd.updateDatesFromFleetContractQuery(datesList).then((res) => res);
+        if(updateDatesFromFleetContract.error){ return { status: false, code: 500, message: updateDatesFromFleetContract.error }; }
+    }
+    let coverageList = [];
+    if(requestBody.coverage){
+        coverageList.push({
+            ccobertura: requestBody.coverage.update.ccobertura,
+            ccontratoflota: requestBody.coverage.update.ccontratoflota,
+            mprima: requestBody.coverage.update.mprima,
+            msuma_aseg: requestBody.coverage.update.msuma_aseg
+        })
+        console.log(coverageList)
+        let updateCoverageFromFleetContract = await bd.updateCoverageFromFleetContractQuery(coverageList).then((res) => res);
+        if(updateCoverageFromFleetContract.error){ return { status: false, code: 500, message: updateCoverageFromFleetContract.error }; }
+    }
+    let extraList=[]
+    if(requestBody.extras){
+        extras.push({
+            ccontratoflota: requestBody.coverage.update.ccontratoflota,
+            xanexo: requestBody.xanexo.toUpperCase(),
+            xobservaciones: requestBody.xobservaciones.toUpperCase(),
+        })
+        let udpateExtras = await bd.updateCoverageFromFleetContractQuery(extraList).then((res) => res);
+        if(udpateExtras.error){ return { status: false, code: 500, message: updateCoverageFromFleetContract.error }; }
+
+    }
+    return { status: true, ccarga: datesList[0].ccarga }; 
+}
+
+router.route('/detail-coverage').post((req, res) => {
+    if(!req.header('Authorization')){
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } });
+        return;
+    }else{
+        operationDetailCoverage(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            console.log(err.message)
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationDetailCoverage' } });
+        });
+    }
+});
+
+const operationDetailCoverage = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let searchData = {
+        ccobertura: requestBody.ccobertura,
+        ccontratoflota: requestBody.ccontratoflota
+    }
+    console.log(searchData)
+    let detailCoverage = await bd.detailCoverageQuery(searchData).then((res) => res);
+    if(detailCoverage.error){ return { status: false, code: 500, message: detailCoverage.error }; }
+    if(detailCoverage.result.rowsAffected > 0){
+        return {    
+                status: true, 
+                ccobertura: detailCoverage.result.recordset[0].CCOBERTURA,
+                xcobertura: detailCoverage.result.recordset[0].XCOBERTURA,
+                ccontratoflota: detailCoverage.result.recordset[0].ccontratoflota,
+                mprima: detailCoverage.result.recordset[0].mprima,
+                msuma_aseg: detailCoverage.result.recordset[0].msuma_aseg,
+               };
+
+    }else{ return { status: false, code: 404, message: 'Coin not found.' }; }
+}
+
+
+router.route('/validation').post((req, res) => {
+    if(!req.header('Authorization')){ 
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
+        return;
+    }else{
+        operationValidationUser(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){ 
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            console.log(err.message)
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationTarifaCasco' } });
+        });
+    }
+});
+
+
+const operationValidationUser = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let searchData = {
+        xdocidentidad: requestBody.xdocidentidad,
+       
+    };
+    let query = await bd.ValidateCliente(searchData).then((res) => res);
+    if(query.error){ return { status: false, code: 500, message: operationTarifaCasco.error };  }
+    return { status: true,
+             xnombre: query.result.recordset[0].XNOMBRE,
+             xapellido: query.result.recordset[0].XAPELLIDO,
+             xdireccion:  query.result.recordset[0].XDIRECCION,
+             xemail:  query.result.recordset[0].XEMAIL,
+             xtelefonocelular:  query.result.recordset[0].XTELEFONOCELULAR,
+             xtelefonocasa:  query.result.recordset[0].XTELEFONOCASA,
+             ccorredor:  query.result.recordset[0].CCORREDOR,
+            }
+    }
+
 module.exports = router;
