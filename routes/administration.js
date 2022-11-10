@@ -28,7 +28,6 @@ const operationSearchAdministrationPaymentRecord = async(authHeader, requestBody
         cfiniquito: requestBody.cfiniquito,
         ccompania: requestBody.ccompania
     }
-    console.log(searchData)
     let searchAdministrationPaymentRecord = await bd.searchAdministrationPaymentRecordQuery(searchData).then((res) => res);
     if(searchAdministrationPaymentRecord.error){ return { status: false, code: 500, message: searchAdministrationPaymentRecord.error }; }
     if(searchAdministrationPaymentRecord.result.rowsAffected > 0){
@@ -60,6 +59,43 @@ const operationSearchAdministrationPaymentRecord = async(authHeader, requestBody
             });
         }
         return { status: true, list: jsonList, settlementList: jsonListSettlement };
+    }else{ return { status: false, code: 404, message: 'Coin not found.' }; }
+}
+
+router.route('/change-provider').post((req, res) => {
+    if(!req.header('Authorization')){
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } });
+        return;
+    }else{
+        operationChangeProvider(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            console.log(err.message)
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationChangeProvider' } });
+        });
+    }
+});
+
+const operationChangeProvider = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let cproveedor = requestBody.cproveedor;
+    let searchProvider = await bd.providerFromBillLoadingQuery(cproveedor).then((res) => res);
+    if(searchProvider.error){ return { status: false, code: 500, message: searchProvider.error }; }
+    if(searchProvider.result.rowsAffected > 0){
+        let razonsocial;
+        if(searchProvider.result.recordset[0].XRAZONSOCIAL){
+            razonsocial = searchProvider.result.recordset[0].XRAZONSOCIAL
+        }else{
+            razonsocial = searchProvider.result.recordset[0].XNOMBRE
+        }
+        return { status: true, 
+                 cproveedor: searchProvider.result.recordset[0].CPROVEEDOR,
+                 xrazonsocial: razonsocial,
+                 nlimite: searchProvider.result.recordset[0].NLIMITE, };
     }else{ return { status: false, code: 404, message: 'Coin not found.' }; }
 }
 

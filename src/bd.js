@@ -6248,8 +6248,8 @@ module.exports = {
         try{
             let pool = await sql.connect(config);
             let result = await pool.request()
-                .input('cproveedor', sql.Int, cproveedor)
-                .query('select * from VWBUSCARPROVEEDORXSERVICIO where CPROVEEDOR = @cproveedor');
+                //.input('cproveedor', sql.Int, cproveedor)
+                .query('select * from VWBUSCARPROVEEDORXSERVICIO');
             //sql.close();
             return { result: result };
         }catch(err){
@@ -12524,6 +12524,31 @@ updateExtras: async(extraList) => {
         return { result: { rowsAffected: rowsAffected } };
     }
     catch(err){
+        return { error: err.message };
+    }
+},
+providerQuery: async(searchData) => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+            .input('cpais', sql.Int, searchData.cpais)
+            .input('ccompania', sql.Int, searchData.ccompania)
+            .query('select * from PRPROVEEDORES WHERE CPAIS = @cpais AND CCOMPANIA = @ccompania');
+        //sql.close()
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+},
+providerFromBillLoadingQuery: async(cproveedor) => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+            .input('cproveedor', sql.Int, cproveedor)
+            .query('select * from PRPROVEEDORES WHERE CPROVEEDOR = @cproveedor');
+        //sql.close()
+        return { result: result };
+    }catch(err){
         return { error: err.message };
     }
 },
