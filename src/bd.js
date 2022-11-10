@@ -20,6 +20,7 @@ module.exports = {
                 .input('bactivo', sql.Bit, true)
                 .query('select * from VWAUTENTICACIONUSUARIO where XEMAIL = @xemail and BACTIVO = @bactivo');
             //sql.close();
+            console.log(result)
             return { result: result };
         }
         catch(err){
@@ -243,9 +244,11 @@ module.exports = {
                 .input('ccompania', sql.Int, userData.ccompania)
                 .input('cdepartamento', sql.Int, userData.cdepartamento)
                 .input('crol', sql.Int, userData.crol)
+                .input('ccorredor', sql.Int, userData.ccorredor)
+                .input('bcorredor', sql.Bit, userData.bcorredor)
                 .input('cusuariocreacion', sql.Int, userData.cusuariocreacion)
                 .input('fcreacion', sql.DateTime, new Date())
-                .query('insert into SEUSUARIO (XNOMBRE, XAPELLIDO, XEMAIL, XTELEFONO, XDIRECCION, XCONTRASENA, BPROVEEDOR, BACTIVO, CPROVEEDOR, CPAIS, CCOMPANIA, CDEPARTAMENTO, CROL, CUSUARIOCREACION, FCREACION) values (@xnombre, @xapellido, @xemail, @xtelefono, @xdireccion, @xcontrasena, @bproveedor, @bactivo, @cproveedor, @cpais, @ccompania, @cdepartamento, @crol, @cusuariocreacion, @fcreacion)');
+                .query('insert into SEUSUARIO (XNOMBRE, XAPELLIDO, XEMAIL, XTELEFONO, XDIRECCION, XCONTRASENA, BPROVEEDOR, BACTIVO, CPROVEEDOR, CPAIS, CCOMPANIA, CDEPARTAMENTO, CROL, BCORREDOR, CCORREDOR, CUSUARIOCREACION, FCREACION) values (@xnombre, @xapellido, @xemail, @xtelefono, @xdireccion, @xcontrasena, @bproveedor, @bactivo, @cproveedor, @cpais, @ccompania, @cdepartamento, @crol, @bcorredor, @ccorredor, @cusuariocreacion, @fcreacion)');
             if(result.rowsAffected > 0){
                 let query = await pool.request()
                     .input('xemail', sql.NVarChar, userData.xemail)
@@ -290,8 +293,10 @@ module.exports = {
                 .input('crol', sql.Int, userData.crol)
                 .input('cproveedor', sql.Int, userData.cproveedor)
                 .input('cusuariomodificacion', sql.Int, userData.cusuariomodificacion)
+                .input('ccorredor', sql.Int, userData.ccorredor)
+                .input('bcorredor', sql.Bit, userData.bcorredor)
                 .input('fmodificacion', sql.DateTime, new Date())
-                .query('update SEUSUARIO set XNOMBRE = @xnombre, XAPELLIDO = @xapellido, XEMAIL = @xemail, XTELEFONO = @xtelefono, XDIRECCION = @xdireccion, BPROVEEDOR = @bproveedor, BACTIVO = @bactivo, CPAIS = @cpais, CCOMPANIA = @ccompania, CDEPARTAMENTO = @cdepartamento, CROL = @crol, CPROVEEDOR = @cproveedor, CUSUARIOMODIFICACION = @cusuariomodificacion, FMODIFICACION = @fmodificacion where CUSUARIO = @cusuario');
+                .query('update SEUSUARIO set XNOMBRE = @xnombre, XAPELLIDO = @xapellido, XEMAIL = @xemail, XTELEFONO = @xtelefono, XDIRECCION = @xdireccion, BPROVEEDOR = @bproveedor, BACTIVO = @bactivo, CPAIS = @cpais, CCOMPANIA = @ccompania, CDEPARTAMENTO = @cdepartamento, CROL = @crol, CPROVEEDOR = @cproveedor, BCORREDOR = @bcorredor, CCORREDOR = @ccorredor, CUSUARIOMODIFICACION = @cusuariomodificacion, FMODIFICACION = @fmodificacion where CUSUARIO = @cusuario');
             //sql.close();
             return { result: result };
         }catch(err){
@@ -12023,12 +12028,13 @@ module.exports = {
     },
     searchCollectionQuery: async(searchData) => {
         try{
-            let query = `SELECT * FROM VWBUSCARRECIBOSPENDIENTES WHERE CESTATUSGENERAL = @cestatusgeneral AND CCOMPANIA = @ccompania${ searchData.xplaca ? " and XPLACA = @xplaca" : '' } `;
+            let query = `SELECT * FROM VWBUSCARRECIBOSPENDIENTES WHERE CESTATUSGENERAL = @cestatusgeneral AND CCOMPANIA = @ccompania${ searchData.xplaca ? " and XPLACA = @xplaca" : '' } ${ searchData.ccorredor ? " and CCORREDOR = @ccorredor" : '' }`;
             let pool = await sql.connect(config);
             let result = await pool.request()
                 .input('cestatusgeneral', sql.Int, 13)
                 .input('ccompania', sql.Int, searchData.ccompania ? searchData.ccompania: undefined)
                 .input('xplaca', sql.NVarChar, searchData.xplaca ? searchData.xplaca: undefined)
+                .input('ccorredor', sql.Int, searchData.ccorredor ? searchData.ccorredor: undefined)
                 //.input('xclausulas', sql.NVarChar, searchData.xclausulas ? searchData.xclausulas: undefined)
                 .query(query);
             //sql.close();
@@ -12549,6 +12555,34 @@ providerFromBillLoadingQuery: async(cproveedor) => {
             .input('cproveedor', sql.Int, cproveedor)
             .query('select * from PRPROVEEDORES WHERE CPROVEEDOR = @cproveedor');
         //sql.close()
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+},
+searchBrokerQuery: async(searchData) => {
+    try{
+        let query = `select * from MACORREDORES WHERE CCOMPANIA = @ccompania AND CPAIS = @cpais`;
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+            .input('cpais', sql.Int, searchData.cpais)
+            .input('ccompania', sql.Int, searchData.ccompania)
+            .query(query);
+        //sql.close();
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+},
+getUserBrokerDataQuery: async(ccorredor, cpais, ccompania) => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+            .input('cpais', sql.Numeric(4, 0), cpais)
+            .input('ccompania', sql.Int, ccompania)
+            .input('ccorredor', sql.Int, ccorredor)
+            .query('select * from MACORREDORES where CCORREDOR = @ccorredor and CPAIS = @cpais and CCOMPANIA = @ccompania');
+        //sql.close();
         return { result: result };
     }catch(err){
         return { error: err.message };

@@ -131,9 +131,10 @@ const operationCreateUser = async(authHeader, requestBody) => {
         cdepartamento: requestBody.cdepartamento,
         crol: requestBody.crol,
         cproveedor: requestBody.cproveedor ? requestBody.cproveedor : undefined,
-        cusuariocreacion: requestBody.cusuariocreacion
+        cusuariocreacion: requestBody.cusuariocreacion,
+        ccorredor: requestBody.ccorredor ? requestBody.ccorredor : undefined,
+        bcorredor: requestBody.bcorredor,
     };
-    console.log(userData)
     let verifyUserEmail = await bd.verifyUserEmailToCreateQuery(userData.xemail).then((res) => res);
     if(verifyUserEmail.error){ return { status: false, code: 500, message: verifyUserEmail.error }; }
     if(verifyUserEmail.result.rowsAffected > 0){ return { status: false, code: 200, condition: 'email-already-exist' }; }
@@ -157,6 +158,7 @@ router.route('/detail').post((req, res) => {
             }
             res.json({ data: result });
         }).catch((err) => {
+            console.log(err.message)
             res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationDetailUser' } })
         });
     }
@@ -177,6 +179,14 @@ const operationDetailUser = async(authHeader, requestBody) => {
                 providerData = { xproveedor: helper.decrypt(getUserProviderData.result.recordset[0].XPROVEEDOR), xrazonsocial: helper.decrypt(getUserProviderData.result.recordset[0].XRAZONSOCIAL) }
             }else{ return { status: false, code: 404, message: 'User Provider not found.' }; }
         }
+        let brokerData = {};
+        if(getUserData.result.recordset[0].BCORREDOR && getUserData.result.recordset[0].CCORREDOR){
+            let getUserBrokerData = await bd.getUserBrokerDataQuery(getUserData.result.recordset[0].CCORREDOR, getUserData.result.recordset[0].CPAIS, getUserData.result.recordset[0].CCOMPANIA).then((res) => res);
+            if(getUserBrokerData.error){ return { status: false, code: 500, message: getUserProviderData.error }; }
+            if(getUserBrokerData.result.rowsAffected > 0){
+                brokerData = { xcorredor: getUserBrokerData.result.recordset[0].XCORREDOR }
+            }else{ return { status: false, code: 404, message: 'User Provider not found.' }; }
+        }
         return { 
             status: true,
             cusuario: getUserData.result.recordset[0].CUSUARIO,
@@ -193,7 +203,8 @@ const operationDetailUser = async(authHeader, requestBody) => {
             crol: getUserData.result.recordset[0].CROL,
             cproveedor: getUserData.result.recordset[0].CPROVEEDOR ? getUserData.result.recordset[0].CPROVEEDOR : undefined,
             xproveedor: providerData.xproveedor ? providerData.xproveedor : undefined,
-            xrazonsocial: providerData.xrazonsocial ? providerData.xrazonsocial : undefined
+            xrazonsocial: providerData.xrazonsocial ? providerData.xrazonsocial : undefined,
+            xcorredor: brokerData.xcorredor ? brokerData.xcorredor : undefined,
         }
     }else{ return { status: false, code: 404, message: 'User not found.' }; }
 }
@@ -232,7 +243,9 @@ const operationUpdateUser = async(authHeader, requestBody) => {
         cdepartamento: requestBody.cdepartamento,
         crol: requestBody.crol,
         cproveedor: requestBody.cproveedor ? requestBody.cproveedor : undefined,
-        cusuariomodificacion: requestBody.cusuariomodificacion
+        cusuariomodificacion: requestBody.cusuariomodificacion,
+        ccorredor: requestBody.ccorredor ? requestBody.ccorredor : undefined,
+        bcorredor: requestBody.bcorredor ? requestBody.bcorredor : undefined,
     };
     let verifyUserEmail = await bd.verifyUserEmailToUpdateQuery(userData.cusuario, userData.xemail).then((res) => res);
     if(verifyUserEmail.error){ return { status: false, code: 500, message: verifyUserEmail.error }; }
@@ -274,6 +287,43 @@ const operationChangeUserPassword = async(requestBody) => {
         }
         else{ return { status: false, code: 404, message: 'User not found!' }; }
     }else{ return { status: false, code: 404, message: 'Password change token not found!' }; }
+}
+
+router.route('/search/broker').post((req, res) => {
+    if(!req.header('Authorization')){
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } });
+        return;
+    }else{
+        operationSearchBroker(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationSearchBroker' } });
+        });
+    }
+});
+
+const operationSearchBroker = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let searchData = {
+        cpais: requestBody.cpais,
+        ccompania: requestBody.ccompania,
+    };
+    let searchBroker = await bd.searchBrokerQuery(searchData).then((res) => res);
+    if(searchBroker.error){ return  { status: false, code: 500, message: searchBroker.error }; }
+    if(searchBroker.result.rowsAffected > 0){
+        let jsonList = [];
+        for(let i = 0; i < searchBroker.result.recordset.length; i++){
+            jsonList.push({
+                ccorredor: searchBroker.result.recordset[i].CCORREDOR,
+                xcorredor: searchBroker.result.recordset[i].XCORREDOR,
+            });
+        }
+        return { status: true, list: jsonList };
+    }else{ return { status: false, code: 404, message: 'Owner not found.' }; }
 }
 
 module.exports = router;
