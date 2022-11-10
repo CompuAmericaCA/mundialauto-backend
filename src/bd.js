@@ -11122,7 +11122,7 @@ module.exports = {
                 .input('cpais', sql.Numeric(4, 0), searchData.cpais)
                 .input('ccompania', sql.Int, searchData.ccompania)
                 .input('ctipoplan', sql.Int, searchData.ctipoplan)
-                .query('select CPLAN, XPLAN, BACTIVO from POPLAN where CPAIS = @cpais and CCOMPANIA = @ccompania and CTIPOPLAN = @ctipoplan');
+                .query('select CPLAN, XPLAN from POPLAN where CPAIS = @cpais and CCOMPANIA = @ccompania and CTIPOPLAN = @ctipoplan and BACTIVO = 1');
             //sql.close();
             return { result: result };
         }catch(err){
