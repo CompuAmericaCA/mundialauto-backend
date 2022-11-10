@@ -8540,10 +8540,9 @@ module.exports = {
                 .input('cciudad', sql.Numeric(11, 0), userData.cciudad)
                 .input('cpais', sql.Numeric(11, 0), userData.cpais)
                 .input('icedula', sql.NVarChar, userData.icedula)
-                .query('insert into TMEMISION_INDIVIDUAL(XNOMBRE, XAPELLIDO, CANO, XCOLOR, XMARCA, XMODELO, XVERSION, XRIF_CLIENTE, EMAIL, XTELEFONO_PROP, XDIRECCIONFISCAL, XSERIALMOTOR, XSERIALCARROCERIA, XPLACA, XTELEFONO_EMP, CPLAN, CCORREDOR, XCEDULA, XCOBERTURA, NCAPACIDAD_P, XTIPO, FINICIO, CMETODOLOGIAPAGO, MSUMA_ASEG, PCASCO, MPRIMA_CASCO, MCATASTROFICO, PDESCUENTO, IFRACCIONAMIENTO, NCUOTAS, MPRIMA_BLINDAJE, MSUMA_BLINDAJE, MPRIMA_BRUTA, PCATASTROFICO, PMOTIN, MMOTIN, PBLINDAJE, CESTADO, CCIUDAD, CPAIS, ICEDULA, FEMISION) output inserted.XPLACA, inserted.CLOTE values (@xnombre, @xapellido, @cano, @xcolor, @xmarca, @xmodelo, @xversion, @xrif_cliente, @email, @xtelefono_prop, @xdireccionfiscal, @xserialmotor, @xserialcarroceria, @xplaca, @xtelefono_emp, @cplan, @ccorredor, @xcedula, @xcobertura, @ncapacidad_p, @xtipo, @finicio, @cmetodologiapago, @msuma_aseg, @pcasco, @mprima_casco, @mcatastrofico, @pdescuento, @ifraccionamiento, @ncuotas, @mprima_blindaje, @msuma_blindaje, @mprima_bruta,@pcatastrofico ,@pmotin, @mmotin, @pblindaje, @cestado, @cciudad, @cpais, @icedula, @femision)')
+                .query('insert into TMEMISION_INDIVIDUAL(XNOMBRE, XAPELLIDO, CANO, XCOLOR, XMARCA, XMODELO, XVERSION, XRIF_CLIENTE, EMAIL, XTELEFONO_PROP, XDIRECCIONFISCAL, XSERIALMOTOR, XSERIALCARROCERIA, XPLACA, XTELEFONO_EMP, CPLAN, CCORREDOR, XCEDULA, XCOBERTURA, NCAPACIDAD_P, XTIPO, FINICIO, CMETODOLOGIAPAGO, MSUMA_ASEG, PCASCO, MPRIMA_CASCO, MCATASTROFICO, PDESCUENTO, IFRACCIONAMIENTO, NCUOTAS, MPRIMA_BLINDAJE, MSUMA_BLINDAJE, MPRIMA_BRUTA, PCATASTROFICO, PMOTIN, MMOTIN, PBLINDAJE, CESTADO, CCIUDAD, CPAIS, ICEDULA, FEMISION) values (@xnombre, @xapellido, @cano, @xcolor, @xmarca, @xmodelo, @xversion, @xrif_cliente, @email, @xtelefono_prop, @xdireccionfiscal, @xserialmotor, @xserialcarroceria, @xplaca, @xtelefono_emp, @cplan, @ccorredor, @xcedula, @xcobertura, @ncapacidad_p, @xtipo, @finicio, @cmetodologiapago, @msuma_aseg, @pcasco, @mprima_casco, @mcatastrofico, @pdescuento, @ifraccionamiento, @ncuotas, @mprima_blindaje, @msuma_blindaje, @mprima_bruta,@pcatastrofico ,@pmotin, @mmotin, @pblindaje, @cestado, @cciudad, @cpais, @icedula, @femision)')
             //sql.close();
-            console.log('lote: ' + insert.recordset[0].CLOTE);
-            return { result: { rowsAffected: rowsAffected, status: true, xplaca: insert.recordset[0].XPLACA } };
+            return { result: { rowsAffected: rowsAffected, status: true } };
         }
         catch(err){
             return { error: err.message };
@@ -8555,7 +8554,6 @@ module.exports = {
             let result = await pool.request()
                 .input('xplaca', sql.NVarChar, plate)
                 .query('SELECT TOP 1 CRECIBO FROM SURECIBO WHERE XPLACA = @xplaca ORDER BY CRECIBO DESC')
-            console.log(result.recordset[0]);
             return {crecibo: result.recordset[0].CRECIBO};
         }catch(err) {
             console.log(err.message);

@@ -1142,9 +1142,8 @@ const operationCreateIndividualContract = async(requestBody) => {
             if(createAccesories.error){ return { status: false, code: 500, message: createAccesories.error }; }
         }
     }
-    let lastReceiptByPlate = bd.getLastReceiptByPlate(operationCreateIndividualContract.xplaca).then((res) => res);
+    let lastReceiptByPlate = await bd.getLastReceiptByPlate(requestBody.xplaca.toUpperCase());
     if(lastReceiptByPlate.error){ return { status: false, code: 500, message: lastReceiptByPlate.error }; }
-    console.log(lastReceiptByPlate);
     return { status: true, code: 200, crecibo: lastReceiptByPlate.crecibo};
 }
 
