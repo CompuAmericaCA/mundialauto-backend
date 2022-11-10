@@ -1118,6 +1118,8 @@ const operationCreateIndividualContract = async(requestBody) => {
         cestado: requestBody.cestado ? requestBody.cestado : undefined,
         cciudad: requestBody.cciudad ? requestBody.cciudad : undefined,
         cpais: requestBody.cpais ? requestBody.cpais : undefined,
+        icedula: requestBody.icedula ? requestBody.icedula : undefined,
+        femision: requestBody.femision 
     };
     console.log(userData)
     if(userData){
