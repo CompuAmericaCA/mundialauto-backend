@@ -715,8 +715,6 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
                 accesories.push(accessory);
             }
         }
-        console.log(getFleetContractData.result.recordset[0].FCREACION);
-        console.log(getFleetContractData.result.recordset[0].FDESDE_POL);
         return {
             status: true,
             ccarga: getFleetContractData.result.recordset[0].ccarga,
@@ -724,6 +722,10 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
             xrecibo: getFleetContractData.result.recordset[0].xrecibo,
             xpoliza: getFleetContractData.result.recordset[0].xpoliza,
             xtituloreporte: getFleetContractData.result.recordset[0].XTITULO_REPORTE,
+            xanexo: getFleetContractData.result.recordset[0].XANEXO,
+            xobservaciones: getFleetContractData.result.recordset[0].XOBSERVACIONES,
+            xdocidentidadrepresentantelegal: getFleetContractData.result.recordset[0].XDOCIDENTIDAD,
+            xnombrerepresentantelegal: getFleetContractData.result.recordset[0].XREPRESENTANTELEGAL,
             ccliente: getFleetContractData.result.recordset[0].CCLIENTE,
             xnombrecliente: getFleetContractClientData.result.recordset[0].XCLIENTE,
             xdocidentidadcliente: getFleetContractClientData.result.recordset[0].XDOCIDENTIDAD,
@@ -1116,6 +1118,8 @@ const operationCreateIndividualContract = async(requestBody) => {
         cestado: requestBody.cestado ? requestBody.cestado : undefined,
         cciudad: requestBody.cciudad ? requestBody.cciudad : undefined,
         cpais: requestBody.cpais ? requestBody.cpais : undefined,
+        icedula: requestBody.icedula ? requestBody.icedula : undefined,
+        femision: requestBody.femision 
     };
     console.log(userData)
     if(userData){
