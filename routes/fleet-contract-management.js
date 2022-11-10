@@ -1123,6 +1123,7 @@ const operationCreateIndividualContract = async(requestBody) => {
     if(userData){
         let operationCreateIndividualContract = await bd.createIndividualContractQuery(userData).then((res) => res);
         if(operationCreateIndividualContract.error){ console.log(operationCreateIndividualContract.error);return { status: false, code: 500, message: operationCreateIndividualContract.error }; }
+
     }
     if(requestBody.accessory){
         if(requestBody.accessory.create){
@@ -1139,7 +1140,10 @@ const operationCreateIndividualContract = async(requestBody) => {
             if(createAccesories.error){ return { status: false, code: 500, message: createAccesories.error }; }
         }
     }
-    return { status: true, code: 500, message: 'Server Internal Error.', hint: 'createContract' };
+    let lastReceiptByPlate = bd.getLastReceiptByPlate(operationCreateIndividualContract.xplaca).then((res) => res);
+    if(lastReceiptByPlate.error){ return { status: false, code: 500, message: lastReceiptByPlate.error }; }
+    console.log(lastReceiptByPlate);
+    return { status: true, code: 200, crecibo: lastReceiptByPlate.crecibo};
 }
 
 
