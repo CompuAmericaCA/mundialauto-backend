@@ -1119,7 +1119,9 @@ const operationCreateIndividualContract = async(requestBody) => {
         cciudad: requestBody.cciudad ? requestBody.cciudad : undefined,
         cpais: requestBody.cpais ? requestBody.cpais : undefined,
         icedula: requestBody.icedula ? requestBody.icedula : undefined,
-        femision: requestBody.femision 
+        femision: requestBody.femision ,
+        ivigencia: requestBody.ivigencia ? requestBody.ivigencia : undefined,
+
     };
     console.log(userData)
     if(userData){
