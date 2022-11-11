@@ -8548,13 +8548,25 @@ module.exports = {
             return { error: err.message };
         }
     },
-    getLastReceiptByPlate: async(plate) => {
+    getLastReceipt: async(xplaca, ccontratoflota) => {
         try {
             let pool = await sql.connect(config);
             let result = await pool.request()
-                .input('xplaca', sql.NVarChar, plate)
-                .query('SELECT TOP 1 CRECIBO FROM SURECIBO WHERE XPLACA = @xplaca ORDER BY CRECIBO DESC')
-            return {crecibo: result.recordset[0].CRECIBO};
+                .input('xplaca', sql.NVarChar, xplaca)
+                .input('ccontratoflota', sql.Int, ccontratoflota)
+                .query('SELECT TOP 1 CRECIBO, FEMISION, FDESDE_POL, FHASTA_POL, FDESDE_REC, FHASTA_REC FROM SURECIBO WHERE XPLACA = @xplaca and CCONTRATOFLOTA = @ccontratoflota ORDER BY CRECIBO DESC')
+            return { crecibo: result.recordset[0].CRECIBO, femision: result.recordset[0].FEMISION, fdesde_pol: result.recordset[0].FDESDE_POL, fhasta_pol: result.recordset[0].FHASTA_POL, crecibo: result.recordset[0].CRECIBO, fdesde_rec: result.recordset[0].FDESDE_REC, fhasta_rec: result.recordset[0].FHASTA_REC, xrecibo: result.recordset[0].XRECIBO };
+        }catch(err) {
+            console.log(err.message);
+            return { error: err.message };
+        }
+    },
+    getLastFleetContract: async() => {
+        try {
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .query('SELECT TOP 1 CCONTRATOFLOTA, CCLIENTE, CPROPIETARIO, CVEHICULOPROPIETARIO FROM SUCONTRATOFLOTA ORDER BY CCONTRATOFLOTA DESC')
+            return { ccontratoflota: result.recordset[0].CCONTRATOFLOTA, ccliente: result.recordset[0].CCLIENTE, cpropietario: result.recordset[0].CPROPIETARIO, cvehiculopropietario: result.recordset[0].CVEHICULOPROPIETARIO };
         }catch(err) {
             console.log(err.message);
             return { error: err.message };

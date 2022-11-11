@@ -784,6 +784,7 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
             xmoneda: getFleetContractData.result.recordset[0].xmoneda,
             xmodelo: getFleetContractData.result.recordset[0].XMODELO,
             xversion: getFleetContractData.result.recordset[0].XVERSION,
+            xcolor: getFleetContractData.result.recordset[0].XCOLOR,
             xplaca: getFleetContractData.result.recordset[0].XPLACA,
             xuso: getFleetContractData.result.recordset[0].XUSO,
             xtipovehiculo: getFleetContractData.result.recordset[0].XTIPO,
@@ -1142,9 +1143,13 @@ const operationCreateIndividualContract = async(requestBody) => {
             if(createAccesories.error){ return { status: false, code: 500, message: createAccesories.error }; }
         }
     }
-    let lastReceiptByPlate = await bd.getLastReceiptByPlate(requestBody.xplaca.toUpperCase());
-    if(lastReceiptByPlate.error){ return { status: false, code: 500, message: lastReceiptByPlate.error }; }
-    return { status: true, code: 200, crecibo: lastReceiptByPlate.crecibo};
+    let lastFleetContract = await bd.getLastFleetContract();
+    if(lastFleetContract.error){ return { status: false, code: 500, message: lastFleetContract.error }; }
+    console.log(lastFleetContract);
+    let lastReceipt = await bd.getLastReceipt(requestBody.xplaca.toUpperCase(), lastFleetContract.ccontratoflota);
+    if(lastReceipt.error){ return { status: false, code: 500, message: lastReceipt.error }; }
+    console.log(lastReceipt);
+    return { status: true, code: 200, ccontratoflota: lastFleetContract.ccontratoflota, ccliente: lastFleetContract.ccliente, cpropietario: lastFleetContract.cpropietario, cvehiculopropietario: lastFleetContract.cvehiculopropietario, crecibo: lastReceipt.crecibo, femision: lastReceipt.femision, fdesde_pol: lastReceipt.fdesde_pol, fhasta_pol: lastReceipt.fhasta_pol, fdesde_rec: lastReceipt.fdesde_rec, fhasta_rec: lastReceipt.fhasta_rec, xrecibo: lastReceipt.xrecibo };
 }
 
 
