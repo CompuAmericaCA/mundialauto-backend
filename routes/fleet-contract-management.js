@@ -1100,7 +1100,7 @@ const operationCreateIndividualContract = async(requestBody) => {
         xcobertura: requestBody.xcobertura.toUpperCase(),
         ncapacidad_p: requestBody.ncapacidad_p,
         xtipo: requestBody.xtipo.toUpperCase(),
-        cmetodologiapago: requestBody.cmetodologiapago,
+        cmetodologiapago: requestBody.cmetodologiapago ? requestBody.cmetodologiapago : undefined,
         msuma_aseg: requestBody.msuma_aseg ? requestBody.msuma_aseg : undefined,
         pcasco: requestBody.pcasco ? requestBody.pcasco : undefined,
         mprima_casco: requestBody.mprima_casco ? requestBody.mprima_casco : undefined,
