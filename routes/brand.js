@@ -25,7 +25,7 @@ const operationSearchBrand = async(authHeader, requestBody) => {
     if(!helper.validateRequestObj(requestBody, ['cpais'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
     let searchData = {
         cpais: requestBody.cpais,
-        xmarca: requestBody.xmarca ? requestBody.xmarca.toUpperCase() : undefined
+        cmarca: requestBody.cmarca ? requestBody.cmarca.toUpperCase() : undefined
     };
     let searchBrand = await bd.searchBrandQuery(searchData).then((res) => res);
     if(searchBrand.error){ return  { status: false, code: 500, message: searchBrand.error }; }

@@ -28,6 +28,7 @@ const operationSearchModel = async(authHeader, requestBody) => {
         xmarca: requestBody.xmarca ? requestBody.xmarca : undefined,
         xmodelo: requestBody.xmodelo ? requestBody.xmodelo : undefined
     }
+
     let searchModel = await bd.searchModelQuery(searchData).then((res) => res);
     if(searchModel.error){ return { status: false, code: 500, message: searchModel.error }; }
     if(searchModel.result.rowsAffected > 0){
@@ -39,7 +40,7 @@ const operationSearchModel = async(authHeader, requestBody) => {
                 cmarca: searchModel.result.recordset[i].CMARCA,
                 xmarca: searchModel.result.recordset[i].XMARCA,
                 bactivo: searchModel.result.recordset[i].BACTIVO
-            });
+            });  
         }
         return { status: true, list: jsonList };
     }else{ return { status: false, code: 404, message: 'Model not found.' }; }
