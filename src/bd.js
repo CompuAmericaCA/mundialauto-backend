@@ -4234,11 +4234,11 @@ module.exports = {
     },
     searchModelQuery: async(searchData) => {
         try{
-            let query = `select DISTINCT XMODELO from VWBUSCARMARCAMODELOVERSION where CPAIS = @cpais and XMARCA= @xmarca`;
+            let query = `select DISTINCT XMODELO from VWBUSCARMARCAMODELOVERSION where CPAIS = @cpais${ searchData.cmarca ? " and CMARCA = @cmarca" : '' } AND BACTIVO = 1`;
             let pool = await sql.connect(config);
             let result = await pool.request()
                 .input('cpais', sql.Numeric(4, 0), searchData.cpais ? searchData.cpais : 1)
-                .input('xmarca', sql.NVarChar, searchData.xmarca ? searchData.xmarca : 1)
+                .input('cmarca', sql.Int, searchData.cmarca ? searchData.cmarca : 1)
                 .query(query);
             //sql.close();
             return { result: result };
@@ -6170,7 +6170,7 @@ module.exports = {
             return { result: { rowsAffected: rowsAffected } };
         }
         catch(err){
-            return { error: err.message };
+            return { error: err.message }
         }
     },
     enterpriseValrepQuery: async(searchData) => {
