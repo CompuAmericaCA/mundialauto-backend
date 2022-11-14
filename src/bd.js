@@ -4234,11 +4234,11 @@ module.exports = {
     },
     searchModelQuery: async(searchData) => {
         try{
-            let query = `select DISTINCT XMODELO, CMODELO, CPAIS, BACTIVO from VWBUSCARMARCAMODELOVERSION where CPAIS = @cpais and CMARCA= @cmarca`;
+            let query = `select DISTINCT XMODELO from VWBUSCARMARCAMODELOVERSION where CPAIS = @cpais${ searchData.cmarca ? " and CMARCA = @cmarca" : '' } AND BACTIVO = 1`;
             let pool = await sql.connect(config);
             let result = await pool.request()
                 .input('cpais', sql.Numeric(4, 0), searchData.cpais ? searchData.cpais : 1)
-                .input('cmarca', sql.NVarChar, searchData.cmarca ? searchData.cmarca : 1)
+                .input('cmarca', sql.Int, searchData.cmarca ? searchData.cmarca : 1)
                 .query(query);
             //sql.close();
             return { result: result };
@@ -6170,7 +6170,7 @@ module.exports = {
             return { result: { rowsAffected: rowsAffected } };
         }
         catch(err){
-            return { error: err.message };
+            return { error: err.message }
         }
     },
     enterpriseValrepQuery: async(searchData) => {
@@ -12585,6 +12585,21 @@ getUserBrokerDataQuery: async(ccorredor, cpais, ccompania) => {
             .input('ccorredor', sql.Int, ccorredor)
             .query('select * from MACORREDORES where CCORREDOR = @ccorredor and CPAIS = @cpais and CCOMPANIA = @ccompania');
         //sql.close();
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+},
+searchServiceOrderFromBillLoadingQuery: async(searchData) => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+            .input('cpais', sql.Int, searchData.cpais)
+            .input('ccompania', sql.Int, searchData.ccompania)
+            .input('cproveedor', sql.Int, searchData.cproveedor)
+            .input('ccliente', sql.Int, searchData.ccliente)
+            .query('select * from VWBUSCARORDENSERVICIOXFACTURA WHERE CPAIS = @cpais AND CCOMPANIA = @ccompania AND CPROVEEDOR = @cproveedor AND CCLIENTE = @ccliente');
+        //sql.close()
         return { result: result };
     }catch(err){
         return { error: err.message };
