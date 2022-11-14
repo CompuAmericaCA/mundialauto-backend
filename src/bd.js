@@ -4234,11 +4234,11 @@ module.exports = {
     },
     searchModelQuery: async(searchData) => {
         try{
-            let query = `select DISTINCT XMODELO from VWBUSCARMARCAMODELOVERSION where CPAIS = @cpais and XMARCA= @xmarca`;
+            let query = `select DISTINCT XMODELO, CMODELO, CPAIS, BACTIVO from VWBUSCARMARCAMODELOVERSION where CPAIS = @cpais and CMARCA= @cmarca`;
             let pool = await sql.connect(config);
             let result = await pool.request()
                 .input('cpais', sql.Numeric(4, 0), searchData.cpais ? searchData.cpais : 1)
-                .input('xmarca', sql.NVarChar, searchData.xmarca ? searchData.xmarca : 1)
+                .input('cmarca', sql.NVarChar, searchData.cmarca ? searchData.cmarca : 1)
                 .query(query);
             //sql.close();
             return { result: result };
@@ -4350,7 +4350,7 @@ module.exports = {
     },
     searchVersionQuery: async(searchData) => {
         try{
-            let query = `select * from VWBUSCARVERSIONDATA where CPAIS = @cpais${ searchData.cmarca ? " and CMARCA = @cmarca" : '' }${ searchData.cmodelo ? " and CMODELO = @cmodelo" : '' }${ searchData.xversion ? " and XVERSION like '%" + searchData.xversion + "%'" : '' }`;
+            let query = `select * from MAVERSION where CPAIS = @cpais${ searchData.cmarca ? " and CMARCA = @cmarca" : '' }${ searchData.cmodelo ? " and CMODELO = @cmodelo" : '' }${ searchData.xversion ? " and XVERSION like '%" + searchData.xversion + "%'" : '' }`;
             let pool = await sql.connect(config);
             let result = await pool.request()
                 .input('cpais', sql.Numeric(4, 0), searchData.cpais ? searchData.cpais : 1)
@@ -7649,8 +7649,9 @@ module.exports = {
             let pool = await sql.connect(config);
             let result = await pool.request()
                 .input('cpais', sql.Numeric(4, 0), searchData.cpais)
-                .input('xmodelo', sql.NVarChar, searchData.xmodelo)
-                .query('select DISTINCT CVERSION, XVERSION, BACTIVO  from VWBUSCARMARCAMODELOVERSION where CPAIS = @cpais and XMODELO = @xmodelo');
+                .input('cmarca', sql.NVarChar, searchData.cmarca)
+                .input('cmodelo', sql.NVarChar, searchData.cmodelo)
+                .query('select DISTINCT CVERSION, XVERSION, BACTIVO  from VWBUSCARMARCAMODELOVERSION where CPAIS = @cpais and CMODELO = @cmodelo and CMARCA = @cmarca');
             //sql.close();
             return { result: result };
         }catch(err){

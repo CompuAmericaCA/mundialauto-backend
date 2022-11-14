@@ -21,13 +21,14 @@ router.route('/search').post((req, res) => {
 
 const operationSearchModel = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
-    if(!helper.validateRequestObj(requestBody, ['cpais','xmarca'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
+    if(!helper.validateRequestObj(requestBody, ['cpais','cmarca'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
     let searchData = {
         cpais: requestBody.cpais,
         cmarca: requestBody.cmarca ? requestBody.cmarca : undefined,
         xmarca: requestBody.xmarca ? requestBody.xmarca : undefined,
         xmodelo: requestBody.xmodelo ? requestBody.xmodelo : undefined
     }
+
     let searchModel = await bd.searchModelQuery(searchData).then((res) => res);
     if(searchModel.error){ return { status: false, code: 500, message: searchModel.error }; }
     if(searchModel.result.rowsAffected > 0){
@@ -39,7 +40,7 @@ const operationSearchModel = async(authHeader, requestBody) => {
                 cmarca: searchModel.result.recordset[i].CMARCA,
                 xmarca: searchModel.result.recordset[i].XMARCA,
                 bactivo: searchModel.result.recordset[i].BACTIVO
-            });
+            });  
         }
         return { status: true, list: jsonList };
     }else{ return { status: false, code: 404, message: 'Model not found.' }; }
