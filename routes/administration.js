@@ -15,7 +15,6 @@ router.route('/search').post((req, res) => {
             }
             res.json({ data: result });
         }).catch((err) => {
-            console.log(err.message)
             res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationSearchAdministrationPaymentRecord' } });
         });
     }
@@ -74,7 +73,6 @@ router.route('/change-provider').post((req, res) => {
             }
             res.json({ data: result });
         }).catch((err) => {
-            console.log(err.message)
             res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationChangeProvider' } });
         });
     }
@@ -97,6 +95,51 @@ const operationChangeProvider = async(authHeader, requestBody) => {
                  xrazonsocial: razonsocial,
                  nlimite: searchProvider.result.recordset[0].NLIMITE, };
     }else{ return { status: false, code: 404, message: 'Coin not found.' }; }
+}
+
+router.route('/service-order').post((req, res) => {
+    if(!req.header('Authorization')){
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } });
+        return;
+    }else{
+        operationServiceOrderFromBillLoading(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationServiceOrderFromBillLoading' } });
+        });
+    }
+});
+
+const operationServiceOrderFromBillLoading = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let searchData = {
+        cpais: requestBody.cpais,
+        ccompania: requestBody.ccompania,
+        cproveedor: requestBody.cproveedor,
+        ccliente: requestBody.ccliente
+    }
+    let searchServiceOrderFromBillLoading = await bd.searchServiceOrderFromBillLoadingQuery(searchData).then((res) => res);
+    if(searchServiceOrderFromBillLoading.error){ return  { status: false, code: 500, message: searchServiceOrderFromBillLoading.error }; }
+    if(searchServiceOrderFromBillLoading.result.rowsAffected > 0){
+        let jsonList = [];
+        for(let i = 0; i < searchServiceOrderFromBillLoading.result.recordset.length; i++){
+            jsonList.push({
+                corden: searchServiceOrderFromBillLoading.result.recordset[i].CORDEN,
+                ccontratoflota: searchServiceOrderFromBillLoading.result.recordset[i].CCONTRATOFLOTA,
+                xcliente: searchServiceOrderFromBillLoading.result.recordset[i].XCLIENTE,
+                xnombre: searchServiceOrderFromBillLoading.result.recordset[i].XNOMBRE,
+                xservicioadicional: searchServiceOrderFromBillLoading.result.recordset[i].XSERVICIOADICIONAL,
+                xservicio: searchServiceOrderFromBillLoading.result.recordset[i].XSERVICIO,
+                mtotal: searchServiceOrderFromBillLoading.result.recordset[i].MTOTAL,
+                mmontototal: searchServiceOrderFromBillLoading.result.recordset[i].MMONTOTOTAL
+            });
+        }
+        return { status: true, list: jsonList };
+    }else{ return { status: false, code: 404, message: 'Notification not found.' }; }
 }
 
 module.exports = router;
