@@ -3652,7 +3652,7 @@ module.exports = {
     },
     searchBrandQuery: async(searchData) => {
         try{
-            let query = `select * from MAMARCA where CPAIS = @cpais${ searchData.xmarca ? " and XMARCA like '%" + searchData.xmarca + "%'" : '' }`;
+            let query = `select * from MAMARCA where CPAIS = @cpais${ searchData.xmarca ? " and XMARCA like '%" + searchData.xmarca + "%'" : '' } ORDER BY XMARCA`;
             let pool = await sql.connect(config);
             let result = await pool.request()
                 .input('cpais', sql.Numeric(4, 0), searchData.cpais ? searchData.cpais : 1)
@@ -4351,6 +4351,21 @@ module.exports = {
     searchVersionQuery: async(searchData) => {
         try{
             let query = `select * from MAVERSION where CPAIS = @cpais${ searchData.cmarca ? " and CMARCA = @cmarca" : '' }${ searchData.cmodelo ? " and CMODELO = @cmodelo" : '' }${ searchData.xversion ? " and XVERSION like '%" + searchData.xversion + "%'" : '' }`;
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .input('cpais', sql.Numeric(4, 0), searchData.cpais ? searchData.cpais : 1)
+                .input('cmarca', sql.Int, searchData.cmarca ? searchData.cmarca : 1)
+                .input('cmodelo', sql.Int, searchData.cmodelo ? searchData.cmodelo : 1)
+                .query(query);
+            //sql.close();
+            return { result: result };
+        }catch(err){
+            return { error: err.message };
+        }
+    },
+    searchVersionnQuery: async(searchData) => {
+        try{
+            let query = `select * from MAVVERSION where CMARCA = @cmarca and CMODELO = @cmodelo and BACTIVO =`;
             let pool = await sql.connect(config);
             let result = await pool.request()
                 .input('cpais', sql.Numeric(4, 0), searchData.cpais ? searchData.cpais : 1)
@@ -12401,12 +12416,14 @@ createAccesoriesFromFleetContractIndividual: async(accessory) => {
         return { error: err.message };
     }
 },
-ValidateCliente: async(searchData) => {
+ValidateVersionDataQuery: async(searchData) => {
     try{
         let pool = await sql.connect(config);
         let result = await pool.request()
-        .input('xdocidentidad', sql.NVarChar, searchData.xdocidentidad)
-        .query('select * from TRPROPIETARIO WHERE XDOCIDENTIDAD = @xdocidentidad');
+        .input('cmarca', sql.NVarChar, searchData.cmarca)
+        .input('cmodelo', sql.NVarChar, searchData.cmodelo)
+        .input('expre1', sql.NVarChar, searchData.expre1)
+        .query('select * from MAVVERSION WHERE CMARCA = @cmarca AND CMODELO = @cmodelo AND EXPRE1 = @expre1');
     //sql.close();
     return { result: result };
 }catch(err){
