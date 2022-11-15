@@ -8579,8 +8579,20 @@ module.exports = {
             let result = await pool.request()
                 .input('xplaca', sql.NVarChar, xplaca)
                 .input('ccontratoflota', sql.Int, ccontratoflota)
-                .query('SELECT TOP 1 CRECIBO, FEMISION, FDESDE_POL, FHASTA_POL, FDESDE_REC, FHASTA_REC FROM SURECIBO WHERE XPLACA = @xplaca and CCONTRATOFLOTA = @ccontratoflota ORDER BY CRECIBO DESC')
-            return { crecibo: result.recordset[0].CRECIBO, femision: result.recordset[0].FEMISION, fdesde_pol: result.recordset[0].FDESDE_POL, fhasta_pol: result.recordset[0].FHASTA_POL, crecibo: result.recordset[0].CRECIBO, fdesde_rec: result.recordset[0].FDESDE_REC, fhasta_rec: result.recordset[0].FHASTA_REC, xrecibo: result.recordset[0].XRECIBO };
+                .query('SELECT TOP 1 CCARGA, CRECIBO, FEMISION, FDESDE_POL, FHASTA_POL, FDESDE_REC, FHASTA_REC, XRECIBO FROM SURECIBO WHERE XPLACA = @xplaca and CCONTRATOFLOTA = @ccontratoflota ORDER BY CRECIBO DESC')
+            return { ccarga: result.recordset[0].CCARGA, crecibo: result.recordset[0].CRECIBO, femision: result.recordset[0].FEMISION, fdesde_pol: result.recordset[0].FDESDE_POL, fhasta_pol: result.recordset[0].FHASTA_POL, crecibo: result.recordset[0].CRECIBO, fdesde_rec: result.recordset[0].FDESDE_REC, fhasta_rec: result.recordset[0].FHASTA_REC, xrecibo: result.recordset[0].XRECIBO };
+        }catch(err) {
+            console.log(err.message);
+            return { error: err.message };
+        }
+    },
+    getCharge: async(ccarga) => {
+        try {
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .input('ccarga', sql.Int, ccarga)
+                .query('SELECT XDESCRIPCION_L, XPOLIZA, FINGRESO FROM SUPOLIZAMATRIZ WHERE CCARGA = @ccarga')
+            return { xdescripcion_l: result.recordset[0].XDESCRIPCION_L, xpoliza: result.recordset[0].XPOLIZA, fsuscripcion: result.recordset[0].FINGRESO };
         }catch(err) {
             console.log(err.message);
             return { error: err.message };

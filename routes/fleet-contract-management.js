@@ -1150,6 +1150,8 @@ const operationCreateIndividualContract = async(requestBody) => {
     console.log(lastFleetContract);
     let lastReceipt = await bd.getLastReceipt(requestBody.xplaca.toUpperCase(), lastFleetContract.ccontratoflota);
     if(lastReceipt.error){ return { status: false, code: 500, message: lastReceipt.error }; }
+    let getCharge = await bd.getCharge(lastReceipt.ccarga);
+    if(getCharge.error){ return { status: false, code: 500, message: getCharge.error }; }
     return { 
         status: true, 
         code: 200, 
@@ -1163,7 +1165,8 @@ const operationCreateIndividualContract = async(requestBody) => {
         fhasta_pol: lastReceipt.fhasta_pol, 
         fdesde_rec: lastReceipt.fdesde_rec, 
         fhasta_rec: lastReceipt.fhasta_rec, 
-        xrecibo: lastReceipt.xrecibo
+        xrecibo: lastReceipt.xrecibo,
+        fsuscripcion: getCharge.fsuscripcion
     };
 }
 
