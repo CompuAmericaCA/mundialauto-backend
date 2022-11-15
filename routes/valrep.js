@@ -2208,7 +2208,7 @@ const operationValrepVersion = async(authHeader, requestBody) => {
     if(query.error){ return { status: false, code: 500, message: query.error }; }
     let jsonArray = [];
     for(let i = 0; i < query.result.recordset.length; i++){
-        jsonArray.push({ cversion: query.result.recordset[i].CVERSION, xversion: query.result.recordset[i].XVERSION, bactivo: query.result.recordset[i].BACTIVO });
+        jsonArray.push({ cversion: query.result.recordset[i].CVERSION, xversion: query.result.recordset[i].XVERSION + '-' + query.result.recordset[i].CANO, bactivo: query.result.recordset[i].BACTIVO, cano: query.result.recordset[i].CANO, control: i, npasajero: query.result.recordset[i].NPASAJERO  });
     }
     return { status: true, list: jsonArray }
 }
@@ -3021,37 +3021,5 @@ const operationValrepProviderBillLoading = async(authHeader, requestBody) => {
     }
     return { status: true, list: jsonArray }
 }
-
-router.route('/search-data-version').post((req, res) => {
-    if(!req.header('Authorization')){ 
-        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
-        return;
-    }else{
-        operationValrepSearchData(req.header('Authorization'), req.body).then((result) => {
-            if(!result.status){ 
-                res.status(result.code).json({ data: result });
-                return;
-            }
-            res.json({ data: result });
-        }).catch((err) => {
-            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationValrepProviderBillLoading' } });
-        });
-    }
-});
-
-const operationValrepSearchData = async(authHeader, requestBody) => {
-    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
-    let searchData = {
-        cmarca: requestBody.cmarca,
-        cmodelo: requestBody.cmodelo,
-        cversion: requestBody.cversion,
-    };
-    let query = await bd.ValidateVersionDataQuery(searchData).then((res) => res);
-    if(query.error){ return { status: false, code: 500, message: operationValidateVersionData.error };  }
-    return { status: true,
-             cano: query.result.recordset[0].CANO,
-             npasajero: query.result.recordset[0].NPASAJERO,
-            }
-    }
 
 module.exports = router;
