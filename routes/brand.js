@@ -41,7 +41,7 @@ const operationSearchBrand = async(authHeader, requestBody) => {
                 cversion: searchBrand.result.recordset[i].CVERSION,
                 xversion: searchBrand.result.recordset[i].XVERSION,
                 cano: searchBrand.result.recordset[i].CANO
-            });
+            });  
         }
         return { status: true, list: jsonList };
     }else{ return { status: false, code: 404, message: 'Brand not found.' }; }
