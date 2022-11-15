@@ -4344,7 +4344,7 @@ module.exports = {
             let result = await pool.request()
                 .input('cpais', sql.Numeric(4, 0), searchData.cpais)
                 .input('cmarca', sql.Int, searchData.cmarca)
-                .query('select CMARCA, CMODELO, XMODELO, BACTIVO from MAMODELO where CPAIS = @cpais');
+                .query('select CMARCA, CMODELO, XMODELO, BACTIVO from MAMODELO where CPAIS = @cpais AND CMARCA = @cmarca');
             //sql.close();
             return { result: result };
         }catch(err){
@@ -7669,7 +7669,7 @@ module.exports = {
                 .input('cpais', sql.Numeric(4, 0), searchData.cpais)
                 .input('cmarca', sql.NVarChar, searchData.cmarca)
                 .input('cmodelo', sql.NVarChar, searchData.cmodelo)
-                .query('select DISTINCT CVERSION, XVERSION, BACTIVO  from VWBUSCARMARCAMODELOVERSION where CPAIS = @cpais');
+                .query('select DISTINCT CVERSION, XVERSION, CANO, NPASAJERO, BACTIVO from VWBUSCARMARCAMODELOVERSION where CPAIS = @cpais AND CMARCA = @cmarca AND CMODELO = @cmodelo');
             //sql.close();
             return { result: result };
         }catch(err){
@@ -12423,10 +12423,10 @@ ValidateVersionDataQuery: async(searchData) => {
     try{
         let pool = await sql.connect(config);
         let result = await pool.request()
-        .input('cmarca', sql.NVarChar, searchData.cmarca)
-        .input('cmodelo', sql.NVarChar, searchData.cmodelo)
-        .input('expre1', sql.NVarChar, searchData.expre1)
-        .query('select * from MAVVERSION WHERE CMARCA = @cmarca AND CMODELO = @cmodelo AND EXPRE1 = @expre1');
+        .input('cmarca', sql.Int, searchData.cmarca)
+        .input('cmodelo', sql.Int, searchData.cmodelo)
+        .input('cversion', sql.Int, searchData.cversion)
+        .query('select * from MAVVERSION WHERE CMARCA = @cmarca AND CMODELO = @cmodelo AND CVERSION = @cversion');
     //sql.close();
     return { result: result };
 }catch(err){
