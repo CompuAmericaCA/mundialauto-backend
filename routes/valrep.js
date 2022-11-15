@@ -1711,7 +1711,7 @@ const operationValrepReceipt = async(authHeader, requestBody) => {
         let mmHasta = dateFormatHasta.getMonth() + 1;
         let yyyyHasta = dateFormatHasta.getFullYear();
         let fhasta_rec = ddHasta + '/' + mmHasta + '/' + yyyyHasta;
-        jsonArray.push({ ccarga: query.result.recordset[i].CCARGA, crecibo: query.result.recordset[i].CRECIBO, fdesde_rec: fdesde_rec, fhasta_rec: fhasta_rec });
+        jsonArray.push({ ccarga: query.result.recordset[i].CCARGA, crecibo: query.result.recordset[i].CRECIBO, nconsecutivo: query.result.recordset[i].NCONSECUTIVO, fdesde_rec: fdesde_rec, fhasta_rec: fhasta_rec });
     }
     return { status: true, list: jsonArray }
 }
