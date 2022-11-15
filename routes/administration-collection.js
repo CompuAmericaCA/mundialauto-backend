@@ -24,7 +24,8 @@ const operationSearchCollection = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
     let searchData = {
         ccompania: requestBody.ccompania,
-        xplaca: requestBody.xplaca ? requestBody.xplaca.toUpperCase() : undefined
+        xplaca: requestBody.xplaca ? requestBody.xplaca.toUpperCase() : undefined,
+        ccorredor: requestBody.ccorredor ? requestBody.ccorredor: undefined
     }
     let searchCollection = await bd.searchCollectionQuery(searchData).then((res) => res);
     if(searchCollection.error){ return { status: false, code: 500, message: searchCollection.error }; }

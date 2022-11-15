@@ -322,7 +322,7 @@ router.route('/model').post((req, res) => {
 
 const operationValrepModel = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
-    if(!helper.validateRequestObj(requestBody, ['cpais', 'cmarca'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
+    //if(!helper.validateRequestObj(requestBody, ['cpais', 'cmarca'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
     let searchData = {
         cpais: requestBody.cpais,
         cmarca: requestBody.cmarca
@@ -1400,8 +1400,8 @@ router.route('/provider').post((req, res) => {
 const operationValrepProvider = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
     //if(!helper.validateRequestObj(requestBody, ['cproveedor'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
-    let cproveedor = requestBody.cproveedor;
-    let query = await bd.providerValrepQuery(cproveedor).then((res) => res);
+    //let cproveedor = requestBody.cproveedor;
+    let query = await bd.providerValrepQuery().then((res) => res);
     if(query.error){ return { status: false, code: 500, message: query.error }; }
     let jsonArray = [];
     for(let i = 0; i < query.result.recordset.length; i++){
@@ -1566,7 +1566,7 @@ const operationValrepClient = async(authHeader, requestBody) => {
     if(query.error){ return { status: false, code: 500, message: query.error }; }
     let jsonArray = [];
     for(let i = 0; i < query.result.recordset.length; i++){
-        jsonArray.push({ ccliente: query.result.recordset[i].CCLIENTE, xcliente: helper.decrypt(query.result.recordset[i].XCLIENTE), bactivo: query.result.recordset[i].BACTIVO });
+        jsonArray.push({ ccliente: query.result.recordset[i].CCLIENTE, xcliente: query.result.recordset[i].XCLIENTE, bactivo: query.result.recordset[i].BACTIVO });
     }
     return { status: true, list: jsonArray }
 }
@@ -2197,10 +2197,11 @@ router.route('/version').post((req, res) => {
 
 const operationValrepVersion = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
-    if(!helper.validateRequestObj(requestBody, ['cpais', 'xmodelo'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
+    //if(!helper.validateRequestObj(requestBody, ['cpais', 'cmodelo','cmarca'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
     let searchData = {
         cpais: requestBody.cpais,
-        xmodelo: requestBody.xmodelo
+        cmarca: requestBody.cmarca ? requestBody.cmarca : undefined,
+        cmodelo: requestBody.cmodelo ? requestBody.cmodelo : undefined,
     };
 
     let query = await bd.versionValrepQuery(searchData).then((res) => res);
@@ -2988,5 +2989,69 @@ const operationValrepSettlement = async(authHeader, requestBody) => {
     }
     return { status: true, list: jsonArray }
 }
+
+router.route('/provider-bill').post((req, res) => {
+    if(!req.header('Authorization')){ 
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
+        return;
+    }else{
+        operationValrepProviderBillLoading(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){ 
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationValrepProviderBillLoading' } });
+        });
+    }
+});
+
+const operationValrepProviderBillLoading = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let searchData = {
+        ccompania: requestBody.ccompania,
+        cpais: requestBody.cpais
+    }
+    let query = await bd.providerQuery(searchData).then((res) => res);
+    if(query.error){ return { status: false, code: 500, message: query.error }; }
+    let jsonArray = [];
+    for(let i = 0; i < query.result.recordset.length; i++){
+        jsonArray.push({ cproveedor: query.result.recordset[i].CPROVEEDOR, xnombre: query.result.recordset[i].XNOMBRE });
+    }
+    return { status: true, list: jsonArray }
+}
+
+router.route('/search-data-version').post((req, res) => {
+    if(!req.header('Authorization')){ 
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
+        return;
+    }else{
+        operationValrepSearchData(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){ 
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationValrepProviderBillLoading' } });
+        });
+    }
+});
+
+const operationValrepSearchData = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let searchData = {
+        cmarca: requestBody.cmarca,
+        cmodelo: requestBody.cmodelo,
+        cversion: requestBody.cversion,
+    };
+    let query = await bd.ValidateVersionDataQuery(searchData).then((res) => res);
+    if(query.error){ return { status: false, code: 500, message: operationValidateVersionData.error };  }
+    return { status: true,
+             cano: query.result.recordset[0].CANO,
+             npasajero: query.result.recordset[0].NPASAJERO,
+            }
+    }
 
 module.exports = router;

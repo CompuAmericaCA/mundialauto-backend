@@ -22,10 +22,11 @@ router.route('/search').post((req, res) => {
 
 const operationSearchBrand = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
-    if(!helper.validateRequestObj(requestBody, ['cpais'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
     let searchData = {
         cpais: requestBody.cpais,
-        xmarca: requestBody.xmarca ? requestBody.xmarca.toUpperCase() : undefined
+        cmarca: requestBody.cmarca ? requestBody.cmarca : undefined,
+        cmodelo: requestBody.cmodelo ? requestBody.cmodelo : undefined,
+        cversion: requestBody.cversion ? requestBody.cversion : undefined
     };
     let searchBrand = await bd.searchBrandQuery(searchData).then((res) => res);
     if(searchBrand.error){ return  { status: false, code: 500, message: searchBrand.error }; }
@@ -35,8 +36,11 @@ const operationSearchBrand = async(authHeader, requestBody) => {
             jsonList.push({
                 cmarca: searchBrand.result.recordset[i].CMARCA,
                 xmarca: searchBrand.result.recordset[i].XMARCA,
-                casociado: searchBrand.result.recordset[i].CASOCIADO,
-                bactivo: searchBrand.result.recordset[i].BACTIVO
+                cmodelo: searchBrand.result.recordset[i].CMODELO,
+                xmodelo: searchBrand.result.recordset[i].XMODELO,
+                cversion: searchBrand.result.recordset[i].CVERSION,
+                xversion: searchBrand.result.recordset[i].XVERSION,
+                cano: searchBrand.result.recordset[i].CANO
             });
         }
         return { status: true, list: jsonList };
