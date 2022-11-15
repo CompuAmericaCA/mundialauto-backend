@@ -2,7 +2,7 @@ const router = require('express').Router();
 const helper = require('../src/helper');
 const bd = require('../src/bd');
 
-router.route('/search').post((req, res) => {
+router.route('/searchh').post((req, res) => {
     if(!req.header('Authorization')){
         res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } });
         return;
@@ -26,7 +26,56 @@ const operationSearchVersion = async(authHeader, requestBody) => {
         cpais: requestBody.cpais,
         cmarca: requestBody.cmarca ? requestBody.cmarca : undefined,
         cmodelo: requestBody.cmodelo ? requestBody.cmodelo : undefined,
-        xversion: requestBody.xversion ? requestBody.xversion.toUpperCase() : undefined
+    } 
+    let searchVersion = await bd.searchVersionnQuery(searchData).then((res) => res);
+    if(searchVersion.error){ return { status: false, code: 500, message: searchVersion.error }; }
+    if(searchVersion.result.rowsAffected > 0){
+        let jsonList = [];
+        for(let i = 0; i < searchVersion.result.recordset.length; i++){
+            jsonList.push({
+                cversion: searchVersion.result.recordset[i].CVERSION,
+                cano: searchVersion.result.recordset[i].CANO,   
+                Expr1: searchVersion.result.recordset[i].Expr1,                             
+                npasajero: searchVersion.result.recordset[i].NPASAJERO,
+                xversion: searchVersion.result.recordset[i].XVERSION,
+                cmodelo: searchVersion.result.recordset[i].CMODELO,
+                xmodelo: searchVersion.result.recordset[i].XMODELO,
+                casociado: searchVersion.result.recordset[i].CASOCIADO,
+                cmarca: searchVersion.result.recordset[i].CMARCA,
+                xmarca: searchVersion.result.recordset[i].XMARCA,
+                bactivo: searchVersion.result.recordset[i].BACTIVO
+            });
+        } 
+       
+        return { status: true, list: jsonList };
+    }else{ return { status: false, code: 404, message: 'Model not found.' }; }
+}
+
+router.route('/search').post((req, res) => {
+    if(!req.header('Authorization')){
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } });
+        return;
+    }else{
+        operationSearchVersionn(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){
+                res.status(result.code).json({ data: result });
+                return;s
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationSearchVersion' } });
+        });
+    }
+});
+
+const operationSearchVersionn = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    if(!helper.validateRequestObj(requestBody, ['cpais'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
+    let searchData = {
+        cpais: requestBody.cpais,
+        cmarca: requestBody.cmarca ? requestBody.cmarca : undefined,
+        cmodelo: requestBody.cmodelo ? requestBody.cmodelo : undefined,
+        cversion: requestBody.cversion ? requestBody.cversion.toUpperCase() : undefined
     }
     let searchVersion = await bd.searchVersionQuery(searchData).then((res) => res);
     if(searchVersion.error){ return { status: false, code: 500, message: searchVersion.error }; }
@@ -35,6 +84,8 @@ const operationSearchVersion = async(authHeader, requestBody) => {
         for(let i = 0; i < searchVersion.result.recordset.length; i++){
             jsonList.push({
                 cversion: searchVersion.result.recordset[i].CVERSION,
+                cano: searchVersion.result.recordset[i].CANO,                
+                npasajero: searchVersion.result.recordset[i].NPASAJERO,
                 xversion: searchVersion.result.recordset[i].XVERSION,
                 cmodelo: searchVersion.result.recordset[i].CMODELO,
                 xmodelo: searchVersion.result.recordset[i].XMODELO,
@@ -180,6 +231,45 @@ const operationUpdateVersion = async(authHeader, requestBody) => {
         if(updateVersion.error){ return { status: false, code: 500, message: updateVersion.error }; }
         if(updateVersion.result.rowsAffected > 0){ return { status: true, cversion: versionData.cversion }; }
         else{ return { status: false, code: 404, message: 'Model not found.' }; }
+    }
+}
+
+router.route('/search-data-version').post((req, res) => {
+    if(!req.header('Authorization')){ 
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
+        return;
+    }else{
+        operationSearchDataVersion(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){ 
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationSearchDataVersion' } });
+        });
+    }
+});
+
+const operationSearchDataVersion = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let searchData = {
+        cmarca: requestBody.cmarca,
+        cmodelo: requestBody.cmodelo,
+        cversion: requestBody.cversion,
+    };
+    let searchDataVersion = await bd.ValidateVersionDataQuery(searchData).then((res) => res);
+    if(searchDataVersion.error){ return { status: false, code: 500, message: searchDataVersion.error }; }
+    if(searchDataVersion.result.rowsAffected > 0){
+        let jsonList = [];
+        for(let i = 0; i < searchDataVersion.result.recordset.length; i++){
+            jsonList.push({
+                cversion: searchDataVersion.result.recordset[i].CVERSION,
+                cano: searchDataVersion.result.recordset[i].CANO,                
+                npasajero: searchVersion.result.recordset[i].NPASAJERO
+            });
+        }
+        return { status: true, list: jsonList };
     }
 }
 

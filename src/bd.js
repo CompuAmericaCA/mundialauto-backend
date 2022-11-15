@@ -3652,10 +3652,13 @@ module.exports = {
     },
     searchBrandQuery: async(searchData) => {
         try{
-            let query = `select * from MAMARCA where CPAIS = @cpais${ searchData.xmarca ? " and XMARCA like '%" + searchData.xmarca + "%'" : '' }`;
+            let query = `select * from VWBUSCARMARCAMODELOVERSION where CPAIS = @cpais${ searchData.cmarca ? " and CMARCA = @cmarca" : '' }${ searchData.cmodelo ? " and CMODELO = @cmodelo" : '' }${ searchData.cversion ? " and CVERSION = @cversion" : '' }`;
             let pool = await sql.connect(config);
             let result = await pool.request()
                 .input('cpais', sql.Numeric(4, 0), searchData.cpais ? searchData.cpais : 1)
+                .input('cmarca', sql.Int, searchData.cmarca ? searchData.cmarca : 1)
+                .input('cmodelo', sql.Int, searchData.cmodelo ? searchData.cmodelo : 1)
+                .input('cversion', sql.Int, searchData.cversion ? searchData.cversion : 1)
                 .query(query);
             //sql.close();
             return { result: result };
@@ -4341,7 +4344,7 @@ module.exports = {
             let result = await pool.request()
                 .input('cpais', sql.Numeric(4, 0), searchData.cpais)
                 .input('cmarca', sql.Int, searchData.cmarca)
-                .query('select CMARCA, CMODELO, XMODELO, BACTIVO from MAMODELO where CPAIS = @cpais and CMARCA = @cmarca');
+                .query('select CMARCA, CMODELO, XMODELO, BACTIVO from MAMODELO where CPAIS = @cpais AND CMARCA = @cmarca');
             //sql.close();
             return { result: result };
         }catch(err){
@@ -4351,6 +4354,21 @@ module.exports = {
     searchVersionQuery: async(searchData) => {
         try{
             let query = `select * from MAVERSION where CPAIS = @cpais${ searchData.cmarca ? " and CMARCA = @cmarca" : '' }${ searchData.cmodelo ? " and CMODELO = @cmodelo" : '' }${ searchData.xversion ? " and XVERSION like '%" + searchData.xversion + "%'" : '' }`;
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .input('cpais', sql.Numeric(4, 0), searchData.cpais ? searchData.cpais : 1)
+                .input('cmarca', sql.Int, searchData.cmarca ? searchData.cmarca : 1)
+                .input('cmodelo', sql.Int, searchData.cmodelo ? searchData.cmodelo : 1)
+                .query(query);
+            //sql.close();
+            return { result: result };
+        }catch(err){
+            return { error: err.message };
+        }
+    },
+    searchVersionnQuery: async(searchData) => {
+        try{
+            let query = `select * from MAVVERSION where CMARCA = @cmarca and CMODELO = @cmodelo and BACTIVO =`;
             let pool = await sql.connect(config);
             let result = await pool.request()
                 .input('cpais', sql.Numeric(4, 0), searchData.cpais ? searchData.cpais : 1)
@@ -7651,7 +7669,7 @@ module.exports = {
                 .input('cpais', sql.Numeric(4, 0), searchData.cpais)
                 .input('cmarca', sql.NVarChar, searchData.cmarca)
                 .input('cmodelo', sql.NVarChar, searchData.cmodelo)
-                .query('select DISTINCT CVERSION, XVERSION, BACTIVO  from VWBUSCARMARCAMODELOVERSION where CPAIS = @cpais and CMODELO = @cmodelo and CMARCA = @cmarca');
+                .query('select DISTINCT CVERSION, XVERSION, CANO, NPASAJERO, BACTIVO from VWBUSCARMARCAMODELOVERSION where CPAIS = @cpais AND CMARCA = @cmarca AND CMODELO = @cmodelo');
             //sql.close();
             return { result: result };
         }catch(err){
@@ -8555,8 +8573,42 @@ module.exports = {
             return { error: err.message };
         }
     },
-
-
+    getLastReceipt: async(xplaca, ccontratoflota) => {
+        try {
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .input('xplaca', sql.NVarChar, xplaca)
+                .input('ccontratoflota', sql.Int, ccontratoflota)
+                .query('SELECT TOP 1 CCARGA, CRECIBO, FEMISION, FDESDE_POL, FHASTA_POL, FDESDE_REC, FHASTA_REC, XRECIBO FROM SURECIBO WHERE XPLACA = @xplaca and CCONTRATOFLOTA = @ccontratoflota ORDER BY CRECIBO DESC')
+            return { ccarga: result.recordset[0].CCARGA, crecibo: result.recordset[0].CRECIBO, femision: result.recordset[0].FEMISION, fdesde_pol: result.recordset[0].FDESDE_POL, fhasta_pol: result.recordset[0].FHASTA_POL, crecibo: result.recordset[0].CRECIBO, fdesde_rec: result.recordset[0].FDESDE_REC, fhasta_rec: result.recordset[0].FHASTA_REC, xrecibo: result.recordset[0].XRECIBO };
+        }catch(err) {
+            console.log(err.message);
+            return { error: err.message };
+        }
+    },
+    getCharge: async(ccarga) => {
+        try {
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .input('ccarga', sql.Int, ccarga)
+                .query('SELECT XDESCRIPCION_L, XPOLIZA, FINGRESO FROM SUPOLIZAMATRIZ WHERE CCARGA = @ccarga')
+            return { xdescripcion_l: result.recordset[0].XDESCRIPCION_L, xpoliza: result.recordset[0].XPOLIZA, fsuscripcion: result.recordset[0].FINGRESO };
+        }catch(err) {
+            console.log(err.message);
+            return { error: err.message };
+        }
+    },
+    getLastFleetContract: async() => {
+        try {
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .query('SELECT TOP 1 CCONTRATOFLOTA, CCLIENTE, CPROPIETARIO, CVEHICULOPROPIETARIO FROM SUCONTRATOFLOTA ORDER BY CCONTRATOFLOTA DESC')
+            return { ccontratoflota: result.recordset[0].CCONTRATOFLOTA, ccliente: result.recordset[0].CCLIENTE, cpropietario: result.recordset[0].CPROPIETARIO, cvehiculopropietario: result.recordset[0].CVEHICULOPROPIETARIO };
+        }catch(err) {
+            console.log(err.message);
+            return { error: err.message };
+        }
+    },
     getReceiptData: async(receiptData) => {
         try{
             let pool = await sql.connect(config);
@@ -12401,12 +12453,14 @@ createAccesoriesFromFleetContractIndividual: async(accessory) => {
         return { error: err.message };
     }
 },
-ValidateCliente: async(searchData) => {
+ValidateVersionDataQuery: async(searchData) => {
     try{
         let pool = await sql.connect(config);
         let result = await pool.request()
-        .input('xdocidentidad', sql.NVarChar, searchData.xdocidentidad)
-        .query('select * from TRPROPIETARIO WHERE XDOCIDENTIDAD = @xdocidentidad');
+        .input('cmarca', sql.Int, searchData.cmarca)
+        .input('cmodelo', sql.Int, searchData.cmodelo)
+        .input('cversion', sql.Int, searchData.cversion)
+        .query('select * from MAVVERSION WHERE CMARCA = @cmarca AND CMODELO = @cmodelo AND CVERSION = @cversion');
     //sql.close();
     return { result: result };
 }catch(err){

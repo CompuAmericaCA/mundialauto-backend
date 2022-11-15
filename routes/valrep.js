@@ -322,7 +322,7 @@ router.route('/model').post((req, res) => {
 
 const operationValrepModel = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
-    if(!helper.validateRequestObj(requestBody, ['cpais', 'cmarca'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
+    //if(!helper.validateRequestObj(requestBody, ['cpais', 'cmarca'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
     let searchData = {
         cpais: requestBody.cpais,
         cmarca: requestBody.cmarca
@@ -1711,7 +1711,7 @@ const operationValrepReceipt = async(authHeader, requestBody) => {
         let mmHasta = dateFormatHasta.getMonth() + 1;
         let yyyyHasta = dateFormatHasta.getFullYear();
         let fhasta_rec = ddHasta + '/' + mmHasta + '/' + yyyyHasta;
-        jsonArray.push({ ccarga: query.result.recordset[i].CCARGA, crecibo: query.result.recordset[i].CRECIBO, fdesde_rec: fdesde_rec, fhasta_rec: fhasta_rec });
+        jsonArray.push({ ccarga: query.result.recordset[i].CCARGA, crecibo: query.result.recordset[i].CRECIBO, nconsecutivo: query.result.recordset[i].NCONSECUTIVO, fdesde_rec: fdesde_rec, fhasta_rec: fhasta_rec });
     }
     return { status: true, list: jsonArray }
 }
@@ -2197,7 +2197,7 @@ router.route('/version').post((req, res) => {
 
 const operationValrepVersion = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
-    if(!helper.validateRequestObj(requestBody, ['cpais', 'cmodelo','cmarca'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
+    //if(!helper.validateRequestObj(requestBody, ['cpais', 'cmodelo','cmarca'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
     let searchData = {
         cpais: requestBody.cpais,
         cmarca: requestBody.cmarca ? requestBody.cmarca : undefined,
@@ -2208,7 +2208,7 @@ const operationValrepVersion = async(authHeader, requestBody) => {
     if(query.error){ return { status: false, code: 500, message: query.error }; }
     let jsonArray = [];
     for(let i = 0; i < query.result.recordset.length; i++){
-        jsonArray.push({ cversion: query.result.recordset[i].CVERSION, xversion: query.result.recordset[i].XVERSION, bactivo: query.result.recordset[i].BACTIVO });
+        jsonArray.push({ cversion: query.result.recordset[i].CVERSION, xversion: query.result.recordset[i].XVERSION + '-' + query.result.recordset[i].CANO, bactivo: query.result.recordset[i].BACTIVO, cano: query.result.recordset[i].CANO, control: i, npasajero: query.result.recordset[i].NPASAJERO  });
     }
     return { status: true, list: jsonArray }
 }
