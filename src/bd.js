@@ -4366,6 +4366,21 @@ module.exports = {
             return { error: err.message };
         }
     },
+    searchVersionnQuery: async(searchData) => {
+        try{
+            let query = `select * from MAVVERSION where CMARCA = @cmarca and CMODELO = @cmodelo and BACTIVO =`;
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .input('cpais', sql.Numeric(4, 0), searchData.cpais ? searchData.cpais : 1)
+                .input('cmarca', sql.Int, searchData.cmarca ? searchData.cmarca : 1)
+                .input('cmodelo', sql.Int, searchData.cmodelo ? searchData.cmodelo : 1)
+                .query(query);
+            //sql.close();
+            return { result: result };
+        }catch(err){
+            return { error: err.message };
+        }
+    },
     verifyVersionNameToCreateQuery: async(versionData) => {
         try{
             let pool = await sql.connect(config);
@@ -12404,12 +12419,14 @@ createAccesoriesFromFleetContractIndividual: async(accessory) => {
         return { error: err.message };
     }
 },
-ValidateCliente: async(searchData) => {
+ValidateVersionDataQuery: async(searchData) => {
     try{
         let pool = await sql.connect(config);
         let result = await pool.request()
-        .input('xdocidentidad', sql.NVarChar, searchData.xdocidentidad)
-        .query('select * from TRPROPIETARIO WHERE XDOCIDENTIDAD = @xdocidentidad');
+        .input('cmarca', sql.NVarChar, searchData.cmarca)
+        .input('cmodelo', sql.NVarChar, searchData.cmodelo)
+        .input('expre1', sql.NVarChar, searchData.expre1)
+        .query('select * from MAVVERSION WHERE CMARCA = @cmarca AND CMODELO = @cmodelo AND EXPRE1 = @expre1');
     //sql.close();
     return { result: result };
 }catch(err){
