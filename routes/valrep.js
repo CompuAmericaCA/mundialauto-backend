@@ -322,7 +322,7 @@ router.route('/model').post((req, res) => {
 
 const operationValrepModel = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
-    if(!helper.validateRequestObj(requestBody, ['cpais', 'cmarca'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
+    //if(!helper.validateRequestObj(requestBody, ['cpais', 'cmarca'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
     let searchData = {
         cpais: requestBody.cpais,
         cmarca: requestBody.cmarca
@@ -2197,7 +2197,7 @@ router.route('/version').post((req, res) => {
 
 const operationValrepVersion = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
-    if(!helper.validateRequestObj(requestBody, ['cpais', 'cmodelo','cmarca'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
+    //if(!helper.validateRequestObj(requestBody, ['cpais', 'cmodelo','cmarca'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
     let searchData = {
         cpais: requestBody.cpais,
         cmarca: requestBody.cmarca ? requestBody.cmarca : undefined,

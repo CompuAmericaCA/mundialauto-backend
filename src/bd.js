@@ -3652,10 +3652,13 @@ module.exports = {
     },
     searchBrandQuery: async(searchData) => {
         try{
-            let query = `select * from MAMARCA where CPAIS = @cpais${ searchData.xmarca ? " and XMARCA like '%" + searchData.xmarca + "%'" : '' }`;
+            let query = `select * from VWBUSCARMARCAMODELOVERSION where CPAIS = @cpais${ searchData.cmarca ? " and CMARCA = @cmarca" : '' }${ searchData.cmodelo ? " and CMODELO = @cmodelo" : '' }${ searchData.cversion ? " and CVERSION = @cversion" : '' }`;
             let pool = await sql.connect(config);
             let result = await pool.request()
                 .input('cpais', sql.Numeric(4, 0), searchData.cpais ? searchData.cpais : 1)
+                .input('cmarca', sql.Int, searchData.cmarca ? searchData.cmarca : 1)
+                .input('cmodelo', sql.Int, searchData.cmodelo ? searchData.cmodelo : 1)
+                .input('cversion', sql.Int, searchData.cversion ? searchData.cversion : 1)
                 .query(query);
             //sql.close();
             return { result: result };
@@ -4341,7 +4344,7 @@ module.exports = {
             let result = await pool.request()
                 .input('cpais', sql.Numeric(4, 0), searchData.cpais)
                 .input('cmarca', sql.Int, searchData.cmarca)
-                .query('select CMARCA, CMODELO, XMODELO, BACTIVO from MAMODELO where CPAIS = @cpais and CMARCA = @cmarca');
+                .query('select CMARCA, CMODELO, XMODELO, BACTIVO from MAMODELO where CPAIS = @cpais');
             //sql.close();
             return { result: result };
         }catch(err){
@@ -7651,7 +7654,7 @@ module.exports = {
                 .input('cpais', sql.Numeric(4, 0), searchData.cpais)
                 .input('cmarca', sql.NVarChar, searchData.cmarca)
                 .input('cmodelo', sql.NVarChar, searchData.cmodelo)
-                .query('select DISTINCT CVERSION, XVERSION, BACTIVO  from VWBUSCARMARCAMODELOVERSION where CPAIS = @cpais and CMODELO = @cmodelo and CMARCA = @cmarca');
+                .query('select DISTINCT CVERSION, XVERSION, BACTIVO  from VWBUSCARMARCAMODELOVERSION where CPAIS = @cpais');
             //sql.close();
             return { result: result };
         }catch(err){
