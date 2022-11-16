@@ -8526,9 +8526,9 @@ module.exports = {
                 .input('xapellido', sql.NVarChar, userData.xapellido)
                 .input('cano', sql.Numeric(11, 2), userData.cano)
                 .input('xcolor', sql.NVarChar, userData.xcolor)
-                .input('xmarca', sql.NVarChar, userData.xmarca)
-                .input('xmodelo', sql.NVarChar, userData.xmodelo)
-                .input('xversion', sql.NVarChar, userData.xversion)
+                .input('cmarca', sql.Int, userData.cmarca)
+                .input('cmodelo', sql.Int, userData.cmodelo)
+                .input('cversion', sql.Int, userData.cversion)
                 .input('xrif_cliente', sql.NVarChar, userData.xrif_cliente)
                 .input('email', sql.NVarChar, userData.email)
                 .input('xtelefono_prop', sql.NVarChar , userData.xtelefono_prop)
@@ -8565,7 +8565,7 @@ module.exports = {
                 .input('cpais', sql.Numeric(11, 0), userData.cpais)
                 .input('icedula', sql.NVarChar, userData.icedula)
                 .input('ivigencia', sql.Int, userData.ivigencia)
-                .query('insert into TMEMISION_INDIVIDUAL(XNOMBRE, XAPELLIDO, CANO, XCOLOR, XMARCA, XMODELO, XVERSION, XRIF_CLIENTE, EMAIL, XTELEFONO_PROP, XDIRECCIONFISCAL, XSERIALMOTOR, XSERIALCARROCERIA, XPLACA, XTELEFONO_EMP, CPLAN, CCORREDOR, XCEDULA, XCOBERTURA, NCAPACIDAD_P, XTIPO, FINICIO, CMETODOLOGIAPAGO, MSUMA_ASEG, PCASCO, MPRIMA_CASCO, MCATASTROFICO, PDESCUENTO, IFRACCIONAMIENTO, NCUOTAS, MPRIMA_BLINDAJE, MSUMA_BLINDAJE, MPRIMA_BRUTA, PCATASTROFICO, PMOTIN, MMOTIN, PBLINDAJE, CESTADO, CCIUDAD, CPAIS, ICEDULA, FEMISION, IVIGENCIA) values (@xnombre, @xapellido, @cano, @xcolor, @xmarca, @xmodelo, @xversion, @xrif_cliente, @email, @xtelefono_prop, @xdireccionfiscal, @xserialmotor, @xserialcarroceria, @xplaca, @xtelefono_emp, @cplan, @ccorredor, @xcedula, @xcobertura, @ncapacidad_p, @xtipo, @finicio, @cmetodologiapago, @msuma_aseg, @pcasco, @mprima_casco, @mcatastrofico, @pdescuento, @ifraccionamiento, @ncuotas, @mprima_blindaje, @msuma_blindaje, @mprima_bruta,@pcatastrofico ,@pmotin, @mmotin, @pblindaje, @cestado, @cciudad, @cpais, @icedula, @femision, @ivigencia)')
+                .query('insert into TMEMISION_INDIVIDUAL(XNOMBRE, XAPELLIDO, CANO, XCOLOR, CMARCA, CMODELO, CVERSION, XRIF_CLIENTE, EMAIL, XTELEFONO_PROP, XDIRECCIONFISCAL, XSERIALMOTOR, XSERIALCARROCERIA, XPLACA, XTELEFONO_EMP, CPLAN, CCORREDOR, XCEDULA, XCOBERTURA, NCAPACIDAD_P, XTIPO, FINICIO, CMETODOLOGIAPAGO, MSUMA_ASEG, PCASCO, MPRIMA_CASCO, MCATASTROFICO, PDESCUENTO, IFRACCIONAMIENTO, NCUOTAS, MPRIMA_BLINDAJE, MSUMA_BLINDAJE, MPRIMA_BRUTA, PCATASTROFICO, PMOTIN, MMOTIN, PBLINDAJE, CESTADO, CCIUDAD, CPAIS, ICEDULA, FEMISION, IVIGENCIA) values (@xnombre, @xapellido, @cano, @xcolor, @cmarca, @cmodelo, @cversion, @xrif_cliente, @email, @xtelefono_prop, @xdireccionfiscal, @xserialmotor, @xserialcarroceria, @xplaca, @xtelefono_emp, @cplan, @ccorredor, @xcedula, @xcobertura, @ncapacidad_p, @xtipo, @finicio, @cmetodologiapago, @msuma_aseg, @pcasco, @mprima_casco, @mcatastrofico, @pdescuento, @ifraccionamiento, @ncuotas, @mprima_blindaje, @msuma_blindaje, @mprima_bruta,@pcatastrofico ,@pmotin, @mmotin, @pblindaje, @cestado, @cciudad, @cpais, @icedula, @femision, @ivigencia)')
             //sql.close();
             return { result: { rowsAffected: rowsAffected, status: true } };
         }
@@ -12654,6 +12654,19 @@ searchServiceOrderFromBillLoadingQuery: async(searchData) => {
             .input('ccliente', sql.Int, searchData.ccliente)
             .query('select * from VWBUSCARORDENSERVICIOXFACTURA WHERE CPAIS = @cpais AND CCOMPANIA = @ccompania AND CPROVEEDOR = @cproveedor AND CCLIENTE = @ccliente');
         //sql.close()
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+},
+searchBrokerIndividualQuery: async(searchData) => {
+    try{
+        let query = `select * from MACORREDORES WHERE CCORREDOR = @ccorredor`;
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+            .input('ccorredor', sql.Int, searchData.ccorredor)
+            .query(query);
+        //sql.close();
         return { result: result };
     }catch(err){
         return { error: err.message };
