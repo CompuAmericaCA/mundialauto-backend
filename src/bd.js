@@ -1,3 +1,4 @@
+const { request } = require('express');
 const sql = require('mssql');
 const config = {
     user: process.env.USER_BD,
@@ -4228,7 +4229,7 @@ module.exports = {
             let pool = await sql.connect(config);
             let result = await pool.request()
                 .input('cpais', sql.Numeric(4, 0), searchData.cpais)
-                .query('select CMARCA, XMARCA, BACTIVO from MAMARCA where CPAIS = @cpais');
+                .query('select CMARCA, XMARCA, BACTIVO from MAMARCA where CPAIS = @cpais ORDER BY XMARCA');
             //sql.close();
             return { result: result };
         }catch(err){
@@ -12672,4 +12673,32 @@ searchBrokerIndividualQuery: async(searchData) => {
         return { error: err.message };
     }
 },
+ValidateCliente: async(searchData) => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+            .input('xdocidentidad', sql.NVarChar, searchData.xdocidentidad)
+            .query('select * from TRPROPIETARIO WHERE XDOCIDENTIDAD = @xdocidentidad ');
+        //sql.close()
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+},
+SearchPlanValue: async(searchData) => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+        .input('cmetodologiapago', sql.NVarChar, searchData.cmetodologiapago)
+        .input('cplan_rc', sql.NVarChar, searchData.cplan_rc)
+        .execute('tmBCalculo_Recibo');
+         let query= await pool.request()
+        .query('select MPRIMA from TMCALCULO_RECIBO');
+        return { result: query };
+              
+    }catch(err){
+        return { error: err.message };
+        }
 }
+}
+
