@@ -1344,11 +1344,11 @@ const operationValuePlan = async(authHeader, requestBody) => {
     };
 
     let valueplan = await bd.SearchPlanValue(searchData).then((res) => res);
-    console.log(valueplan.result.recordset[0].MPRIMA)
     if(valueplan.error){ return { status: false, code: 500, message: ValuePlan.error }; }
     if(valueplan.result.rowsAffected > 0){
         return { status : true,
                 mprima: valueplan.result.recordset[0].MPRIMA,
+                
                };
         
     }else{ return { status: false, code: 404, message: 'value not found.' }; }
