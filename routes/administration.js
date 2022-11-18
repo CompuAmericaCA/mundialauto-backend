@@ -142,4 +142,77 @@ const operationServiceOrderFromBillLoading = async(authHeader, requestBody) => {
     }else{ return { status: false, code: 404, message: 'Notification not found.' }; }
 }
 
+router.route('/search-exchange-rate').post((req, res) => {
+    if(!req.header('Authorization')){
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } });
+        return;
+    }else{
+        operationSearchExchangeRate(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationSearchExchangeRate' } });
+        });
+    }
+});
+
+const operationSearchExchangeRate = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let searchData = {
+        cpais: requestBody.cpais,
+        ccompania: requestBody.ccompania,
+        fingreso: requestBody.fingreso ? requestBody.fingreso: undefined,
+    }
+    console.log(searchData)
+    let searchExchangeRate = await bd.searchExchangeRateQuery(searchData).then((res) => res);
+    if(searchExchangeRate.error){ return  { status: false, code: 500, message: searchExchangeRate.error }; }
+    if(searchExchangeRate.result.rowsAffected > 0){
+        let jsonList = [];
+        for(let i = 0; i < searchExchangeRate.result.recordset.length; i++){
+            jsonList.push({
+                ctasa: searchExchangeRate.result.recordset[i].CTASA,
+                mtasa_cambio: searchExchangeRate.result.recordset[i].MTASA_CAMBIO,
+                fingreso: searchExchangeRate.result.recordset[i].FINGRESO,
+            });
+        }
+        return { status: true, list: jsonList };
+    }else{ return { status: false, code: 404, message: 'Notification not found.' }; }
+}
+
+router.route('/create-exchange-rate').post((req, res) => {
+    if(!req.header('Authorization')){
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } });
+        return;
+    }else{
+        operationCreateExchangeRate(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            console.log(err.message)
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationCreateExchangeRate' } });
+        });
+    }
+});
+
+const operationCreateExchangeRate = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let dataList = {
+        cpais: requestBody.cpais,
+        ccompania: requestBody.ccompania,
+        mtasa_cambio: requestBody.mtasa_cambio,
+        fingreso: requestBody.fingreso
+    }
+    let createCreateExchangeRate = await bd.createCreateExchangeRateQuery(dataList).then((res) => res);
+    if(createCreateExchangeRate.error){ return { status: false, code: 500, message: updateCollection.error }; }
+    if(createCreateExchangeRate.result.rowsAffected > 0){ return { status: true }; }
+    else{ return { status: false, code: 404, message: 'Service Order not found.' }; }
+    
+}
+
 module.exports = router;
