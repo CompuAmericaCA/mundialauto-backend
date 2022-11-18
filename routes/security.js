@@ -56,7 +56,7 @@ const operationAuth = async(requestBody) => {
                         status: true, 
                         cusuario: query.result.recordset[0].CUSUARIO, 
                         crol: query.result.recordset[0].CROL, 
-                        ccompania: query.result.recordset[0].CCOMPANIA, 
+                        //ccompania: query.result.recordset[0].CCOMPANIA, 
                         xcompania: query.result.recordset[0].XCOMPANIA, 
                         xcolornav: query.result.recordset[0].XCOLORNAV, 
                         ctipo_sistema: query.result.recordset[0].CTIPO_SISTEMA,
