@@ -1437,7 +1437,6 @@ const operationDetailCoverage = async(authHeader, requestBody) => {
         ccobertura: requestBody.ccobertura,
         ccontratoflota: requestBody.ccontratoflota
     }
-    console.log(searchData)
     let detailCoverage = await bd.detailCoverageQuery(searchData).then((res) => res);
     if(detailCoverage.error){ return { status: false, code: 500, message: detailCoverage.error }; }
     if(detailCoverage.result.rowsAffected > 0){
@@ -1481,6 +1480,7 @@ const operationValidationUser = async(authHeader, requestBody) => {
     };
     let query = await bd.ValidateCliente(searchData).then((res) => res);
     if(query.error){ return { status: false, code: 500, message: operationTarifaCasco.error };  }
+    if(query.result.rowsAffected > 0){
     return { status: true,
              xnombre: query.result.recordset[0].XNOMBRE,
              xapellido: query.result.recordset[0].XAPELLIDO,
@@ -1493,5 +1493,6 @@ const operationValidationUser = async(authHeader, requestBody) => {
              cciudad:  query.result.recordset[0].CCIUDAD,
             }
     }
+}
 
 module.exports = router;
