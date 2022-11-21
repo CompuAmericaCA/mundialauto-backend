@@ -12141,21 +12141,20 @@ module.exports = {
         try{
             let rowsAffected = 0;
             let pool = await sql.connect(config);
-            for(let i = 0; i < collectionDataList.length; i++){
-                let update = await pool.request()
-                .input('crecibo', sql.Int, paymentData.crecibo)
-                .input('ctipopago', sql.Int, paymentData.ctipopago)
-                .input('xreferencia', sql.NVarChar, paymentData.xreferencia)
-                .input('fcobro', sql.DateTime, paymentData.fcobro)
-                .input('mprima_pagada', sql.Numeric(17,2), paymentData.mprima_pagada)
-                .input('cestatusgeneral', sql.Int, 12)
-                .query('update SURECIBO set XREFERENCIA = @xreferencia, CTIPOPAGO = @ctipopago, FCOBRO = @fcobro, MPRIMA_PAGADA = @mprima_pagada, CESTATUSGENERAL = @cestatusgeneral where CRECIBO = @crecibo');
-                rowsAffected = rowsAffected + update.rowsAffected;
-            }
+            let update = await pool.request()
+            .input('crecibo', sql.Int, paymentData.crecibo)
+            .input('ctipopago', sql.Int, paymentData.ctipopago)
+            .input('xreferencia', sql.NVarChar, paymentData.xreferencia)
+            .input('fcobro', sql.DateTime, paymentData.fcobro)
+            .input('mprima_pagada', sql.Numeric(17,2), paymentData.mprima_pagada)
+            .input('cestatusgeneral', sql.Int, 12)
+            .query('update SURECIBO set XREFERENCIA = @xreferencia, CTIPOPAGO = @ctipopago, FCOBRO = @fcobro, MPRIMA_PAGADA = @mprima_pagada, CESTATUSGENERAL = @cestatusgeneral where CRECIBO = @crecibo');
+            rowsAffected = rowsAffected + update.rowsAffected;
             //sql.close();
             return { result: { rowsAffected: rowsAffected } };
         }
         catch(err){
+            console.log(err.message);
             return { error: err.message };
         }
     },
