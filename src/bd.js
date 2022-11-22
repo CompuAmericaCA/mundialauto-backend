@@ -12137,6 +12137,28 @@ module.exports = {
             return { error: err.message };
         }
     },
+    updateReceiptPaymentQuery: async(paymentData) => {
+        try{
+            let rowsAffected = 0;
+            let pool = await sql.connect(config);
+            for(let i = 0; i < collectionDataList.length; i++){
+                let update = await pool.request()
+                .input('crecibo', sql.Int, paymentData.crecibo)
+                .input('ctipopago', sql.Int, paymentData.ctipopago)
+                .input('xreferencia', sql.NVarChar, paymentData.xreferencia)
+                .input('fcobro', sql.DateTime, paymentData.fcobro)
+                .input('mprima_pagada', sql.Numeric(17,2), paymentData.mprima_pagada)
+                .input('cestatusgeneral', sql.Int, 12)
+                .query('update SURECIBO set XREFERENCIA = @xreferencia, CTIPOPAGO = @ctipopago, FCOBRO = @fcobro, MPRIMA_PAGADA = @mprima_pagada, CESTATUSGENERAL = @cestatusgeneral where CRECIBO = @crecibo');
+                rowsAffected = rowsAffected + update.rowsAffected;
+            }
+            //sql.close();
+            return { result: { rowsAffected: rowsAffected } };
+        }
+        catch(err){
+            return { error: err.message };
+        }
+    },
     plateValrepQuery: async(searchData) => {
         try{
             let pool = await sql.connect(config);
@@ -12699,6 +12721,41 @@ SearchPlanValue: async(searchData) => {
     }catch(err){
         return { error: err.message };
         }
-}
+},
+searchExchangeRateQuery: async(searchData) => {
+    try{
+        let query = `select * from ADTASACAMBIO WHERE CCOMPANIA = @ccompania AND CPAIS = @cpais${ searchData.fingreso ? " and FINGRESO = @fingreso" : '' }`;
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+            .input('cpais', sql.Int, searchData.cpais)
+            .input('ccompania', sql.Int, searchData.ccompania)
+            .input('fingreso', sql.DateTime, searchData.fingreso ? searchData.fingreso: 1)
+            .query(query);
+        //sql.close();
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+},
+createCreateExchangeRateQuery: async(dataList) => {
+    try{
+        let rowsAffected = 0;
+        let pool = await sql.connect(config);
+        
+        let insert = await pool.request()
+            .input('cpais', sql.Int, dataList.cpais)
+            .input('ccompania', sql.Int, dataList.ccompania)
+            .input('mtasa_cambio', sql.Numeric(18, 2), dataList.mtasa_cambio)
+            .input('fingreso', sql.DateTime, dataList.fingreso)
+            .query('insert into ADTASACAMBIO (MTASA_CAMBIO, FINGRESO, CPAIS, CCOMPANIA) values (@mtasa_cambio, @fingreso, @cpais, @ccompania)')
+        rowsAffected = rowsAffected + insert.rowsAffected;
+        
+        //sql.close();
+        return { result: { rowsAffected: rowsAffected } };
+    }
+    catch(err){
+        return { error: err.message };
+    }
+},
 }
 
