@@ -1466,7 +1466,7 @@ router.route('/validation').post((req, res) => {
             res.json({ data: result });
         }).catch((err) => {
             console.log(err.message)
-            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationTarifaCasco' } });
+            res.status(404).json({ data: { status: false, code: 404, message: err.message, hint: 'operationSearchClient' } });
         });
     }
 });
@@ -1479,7 +1479,7 @@ const operationValidationUser = async(authHeader, requestBody) => {
        
     };
     let query = await bd.ValidateCliente(searchData).then((res) => res);
-    if(query.error){ return { status: false, code: 500, message: operationTarifaCasco.error };  }
+    if(query.error){ return { status: false, code: 404, message: operationSearchClient.error };  }
     if(query.result.rowsAffected > 0){
     return { status: true,
              xnombre: query.result.recordset[0].XNOMBRE,
