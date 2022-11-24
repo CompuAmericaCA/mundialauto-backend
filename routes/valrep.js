@@ -2923,6 +2923,7 @@ const operationValrepTypeMetodologia = async(authHeader, requestBody) => {
         ccompania: requestBody.ccompania,
         cpais: requestBody.cpais
     };
+
     let query = await bd.TypeMetodologia(searchData).then((res) => res);
     if(query.error){ return { status: false, code: 500, message: query.error }; }
     let jsonArray = [];
@@ -2931,6 +2932,7 @@ const operationValrepTypeMetodologia = async(authHeader, requestBody) => {
             cmetodologiapago: query.result.recordset[i].CMETODOLOGIAPAGO,
             xmetodologiapago: query.result.recordset[i].XMETODOLOGIAPAGO });
     }
+
     return { status: true, list: jsonArray }
 }
 
