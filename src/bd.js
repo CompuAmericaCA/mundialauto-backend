@@ -12757,5 +12757,110 @@ createCreateExchangeRateQuery: async(dataList) => {
         return { error: err.message };
     }
 },
+detailExchangeRateQuery: async(searchData) => {
+    try{
+        let query = `select * from ADTASACAMBIO WHERE CCOMPANIA = @ccompania AND CPAIS = @cpais AND CTASA = @ctasa`;
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+            .input('cpais', sql.Int, searchData.cpais)
+            .input('ccompania', sql.Int, searchData.ccompania)
+            .input('ctasa', sql.Int, searchData.ctasa)
+            .query(query);
+        //sql.close();
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+},
+searchSettlementFromBillLoadingQuery: async(searchData) => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+            .input('ccompania', sql.Int, searchData.ccompania)
+            .input('ccliente', sql.Int, searchData.ccliente)
+            .query('SELECT * FROM VWBUSCARFINIQUITOXFACTURA WHERE CCOMPANIA = @ccompania AND CCLIENTE = @ccliente');
+        //sql.close()
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+},
+codeBillLoadingQuery: async() => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+            .query('select MAX(CFACTURA) AS CFACTURA from ADREGISTROFACTURA');
+        //sql.close();
+        console.log(result)
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+},
+createBillLoadingServiceOrderQuery: async(serviceOrderList, billLoadingData) => {
+    try{
+        let rowsAffected = 0;
+        let pool = await sql.connect(config);
+        for(let i = 0; i < serviceOrderList.length; i++){
+            let insert = await pool.request()
+                .input('corden', sql.Int, serviceOrderList[i].corden)
+                .input('cpais', sql.Int, billLoadingData.cpais)
+                .input('ccompania', sql.Int, billLoadingData.ccompania)
+                .input('cusuario', sql.Int, billLoadingData.cusuario)
+                .input('cfactura', sql.Int, billLoadingData.cfactura)
+                .input('cproveedor', sql.Int, billLoadingData.cproveedor)
+                .input('xtipopagador', sql.NVarChar, billLoadingData.xtipopagador)
+                .input('cpagador', sql.Int, billLoadingData.cpagador)
+                .input('ffactura', sql.DateTime, billLoadingData.ffactura)
+                .input('frecepcion', sql.DateTime, billLoadingData.frecepcion)
+                .input('fvencimiento', sql.DateTime, billLoadingData.fvencimiento)
+                .input('nfactura', sql.Numeric(18, 0), billLoadingData.nfactura)
+                .input('ncontrol', sql.Numeric(18, 0), billLoadingData.ncontrol)
+                .input('mmontofactura', sql.Numeric(18, 2), billLoadingData.mmontofactura)
+                .input('xobservacion', sql.NVarChar, billLoadingData.xobservacion)
+                .input('fcreacion', sql.DateTime, new Date())
+                .query('INSERT INTO ADREGISTROFACTURA (CFACTURA, CORDEN, CPROVEEDOR, CPAGADOR, XTIPOPAGADOR, XOBSERVACION, FFACTURA, FRECEPCION, FVENCIMIENTO, NFACTURA, NCONTROL, MMONTOFACTURA, CPAIS, CCOMPANIA, CUSUARIOCREACION, FCREACION) VALUES (@cfactura, @corden, @cproveedor, @cpagador, @xtipopagador, @xobservacion, @ffactura, @frecepcion, @fvencimiento, @nfactura, @ncontrol, @mmontofactura, @cpais, @ccompania, @cusuario, @fcreacion)')
+            rowsAffected = rowsAffected + insert.rowsAffected;
+        }
+        //sql.close();
+        return { result: { rowsAffected: rowsAffected } };
+    }
+    catch(err){
+        return { error: err.message };
+    }
+},
+createBillLoadingSettlementQuery: async(settlementList, billLoadingData) => {
+    try{
+        let rowsAffected = 0;
+        let pool = await sql.connect(config);
+        for(let i = 0; i < settlementList.length; i++){
+            let insert = await pool.request()
+                .input('cfiniquito', sql.Int, settlementList[i].cfiniquito)
+                .input('cpais', sql.Int, billLoadingData.cpais)
+                .input('ccompania', sql.Int, billLoadingData.ccompania)
+                .input('cusuario', sql.Int, billLoadingData.cusuario)
+                .input('cfactura', sql.Int, billLoadingData.cfactura)
+                .input('cproveedor', sql.Int, billLoadingData.cproveedor)
+                .input('xtipopagador', sql.NVarChar, billLoadingData.xtipopagador)
+                .input('cpagador', sql.Int, billLoadingData.cpagador)
+                .input('ffactura', sql.DateTime, billLoadingData.ffactura)
+                .input('frecepcion', sql.DateTime, billLoadingData.frecepcion)
+                .input('fvencimiento', sql.DateTime, billLoadingData.fvencimiento)
+                .input('nfactura', sql.Numeric(18, 0), billLoadingData.nfactura)
+                .input('ncontrol', sql.Numeric(18, 0), billLoadingData.ncontrol)
+                .input('mmontofactura', sql.Numeric(18, 2), billLoadingData.mmontofactura)
+                .input('xobservacion', sql.NVarChar, billLoadingData.xobservacion)
+                .input('fcreacion', sql.DateTime, new Date())
+                .query('INSERT INTO ADREGISTROFACTURA (CFACTURA, CFINIQUITO, CPROVEEDOR, CPAGADOR, XTIPOPAGADOR, XOBSERVACION, FFACTURA, FRECEPCION, FVENCIMIENTO, NFACTURA, NCONTROL, MMONTOFACTURA, CPAIS, CCOMPANIA, CUSUARIOCREACION, FCREACION) VALUES (@cfactura, @cfiniquito, @cproveedor, @cpagador, @xtipopagador, @xobservacion, @ffactura, @frecepcion, @fvencimiento, @nfactura, @ncontrol, @mmontofactura, @cpais, @ccompania, @cusuario, @fcreacion)')
+            rowsAffected = rowsAffected + insert.rowsAffected;
+        }
+        //sql.close();
+        return { result: { rowsAffected: rowsAffected } };
+    }
+    catch(err){
+        console.log(err.message)
+        return { error: err.message };
+    }
+},
 }
 
