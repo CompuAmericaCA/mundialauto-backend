@@ -8574,6 +8574,62 @@ module.exports = {
             return { error: err.message };
         }
     },
+    createContractBrokerQuery: async(userData) => {
+        try{
+            let rowsAffected = 0;
+            let pool = await sql.connect(config);
+            let insert = await pool.request()
+                .input('xnombre', sql.NVarChar, userData.xnombre ? userData.xnombre: undefined)
+                .input('xapellido', sql.NVarChar, userData.xapellido)
+                .input('cano', sql.Numeric(11, 2), userData.cano)
+                .input('xcolor', sql.NVarChar, userData.xcolor)
+                .input('cmarca', sql.Int, userData.cmarca)
+                .input('cmodelo', sql.Int, userData.cmodelo)
+                .input('cversion', sql.Int, userData.cversion)
+                .input('xrif_cliente', sql.NVarChar, userData.xrif_cliente)
+                .input('email', sql.NVarChar, userData.email)
+                .input('xtelefono_prop', sql.NVarChar , userData.xtelefono_prop)
+                .input('xdireccionfiscal', sql.NVarChar, userData.xdireccionfiscal)
+                .input('xserialmotor', sql.NVarChar, userData.xserialmotor)
+                .input('xserialcarroceria', sql.NVarChar, userData.xserialcarroceria)
+                .input('xplaca', sql.NVarChar, userData.xplaca)
+                .input('xtelefono_emp', sql.NVarChar, userData.xtelefono_emp)
+                .input('cplan', sql.Numeric(11, 0), userData.cplan)
+                .input('ccorredor', sql.Numeric(11, 0), userData.ccorredor)
+                .input('xcedula', sql.NVarChar, userData.xcedula)
+                .input('xcobertura', sql.NVarChar, userData.xcobertura)
+                .input('ncapacidad_p', sql.NVarChar, userData.ncapacidad_p)
+                .input('xtipo', sql.NVarChar, userData.xtipo)
+                .input('finicio',  sql.DateTime, new Date())
+                .input('femision',  sql.DateTime, userData.femision)
+                .input('cmetodologiapago', sql.Numeric(11, 0), userData.cmetodologiapago)
+                .input('msuma_aseg', sql.Numeric(11, 0), userData.msuma_aseg)
+                .input('pcasco', sql.Numeric(11, 0), userData.pcasco)
+                .input('mprima_casco', sql.Numeric(11, 0), userData.mprima_casco)
+                .input('mcatastrofico', sql.Numeric(11, 0), userData.mcatastrofico)
+                .input('pdescuento', sql.Numeric(17, 2), userData.pdescuento)
+                .input('ifraccionamiento', sql.Bit, userData.ifraccionamiento)
+                .input('ncuotas', sql.Int, userData.ncuotas)
+                .input('mprima_blindaje', sql.Numeric(11, 0), userData.mprima_blindaje)
+                .input('msuma_blindaje', sql.Numeric(11, 0), userData.msuma_blindaje)
+                .input('mprima_bruta', sql.Numeric(11, 0), userData.mprima_bruta)
+                .input('pcatastrofico', sql.Numeric(11, 0), userData.pcatastrofico)
+                .input('pmotin', sql.Numeric(11, 0), userData.pmotin)
+                .input('mmotin', sql.Numeric(11, 0), userData.mmotin)
+                .input('pblindaje', sql.Numeric(11, 0), userData.pblindaje)
+                .input('cestado', sql.Numeric(11, 0), userData.cestado)
+                .input('cciudad', sql.Numeric(11, 0), userData.cciudad)
+                .input('cpais', sql.Numeric(11, 0), userData.cpais)
+                .input('icedula', sql.NVarChar, userData.icedula)
+                .input('ivigencia', sql.Int, userData.ivigencia)
+                .query('insert into TMEMISION_CORREDOR(XNOMBRE, XAPELLIDO, CANO, XCOLOR, CMARCA, CMODELO, CVERSION, XRIF_CLIENTE, EMAIL, XTELEFONO_PROP, XDIRECCIONFISCAL, XSERIALMOTOR, XSERIALCARROCERIA, XPLACA, XTELEFONO_EMP, CPLAN, CCORREDOR, XCEDULA, XCOBERTURA, NCAPACIDAD_P, XTIPO, FINICIO, CMETODOLOGIAPAGO, MSUMA_ASEG, PCASCO, MPRIMA_CASCO, MCATASTROFICO, PDESCUENTO, IFRACCIONAMIENTO, NCUOTAS, MPRIMA_BLINDAJE, MSUMA_BLINDAJE, MPRIMA_BRUTA, PCATASTROFICO, PMOTIN, MMOTIN, PBLINDAJE, CESTADO, CCIUDAD, CPAIS, ICEDULA, FEMISION, IVIGENCIA) values (@xnombre, @xapellido, @cano, @xcolor, @cmarca, @cmodelo, @cversion, @xrif_cliente, @email, @xtelefono_prop, @xdireccionfiscal, @xserialmotor, @xserialcarroceria, @xplaca, @xtelefono_emp, @cplan, @ccorredor, @xcedula, @xcobertura, @ncapacidad_p, @xtipo, @finicio, @cmetodologiapago, @msuma_aseg, @pcasco, @mprima_casco, @mcatastrofico, @pdescuento, @ifraccionamiento, @ncuotas, @mprima_blindaje, @msuma_blindaje, @mprima_bruta,@pcatastrofico ,@pmotin, @mmotin, @pblindaje, @cestado, @cciudad, @cpais, @icedula, @femision, @ivigencia)')
+            //sql.close();
+            return { result: { rowsAffected: rowsAffected, status: true } };
+        }
+        catch(err){
+            return { error: err.message };
+        }
+    },
     getLastReceipt: async(xplaca, ccontratoflota) => {
         try {
             let pool = await sql.connect(config);
@@ -12720,6 +12776,41 @@ SearchPlanValue: async(searchData) => {
     }catch(err){
         return { error: err.message };
         }
-}
+},
+searchExchangeRateQuery: async(searchData) => {
+    try{
+        let query = `select * from ADTASACAMBIO WHERE CCOMPANIA = @ccompania AND CPAIS = @cpais${ searchData.fingreso ? " and FINGRESO = @fingreso" : '' }`;
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+            .input('cpais', sql.Int, searchData.cpais)
+            .input('ccompania', sql.Int, searchData.ccompania)
+            .input('fingreso', sql.DateTime, searchData.fingreso ? searchData.fingreso: 1)
+            .query(query);
+        //sql.close();
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+},
+createCreateExchangeRateQuery: async(dataList) => {
+    try{
+        let rowsAffected = 0;
+        let pool = await sql.connect(config);
+        
+        let insert = await pool.request()
+            .input('cpais', sql.Int, dataList.cpais)
+            .input('ccompania', sql.Int, dataList.ccompania)
+            .input('mtasa_cambio', sql.Numeric(18, 2), dataList.mtasa_cambio)
+            .input('fingreso', sql.DateTime, dataList.fingreso)
+            .query('insert into ADTASACAMBIO (MTASA_CAMBIO, FINGRESO, CPAIS, CCOMPANIA) values (@mtasa_cambio, @fingreso, @cpais, @ccompania)')
+        rowsAffected = rowsAffected + insert.rowsAffected;
+        
+        //sql.close();
+        return { result: { rowsAffected: rowsAffected } };
+    }
+    catch(err){
+        return { error: err.message };
+    }
+},
 }
 

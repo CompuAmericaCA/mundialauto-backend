@@ -722,6 +722,7 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
             xrecibo: getFleetContractData.result.recordset[0].xrecibo,
             xpoliza: getFleetContractData.result.recordset[0].xpoliza,
             xtituloreporte: getFleetContractData.result.recordset[0].XTITULO_REPORTE,
+            xtransmision: getFleetContractData.result.recordset[0].XTRANSMISION,
             xanexo: getFleetContractData.result.recordset[0].XANEXO,
             xobservaciones: getFleetContractData.result.recordset[0].XOBSERVACIONES,
             xdocidentidadrepresentantelegal: getFleetContractData.result.recordset[0].XDOCIDENTIDAD,
@@ -1124,7 +1125,6 @@ const operationCreateIndividualContract = async(requestBody) => {
         ivigencia: requestBody.ivigencia ? requestBody.ivigencia : undefined,
 
     };
-    console.log(userData)
     if(userData){
         let operationCreateIndividualContract = await bd.createIndividualContractQuery(userData).then((res) => res);
         if(operationCreateIndividualContract.error){ console.log(operationCreateIndividualContract.error);return { status: false, code: 500, message: operationCreateIndividualContract.error }; }
@@ -1466,7 +1466,7 @@ router.route('/validation').post((req, res) => {
             res.json({ data: result });
         }).catch((err) => {
             console.log(err.message)
-            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationTarifaCasco' } });
+            res.status(404).json({ data: { status: false, code: 404, message: err.message, hint: 'operationSearchClient' } });
         });
     }
 });
@@ -1479,7 +1479,7 @@ const operationValidationUser = async(authHeader, requestBody) => {
        
     };
     let query = await bd.ValidateCliente(searchData).then((res) => res);
-    if(query.error){ return { status: false, code: 500, message: operationTarifaCasco.error };  }
+    if(query.error){ return { status: false, code: 404, message: operationSearchClient.error };  }
     if(query.result.rowsAffected > 0){
     return { status: true,
              xnombre: query.result.recordset[0].XNOMBRE,
@@ -1493,6 +1493,108 @@ const operationValidationUser = async(authHeader, requestBody) => {
              cciudad:  query.result.recordset[0].CCIUDAD,
             }
     }
+}
+
+
+router.route('/create/Contract-Broker').post((req, res) => {
+    operationCreateContractBroker(req.body).then((result) => {
+        if(!result.status){
+            res.status(result.code).json({ data: result });
+            return;
+        }
+        res.json({ data: result });
+    }).catch((err) => {
+        console.log(err.message)
+        res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationContract' } });
+    });
+});
+
+const operationCreateContractBroker = async(requestBody) => {
+    let userData = {
+        xnombre: requestBody.xnombre.toUpperCase(),
+        xapellido: requestBody.xapellido.toUpperCase(),
+        cano: requestBody.cano ? requestBody.cano : undefined,
+        ccolor: requestBody.ccolor ? requestBody.ccolor : undefined,
+        cmarca: requestBody.cmarca ? requestBody.cmarca : undefined,
+        cmodelo: requestBody.cmodelo ? requestBody.cmodelo : undefined,
+        cversion: requestBody.cversion ? requestBody.cversion : undefined,
+        xrif_cliente: requestBody.xrif_cliente ? requestBody.xrif_cliente : undefined,
+        email: requestBody.email ? requestBody.email : undefined,
+        xtelefono_prop: requestBody.xtelefono_prop ? requestBody.xtelefono_prop : undefined,
+        xdireccionfiscal: requestBody.xdireccionfiscal.toUpperCase(),
+        xserialmotor: requestBody.xserialmotor.toUpperCase(),
+        xserialcarroceria: requestBody.xserialcarroceria.toUpperCase(),
+        xplaca: requestBody.xplaca.toUpperCase(),
+        xtelefono_emp: requestBody.xtelefono_emp,
+        cplan: requestBody.cplan,
+        ccorredor: requestBody.ccorredor ? requestBody.ccorredor : undefined,
+        xcedula:requestBody.xcedula,
+        xcobertura: requestBody.xcobertura.toUpperCase(),
+        ncapacidad_p: requestBody.ncapacidad_p,
+        xtipo: requestBody.xtipo.toUpperCase(),
+        cmetodologiapago: requestBody.cmetodologiapago ? requestBody.cmetodologiapago : undefined,
+        msuma_aseg: requestBody.msuma_aseg ? requestBody.msuma_aseg : undefined,
+        pcasco: requestBody.pcasco ? requestBody.pcasco : undefined,
+        mprima_casco: requestBody.mprima_casco ? requestBody.mprima_casco : undefined,
+        mcatastrofico: requestBody.mcatastrofico ? requestBody.mcatastrofico : undefined,
+        pdescuento: requestBody.pdescuento ? requestBody.pdescuento : undefined,
+        mprima_bruta: requestBody.mprima_bruta ? requestBody.mprima_bruta : undefined,
+        mprima_blindaje: requestBody.mprima_blindaje ? requestBody.mprima_blindaje : undefined,
+        msuma_blindaje: requestBody.msuma_blindaje ? requestBody.msuma_blindaje : undefined,
+        pcatastrofico: requestBody.pcatastrofico ? requestBody.pcatastrofico : undefined,
+        pmotin: requestBody.pmotin ? requestBody.pmotin : undefined,
+        mmotin: requestBody.mmotin ? requestBody.mmotin : undefined,
+        pblindaje: requestBody.pblindaje ? requestBody.pblindaje : undefined,
+        cestado: requestBody.cestado ? requestBody.cestado : undefined,
+        cciudad: requestBody.cciudad ? requestBody.cciudad : undefined,
+        cpais: requestBody.cpais ? requestBody.cpais : undefined,
+        icedula: requestBody.icedula ? requestBody.icedula : undefined,
+        femision: requestBody.femision ,
+    };
+    console.log(userData)
+    if(userData){
+        let operationCreateIndividualContract = await bd.createContractBrokerQueryyy(userData).then((res) => res);
+        if(operationCreateIndividualContract.error){ console.log(operationCreateIndividualContract.error);return { status: false, code: 500, message: operationCreateIndividualContract.error }; }
+
+    }
+    if(requestBody.accessory){
+        if(requestBody.accessory.create){
+            let accessory = [];
+            for(let i = 0; i < requestBody.accessory.create.length; i++){
+                accessory.push({
+                    caccesorio:  requestBody.accessory.create[i].caccesorio,
+                    msuma_accesorio:  requestBody.accessory.create[i].msuma_aseg,
+                    mprima_accesorio:  requestBody.accessory.create[i].mprima,
+                    ptasa:  requestBody.accessory.create[i].ptasa
+                })
+            }
+            let createAccesories = await bd.createAccesoriesFromFleetContractIndividual(accessory).then((res) => res);
+            if(createAccesories.error){ return { status: false, code: 500, message: createAccesories.error }; }
+        }
+    }
+    let lastFleetContract = await bd.getLastFleetContract();
+    if(lastFleetContract.error){ return { status: false, code: 500, message: lastFleetContract.error }; }
+    console.log(lastFleetContract);
+    let lastReceipt = await bd.getLastReceipt(requestBody.xplaca.toUpperCase(), lastFleetContract.ccontratoflota);
+    if(lastReceipt.error){ return { status: false, code: 500, message: lastReceipt.error }; }
+    let getCharge = await bd.getCharge(lastReceipt.ccarga);
+    if(getCharge.error){ return { status: false, code: 500, message: getCharge.error }; }
+    return { 
+        status: true, 
+        code: 200, 
+        ccontratoflota: lastFleetContract.ccontratoflota, 
+        ccliente: lastFleetContract.ccliente, 
+        cpropietario: lastFleetContract.cpropietario, 
+        cvehiculopropietario: lastFleetContract.cvehiculopropietario, 
+        crecibo: lastReceipt.crecibo, 
+        femision: lastReceipt.femision, 
+        fdesde_pol: lastReceipt.fdesde_pol, 
+        fhasta_pol: lastReceipt.fhasta_pol, 
+        fdesde_rec: lastReceipt.fdesde_rec, 
+        fhasta_rec: lastReceipt.fhasta_rec, 
+        xrecibo: lastReceipt.xrecibo,
+        fsuscripcion: getCharge.fsuscripcion
+    };
 }
 
 module.exports = router;
