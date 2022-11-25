@@ -215,4 +215,37 @@ const operationCreateExchangeRate = async(authHeader, requestBody) => {
     
 }
 
+router.route('/last-exchange-rate').post((req, res) => {
+    if(!req.header('Authorization')){
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } });
+        return;
+    }else{
+        operationGetLastExchangeRate(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            console.log(err.message)
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationGetLastExchangeRate' } });
+        });
+    }
+});
+
+const operationGetLastExchangeRate = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let lastExchangeRate = await bd.lastExchangeRateQuery().then((res) => res);
+    if(lastExchangeRate.error){ return  { status: false, code: 500, message: lastExchangeRate.error }; }
+    if(lastExchangeRate.result.rowsAffected > 0){
+        let tasaCambio = {
+            ctasa_cambio: lastExchangeRate.result.recordset[0].CTASA,
+            mtasa_cambio: lastExchangeRate.result.recordset[0].MTASA_CAMBIO,
+            fingreso: lastExchangeRate.result.recordset[0].FINGRESO
+        }
+        console.log(tasaCambio);
+        return { status: true, tasaCambio: tasaCambio };
+    }else{ return { status: false, code: 404, message: 'Exchange Rate not found.' }; }
+}
+
 module.exports = router;

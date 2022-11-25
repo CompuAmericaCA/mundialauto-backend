@@ -12792,6 +12792,18 @@ searchExchangeRateQuery: async(searchData) => {
         return { error: err.message };
     }
 },
+lastExchangeRateQuery: async() => {
+    try{
+        let query = 'SELECT TOP 1 * FROM ADTASACAMBIO ORDER BY CTASA DESC';
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+            .query(query);
+        //sql.close();
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+},
 createCreateExchangeRateQuery: async(dataList) => {
     try{
         let rowsAffected = 0;
