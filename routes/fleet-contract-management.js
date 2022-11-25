@@ -1340,7 +1340,7 @@ const operationValuePlan = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
     let searchData = {
         cplan_rc: requestBody.cplan,
-        cmetodologiapago: requestBody.ivigencia,
+        cmetodologiapago: requestBody.cmetodologiapago,
     };
 
     let valueplan = await bd.SearchPlanValue(searchData).then((res) => res);
@@ -1348,6 +1348,7 @@ const operationValuePlan = async(authHeader, requestBody) => {
     if(valueplan.result.rowsAffected > 0){
         return { status : true,
                 mprima: valueplan.result.recordset[0].MPRIMA,
+                ccubii: valueplan.result.recordset[0].CCUBII,
                 
                };
         
@@ -1511,66 +1512,44 @@ router.route('/create/Contract-Broker').post((req, res) => {
 
 const operationCreateContractBroker = async(requestBody) => {
     let userData = {
+        icedula: requestBody.icedula ? requestBody.icedula : undefined,
+        xrif_cliente: requestBody.xrif_cliente ? requestBody.xrif_cliente : undefined,
         xnombre: requestBody.xnombre.toUpperCase(),
         xapellido: requestBody.xapellido.toUpperCase(),
-        cano: requestBody.cano ? requestBody.cano : undefined,
-        ccolor: requestBody.ccolor ? requestBody.ccolor : undefined,
+        xtelefono_emp: requestBody.xtelefono_emp,
+        xtelefono_prop: requestBody.xtelefono_prop ? requestBody.xtelefono_prop : undefined,
+        email: requestBody.email ? requestBody.email : undefined,
+        cpais: requestBody.cpais ? requestBody.cpais : undefined,
+        cestado: requestBody.cestado ? requestBody.cestado : undefined,
+        cciudad: requestBody.cciudad ? requestBody.cciudad : undefined,
+        xdireccionfiscal: requestBody.xdireccionfiscal.toUpperCase(),
+        xplaca: requestBody.xplaca.toUpperCase(),
         cmarca: requestBody.cmarca ? requestBody.cmarca : undefined,
         cmodelo: requestBody.cmodelo ? requestBody.cmodelo : undefined,
         cversion: requestBody.cversion ? requestBody.cversion : undefined,
-        xrif_cliente: requestBody.xrif_cliente ? requestBody.xrif_cliente : undefined,
-        email: requestBody.email ? requestBody.email : undefined,
-        xtelefono_prop: requestBody.xtelefono_prop ? requestBody.xtelefono_prop : undefined,
-        xdireccionfiscal: requestBody.xdireccionfiscal.toUpperCase(),
-        xserialmotor: requestBody.xserialmotor.toUpperCase(),
+        cano: requestBody.cano ? requestBody.cano : undefined,
+        ncapacidad_p: requestBody.ncapacidad_p,
+        ccolor: requestBody.ccolor ? requestBody.ccolor : undefined,
         xserialcarroceria: requestBody.xserialcarroceria.toUpperCase(),
-        xplaca: requestBody.xplaca.toUpperCase(),
-        xtelefono_emp: requestBody.xtelefono_emp,
+        xserialmotor: requestBody.xserialmotor.toUpperCase(),
+        xcobertura: requestBody.xcobertura.toUpperCase(),
+        xtipo: requestBody.xtipo.toUpperCase(),
         cplan: requestBody.cplan,
+        cmetodologiapago: requestBody.cmetodologiapago ? requestBody.cmetodologiapago : undefined,
+        femision: requestBody.femision ,
+        ncobro: requestBody.ncobro ,
+        corden: requestBody.corden,
         ccorredor: requestBody.ccorredor ? requestBody.ccorredor : undefined,
         xcedula:requestBody.xcedula,
-        xcobertura: requestBody.xcobertura.toUpperCase(),
-        ncapacidad_p: requestBody.ncapacidad_p,
-        xtipo: requestBody.xtipo.toUpperCase(),
-        cmetodologiapago: requestBody.cmetodologiapago ? requestBody.cmetodologiapago : undefined,
-        msuma_aseg: requestBody.msuma_aseg ? requestBody.msuma_aseg : undefined,
-        pcasco: requestBody.pcasco ? requestBody.pcasco : undefined,
-        mprima_casco: requestBody.mprima_casco ? requestBody.mprima_casco : undefined,
-        mcatastrofico: requestBody.mcatastrofico ? requestBody.mcatastrofico : undefined,
-        pdescuento: requestBody.pdescuento ? requestBody.pdescuento : undefined,
-        mprima_bruta: requestBody.mprima_bruta ? requestBody.mprima_bruta : undefined,
-        mprima_blindaje: requestBody.mprima_blindaje ? requestBody.mprima_blindaje : undefined,
-        msuma_blindaje: requestBody.msuma_blindaje ? requestBody.msuma_blindaje : undefined,
-        pcatastrofico: requestBody.pcatastrofico ? requestBody.pcatastrofico : undefined,
-        pmotin: requestBody.pmotin ? requestBody.pmotin : undefined,
-        mmotin: requestBody.mmotin ? requestBody.mmotin : undefined,
-        pblindaje: requestBody.pblindaje ? requestBody.pblindaje : undefined,
-        cestado: requestBody.cestado ? requestBody.cestado : undefined,
-        cciudad: requestBody.cciudad ? requestBody.cciudad : undefined,
-        cpais: requestBody.cpais ? requestBody.cpais : undefined,
-        icedula: requestBody.icedula ? requestBody.icedula : undefined,
-        femision: requestBody.femision ,
+        ctipopago: requestBody.ctipopago,
+        xreferencia: requestBody.xreferencia,
+        fcobro:requestBody.fcobro,
+        mprima_pagada: requestBody.mprima_pagada,
     };
     console.log(userData)
     if(userData){
         let operationCreateIndividualContract = await bd.createContractBrokerQueryyy(userData).then((res) => res);
         if(operationCreateIndividualContract.error){ console.log(operationCreateIndividualContract.error);return { status: false, code: 500, message: operationCreateIndividualContract.error }; }
-
-    }
-    if(requestBody.accessory){
-        if(requestBody.accessory.create){
-            let accessory = [];
-            for(let i = 0; i < requestBody.accessory.create.length; i++){
-                accessory.push({
-                    caccesorio:  requestBody.accessory.create[i].caccesorio,
-                    msuma_accesorio:  requestBody.accessory.create[i].msuma_aseg,
-                    mprima_accesorio:  requestBody.accessory.create[i].mprima,
-                    ptasa:  requestBody.accessory.create[i].ptasa
-                })
-            }
-            let createAccesories = await bd.createAccesoriesFromFleetContractIndividual(accessory).then((res) => res);
-            if(createAccesories.error){ return { status: false, code: 500, message: createAccesories.error }; }
-        }
     }
     let lastFleetContract = await bd.getLastFleetContract();
     if(lastFleetContract.error){ return { status: false, code: 500, message: lastFleetContract.error }; }

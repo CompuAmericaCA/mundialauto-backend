@@ -21,7 +21,7 @@ module.exports = {
                 .input('bactivo', sql.Bit, true)
                 .query('select * from VWAUTENTICACIONUSUARIO where XEMAIL = @xemail and BACTIVO = @bactivo');
             //sql.close();
-            console.log(result)
+       
             return { result: result };
         }
         catch(err){
@@ -3350,7 +3350,7 @@ module.exports = {
         try{
             let pool = await sql.connect(config);
             let result = await pool.request()
-                .input('cpais', sql.Numeric(4, 0), cpais = 58)
+                .input('cpais', sql.Numeric(4, 0), cpais)
                 .query('select CESTADO, XESTADO, BACTIVO from MAESTADO where CPAIS = @cpais');
             //sql.close();
             return { result: result };
@@ -12771,7 +12771,7 @@ SearchPlanValue: async(searchData) => {
         .input('cplan_rc', sql.NVarChar, searchData.cplan_rc)
         .execute('tmBCalculo_Recibo');
          let query= await pool.request()
-        .query('select MPRIMA from TMCALCULO_RECIBO');
+        .query('select * from TMCALCULO_RECIBO');
         return { result: query };
               
     }catch(err){
