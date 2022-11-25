@@ -1348,10 +1348,10 @@ const operationValuePlan = async(authHeader, requestBody) => {
     if(valueplan.result.rowsAffected > 0){
         return { status : true,
                 mprima: valueplan.result.recordset[0].MPRIMA,
-                ccubii: valueplan.result.recordset[0].CCUBII,
+                ccubii: UB_ + valueplan.result.recordset[0].CCUBII,
                 
                };
-        
+    
     }else{ return { status: false, code: 404, message: 'value not found.' }; }
 
     
