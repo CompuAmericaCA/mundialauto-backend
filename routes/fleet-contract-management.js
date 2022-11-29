@@ -1346,12 +1346,14 @@ const operationValuePlan = async(authHeader, requestBody) => {
     let valueplan = await bd.SearchPlanValue(searchData).then((res) => res);
     if(valueplan.error){ return { status: false, code: 500, message: ValuePlan.error }; }
     if(valueplan.result.rowsAffected > 0){
-        return { status : true,
-                mprima: valueplan.result.recordset[0].MPRIMA,
-                ccubii: UB_ + valueplan.result.recordset[0].CCUBII,
-                
+    //  value = valueplan.result.recordset[0].MPRIMA
+        return { 
+                status : true,
+                mprima: valueplan.result.recordset[0].MPRIMA.toString(),
+                ccubii: valueplan.result.recordset[0].CCUBII,
+  
                };
-    
+                     
     }else{ return { status: false, code: 404, message: 'value not found.' }; }
 
     
