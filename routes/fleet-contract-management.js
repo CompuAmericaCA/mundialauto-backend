@@ -1550,7 +1550,7 @@ const operationCreateContractBroker = async(requestBody) => {
     };
     console.log(userData)
     if(userData){
-        let operationCreateIndividualContract = await bd.createContractBrokerQueryyy(userData).then((res) => res);
+        let operationCreateIndividualContract = await bd.createContractBrokerQueryyyy(userData).then((res) => res);
         if(operationCreateIndividualContract.error){ console.log(operationCreateIndividualContract.error);return { status: false, code: 500, message: operationCreateIndividualContract.error }; }
     }
     let lastFleetContract = await bd.getLastFleetContract();
