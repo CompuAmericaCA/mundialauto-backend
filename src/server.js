@@ -101,6 +101,7 @@ app.post('/api/upload/document', document_upload.single('xdocumento'), function 
   res.json({ data: { status: true, uploadedFile: file } });
 },
  (error, req, res, next) => {
+  console.log(error.message)
   res.status(400).json({ data: { status: false, code: 400, message: error.message } });
 });
 
