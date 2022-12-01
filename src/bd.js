@@ -12533,6 +12533,28 @@ createAccesoriesFromFleetContractIndividual: async(accessory) => {
         return { error: err.message };
     }
 },
+AddPaymentData: async(payment,id) => {
+    try{
+        let rowsAffected = 0;
+        let pool = await sql.connect(config);
+        for(let i = 0; i < payment.length; i++){
+            let insert = await pool.request()
+                .input('xcedula', sql.Int, id.xcedula)
+                .input('ctipopago', sql.Int, payment[i].ctipopago)
+                .input('xreferencia', sql.Numeric(18, 2), payment[i].xreferencia)
+                .input('fcobro', sql.Numeric(18, 2), payment[i].fcobro)
+                .input('cbanco', sql.Numeric(18, 2), payment[i].cbanco)
+                .input('mprima_pagada', sql.Numeric(18, 2), payment[i].mprima_pagada)
+                .query('insert into TMEMISION_INDIVIDUAL (CTIPOPAGO, XREFERENCIA, FCOBRO, CBANCO, MPRIMA_PAGADA) values (@ctipopago, @xreferencia, @fcobro, @cbanco, @mprima_pagada)')
+            rowsAffected = rowsAffected + insert.rowsAffected;
+        }
+        //sql.close();
+        return { result: { rowsAffected: rowsAffected } };
+    }
+    catch(err){
+        return { error: err.message };
+    }
+},
 ValidateVersionDataQuery: async(searchData) => {
     try{
         let pool = await sql.connect(config);
@@ -12772,6 +12794,7 @@ SearchPlanValue: async(searchData) => {
         let result = await pool.request()
         .input('cmetodologiapago', sql.NVarChar, searchData.cmetodologiapago)
         .input('cplan_rc', sql.NVarChar, searchData.cplan_rc)
+        .input('xtipo', sql.NVarChar, searchData.xtipo)
         .execute('tmBCalculo_Recibo');
          let query= await pool.request()
         .query('select * from TMCALCULO_RECIBO');

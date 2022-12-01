@@ -1128,7 +1128,6 @@ const operationCreateIndividualContract = async(requestBody) => {
     if(userData){
         let operationCreateIndividualContract = await bd.createIndividualContractQuery(userData).then((res) => res);
         if(operationCreateIndividualContract.error){ console.log(operationCreateIndividualContract.error);return { status: false, code: 500, message: operationCreateIndividualContract.error }; }
-
     }
     if(requestBody.accessory){
         if(requestBody.accessory.create){
@@ -1143,6 +1142,22 @@ const operationCreateIndividualContract = async(requestBody) => {
             }
             let createAccesories = await bd.createAccesoriesFromFleetContractIndividual(accessory).then((res) => res);
             if(createAccesories.error){ return { status: false, code: 500, message: createAccesories.error }; }
+        }
+    }
+    if(requestBody.payment){
+        if(requestBody.payment.add){
+            let payment = [];
+            for(let i = 0; i < requestBody.payment.add.length; i++){
+                payment.push({
+                    ctipopago:  requestBody.payment.add[i].ctipopago,
+                    xreferencia:  requestBody.payment.add[i].xreferencia,
+                    fcobro:  requestBody.payment.add[i].fcobro,
+                    cbanco:  requestBody.payment.add[i].cbanco,
+                    mprima_pagada:  requestBody.payment.add[i].mprima_pagada
+                })
+            }
+            let addpayment = await bd.AddPaymentData(payment).then((res) => res);
+            if(addpayment.error){ return { status: false, code: 500, message: addpayment.error }; }
         }
     }
     let lastFleetContract = await bd.getLastFleetContract();
@@ -1341,6 +1356,7 @@ const operationValuePlan = async(authHeader, requestBody) => {
     let searchData = {
         cplan_rc: requestBody.cplan,
         cmetodologiapago: requestBody.cmetodologiapago,
+        xtipo: requestBody.xtipo
     };
 
     let valueplan = await bd.SearchPlanValue(searchData).then((res) => res);
@@ -1550,6 +1566,23 @@ const operationCreateContractBroker = async(requestBody) => {
         ccodigo_ubii: requestBody.ccodigo_ubii
     };
     console.log(userData)
+    if(requestBody.payment){
+        if(requestBody.payment.add){
+            let payment = [];
+            for(let i = 0; i < requestBody.payment.add.length; i++){
+                payment.push({
+                    ctipopago:  requestBody.payment.add[i].ctipopago,
+                    xreferencia:  requestBody.payment.add[i].xreferencia,
+                    fcobro:  requestBody.payment.add[i].fcobro,
+                    cbanco:  requestBody.payment.add[i].cbanco,
+                    mprima_pagada:  requestBody.payment.add[i].mprima_pagada
+                })
+            }
+            let id =  requestBody.xcedula
+            let addpayment = await bd.AddPaymentData(payment,id).then((res) => res);
+            if(addpayment.error){ return { status: false, code: 500, message: addpayment.error }; }
+        }
+    }
     if(userData){
         let operationCreateIndividualContract = await bd.createContractBrokerQuery(userData).then((res) => res);
         if(operationCreateIndividualContract.error){ console.log(operationCreateIndividualContract.error);return { status: false, code: 500, message: operationCreateIndividualContract.error }; }
