@@ -1547,10 +1547,11 @@ const operationCreateContractBroker = async(requestBody) => {
         xreferencia: requestBody.xreferencia,
         fcobro:requestBody.fcobro,
         mprima_pagada: requestBody.mprima_pagada,
+        ccodigo_ubii: requestBody.ccodigo_ubii
     };
     console.log(userData)
     if(userData){
-        let operationCreateIndividualContract = await bd.createContractBrokerQueryyy(userData).then((res) => res);
+        let operationCreateIndividualContract = await bd.createContractBrokerQuery(userData).then((res) => res);
         if(operationCreateIndividualContract.error){ console.log(operationCreateIndividualContract.error);return { status: false, code: 500, message: operationCreateIndividualContract.error }; }
     }
     let lastFleetContract = await bd.getLastFleetContract();
