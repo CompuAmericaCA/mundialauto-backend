@@ -1145,18 +1145,19 @@ const operationCreateIndividualContract = async(requestBody) => {
         }
     }
     if(requestBody.payment){
-        if(requestBody.payment.add){
+        console.log(requestBody.payment)
+        if(requestBody.payment.create){
             let payment = [];
-            for(let i = 0; i < requestBody.payment.add.length; i++){
+            for(let i = 0; i < requestBody.payment.create.length; i++){
                 payment.push({
-                    ctipopago:  requestBody.payment.add[i].ctipopago,
-                    xreferencia:  requestBody.payment.add[i].xreferencia,
-                    fcobro:  requestBody.payment.add[i].fcobro,
-                    cbanco:  requestBody.payment.add[i].cbanco,
-                    mprima_pagada:  requestBody.payment.add[i].mprima_pagada
+                    ctipopago:  requestBody.payment.create[i].ctipopago,
+                    xreferencia:  requestBody.payment.create[i].xreferencia,
+                    fcobro:  requestBody.payment.create[i].fcobro,
+                    cbanco:  requestBody.payment.create[i].cbanco,
+                    mprima_pagada:  requestBody.payment.create[i].mprima_pagada
                 })
             }
-            let addpayment = await bd.AddPaymentData(payment).then((res) => res);
+            let addpayment = await bd.AddPaymentData(payment, userData).then((res) => res);
             if(addpayment.error){ return { status: false, code: 500, message: addpayment.error }; }
         }
     }

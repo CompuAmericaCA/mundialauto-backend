@@ -12533,19 +12533,20 @@ createAccesoriesFromFleetContractIndividual: async(accessory) => {
         return { error: err.message };
     }
 },
-AddPaymentData: async(payment,id) => {
+AddPaymentData: async(payment, userData) => {
     try{
         let rowsAffected = 0;
         let pool = await sql.connect(config);
         for(let i = 0; i < payment.length; i++){
             let insert = await pool.request()
-                .input('xcedula', sql.Int, id.xcedula)
+                .input('femision', sql.DateTime, userData.femision)
+                .input('xserialcarroceria', sql.Int, userData.ccarga)
                 .input('ctipopago', sql.Int, payment[i].ctipopago)
                 .input('xreferencia', sql.Numeric(18, 2), payment[i].xreferencia)
                 .input('fcobro', sql.Numeric(18, 2), payment[i].fcobro)
                 .input('cbanco', sql.Numeric(18, 2), payment[i].cbanco)
                 .input('mprima_pagada', sql.Numeric(18, 2), payment[i].mprima_pagada)
-                .query('insert into TMEMISION_INDIVIDUAL (CTIPOPAGO, XREFERENCIA, FCOBRO, CBANCO, MPRIMA_PAGADA) values (@ctipopago, @xreferencia, @fcobro, @cbanco, @mprima_pagada)')
+                .query('insert into TMEMISION_INDIVIDUAL (CTIPOPAGO, XREFERENCIA, FCOBRO, CBANCO, MPRIMA_PAGADA) values (@ctipopago, @xreferencia, @fcobro, @cbanco, @mprima_pagada) ')
             rowsAffected = rowsAffected + insert.rowsAffected;
         }
         //sql.close();
