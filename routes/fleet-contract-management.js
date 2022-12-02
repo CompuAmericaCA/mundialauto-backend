@@ -1472,7 +1472,7 @@ const operationDetailCoverage = async(authHeader, requestBody) => {
 }
 
 
-router.route('/validation').post((req, res) => {
+router.route('/validationexistingcustomer').post((req, res) => {
     if(!req.header('Authorization')){ 
         res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
         return;
@@ -1510,6 +1510,45 @@ const operationValidationUser = async(authHeader, requestBody) => {
              ccorredor:  query.result.recordset[0].CCORREDOR,
              cestado:  query.result.recordset[0].CESTADO,
              cciudad:  query.result.recordset[0].CCIUDAD,
+            }
+    }
+}
+
+router.route('/contractvalidationpaid').post((req, res) => {
+    if(!req.header('Authorization')){ 
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
+        return;
+    }else{
+        operationcontractvalidationpaid(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){ 
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            console.log(err.message)
+            res.status(404).json({ data: { status: false, code: 404, message: err.message, hint: 'operationvalidationpaid' } });
+        });
+    }
+});
+
+
+const operationcontractvalidationpaid = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let searchData = {
+        ccodigo_ubii: requestBody.ccodigo_ubii,
+       
+    };
+    let query = await bd.Validatepayment(searchData).then((res) => res);
+    console.log(query)
+    if(query.error){ return { status: false, code: 404, message: operationvalidationpaid.error };  }
+    if(query.result.rowsAffected > 0){
+    return { status: true,
+            cestatusgeneral : query.result.recordset[0].CESTAUSGENERAL
+            }
+    }
+    else if(query.result.rowsAffected < 0){
+        return { status: false,
             }
     }
 }

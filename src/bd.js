@@ -12773,6 +12773,18 @@ ValidateCliente: async(searchData) => {
         return { error: err.message };
     }
 },
+Validatepayment: async(searchData) => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+            .input('ccodigo_ubii', sql.NVarChar, searchData.ccodigo_ubii)
+            .query('select CESTATUSGENERAL from SURECIBO WHERE CCODIGO_UBII = @ccodigo_ubii ');
+        console.log(result)
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+},
 searchBrokerIndividualQuery: async(searchData) => {
     try{
         let query = `select * from MACORREDORES WHERE CCORREDOR = @ccorredor`;
