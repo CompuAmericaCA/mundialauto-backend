@@ -12213,6 +12213,27 @@ module.exports = {
             return { error: err.message };
         }
     },
+    updateReceiptPaymentBrokerQuery: async(paymentData) => {
+        try{
+            let rowsAffected = 0;
+            let pool = await sql.connect(config);
+            let update = await pool.request()
+            .input('orderId', sql.Int, paymentData.orderId)
+            .input('ctipopago', sql.Int, paymentData.ctipopago)
+            .input('xreferencia', sql.NVarChar, paymentData.xreferencia)
+            .input('fcobro', sql.DateTime, paymentData.fcobro)
+            .input('mprima_pagada', sql.Numeric(17,2), paymentData.mprima_pagada)
+            .input('cestatusgeneral', sql.Int, 12)
+            .query('update SURECIBO set XREFERENCIA = @xreferencia, CTIPOPAGO = @ctipopago, FCOBRO = @fcobro, MPRIMA_PAGADA = @mprima_pagada, CESTATUSGENERAL = @cestatusgeneral where CCODIGO_UBII = @orderId');
+            rowsAffected = rowsAffected + update.rowsAffected;
+            //sql.close();
+            return { result: { rowsAffected: rowsAffected } };
+        }
+        catch(err){
+            console.log(err.message);
+            return { error: err.message };
+        }
+    },
     plateValrepQuery: async(searchData) => {
         try{
             let pool = await sql.connect(config);
