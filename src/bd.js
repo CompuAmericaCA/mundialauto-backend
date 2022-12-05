@@ -12808,6 +12808,7 @@ SearchPlanValue: async(searchData) => {
         .execute('tmBCalculo_Recibo');
          let query= await pool.request()
         .query('select * from TMCALCULO_RECIBO');
+        console.log(query)
         return { result: query };
               
     }catch(err){
