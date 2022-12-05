@@ -12169,10 +12169,8 @@ module.exports = {
         try{
             let pool = await sql.connect(config);
             let result = await pool.request()
-                .input('cpais', sql.Int, searchData.cpais)
-                .input('ccompania', sql.Int, searchData.ccompania)
                 .input('crecibo', sql.Int, searchData.crecibo)
-                .query('select * from VWBUSCARPROPIETARIOXRECIBO where CRECIBO = @crecibo and CPAIS = @cpais and CCOMPANIA = @ccompania');
+                .query('select * from VWBUSCARRECIBO where CRECIBO = @crecibo');
             //sql.close();
             return { result: result };
         }catch(err){
@@ -12208,21 +12206,41 @@ module.exports = {
         try{
             let rowsAffected = 0;
             let pool = await sql.connect(config);
-            for(let i = 0; i < collectionDataList.length; i++){
-                let update = await pool.request()
-                .input('crecibo', sql.Int, paymentData.crecibo)
-                .input('ctipopago', sql.Int, paymentData.ctipopago)
-                .input('xreferencia', sql.NVarChar, paymentData.xreferencia)
-                .input('fcobro', sql.DateTime, paymentData.fcobro)
-                .input('mprima_pagada', sql.Numeric(17,2), paymentData.mprima_pagada)
-                .input('cestatusgeneral', sql.Int, 12)
-                .query('update SURECIBO set XREFERENCIA = @xreferencia, CTIPOPAGO = @ctipopago, FCOBRO = @fcobro, MPRIMA_PAGADA = @mprima_pagada, CESTATUSGENERAL = @cestatusgeneral where CRECIBO = @crecibo');
-                rowsAffected = rowsAffected + update.rowsAffected;
-            }
+            let update = await pool.request()
+            .input('crecibo', sql.Int, paymentData.crecibo)
+            .input('ctipopago', sql.Int, paymentData.ctipopago)
+            .input('xreferencia', sql.NVarChar, paymentData.xreferencia)
+            .input('fcobro', sql.DateTime, paymentData.fcobro)
+            .input('mprima_pagada', sql.Numeric(17,2), paymentData.mprima_pagada)
+            .input('cestatusgeneral', sql.Int, 12)
+            .query('update SURECIBO set XREFERENCIA = @xreferencia, CTIPOPAGO = @ctipopago, FCOBRO = @fcobro, MPRIMA_PAGADA = @mprima_pagada, CESTATUSGENERAL = @cestatusgeneral where CRECIBO = @crecibo');
+            rowsAffected = rowsAffected + update.rowsAffected;
             //sql.close();
             return { result: { rowsAffected: rowsAffected } };
         }
         catch(err){
+            console.log(err.message);
+            return { error: err.message };
+        }
+    },
+    updateReceiptPaymentBrokerQuery: async(paymentData) => {
+        try{
+            let rowsAffected = 0;
+            let pool = await sql.connect(config);
+            let update = await pool.request()
+            .input('orderId', sql.Int, paymentData.orderId)
+            .input('ctipopago', sql.Int, paymentData.ctipopago)
+            .input('xreferencia', sql.NVarChar, paymentData.xreferencia)
+            .input('fcobro', sql.DateTime, paymentData.fcobro)
+            .input('mprima_pagada', sql.Numeric(17,2), paymentData.mprima_pagada)
+            .input('cestatusgeneral', sql.Int, 12)
+            .query('update SURECIBO set XREFERENCIA = @xreferencia, CTIPOPAGO = @ctipopago, FCOBRO = @fcobro, MPRIMA_PAGADA = @mprima_pagada, CESTATUSGENERAL = @cestatusgeneral where CCODIGO_UBII = @orderId');
+            rowsAffected = rowsAffected + update.rowsAffected;
+            //sql.close();
+            return { result: { rowsAffected: rowsAffected } };
+        }
+        catch(err){
+            console.log(err.message);
             return { error: err.message };
         }
     },
@@ -12823,6 +12841,18 @@ searchExchangeRateQuery: async(searchData) => {
             .input('cpais', sql.Int, searchData.cpais)
             .input('ccompania', sql.Int, searchData.ccompania)
             .input('fingreso', sql.DateTime, searchData.fingreso ? searchData.fingreso: 1)
+            .query(query);
+        //sql.close();
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+},
+lastExchangeRateQuery: async() => {
+    try{
+        let query = 'SELECT TOP 1 * FROM ADTASACAMBIO ORDER BY CTASA DESC';
+        let pool = await sql.connect(config);
+        let result = await pool.request()
             .query(query);
         //sql.close();
         return { result: result };

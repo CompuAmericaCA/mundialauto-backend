@@ -521,6 +521,7 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
         ccompania: requestBody.ccompania,
         ccontratoflota: requestBody.ccontratoflota
     };
+    console.log(fleetContractData);
     let getFleetContractData = await bd.getFleetContractDataQuery(fleetContractData).then((res) => res);
     if(getFleetContractData.error){ return { status: false, code: 500, message: getFleetContractData.error }; }
     if(getFleetContractData.result.rowsAffected > 0){
@@ -1576,8 +1577,10 @@ const operationCreateContractBroker = async(requestBody) => {
     if(lastFleetContract.error){ return { status: false, code: 500, message: lastFleetContract.error }; }
     let lastReceipt = await bd.getLastReceipt(requestBody.xplaca.toUpperCase(), lastFleetContract.ccontratoflota);
     if(lastReceipt.error){ return { status: false, code: 500, message: lastReceipt.error }; }
+    console.log(lastReceipt);
     let getCharge = await bd.getCharge(lastReceipt.ccarga);
     if(getCharge.error){ return { status: false, code: 500, message: getCharge.error }; }
+    console.log(getCharge);
     return { 
         status: true, 
         code: 200, 
@@ -1594,6 +1597,44 @@ const operationCreateContractBroker = async(requestBody) => {
         xrecibo: lastReceipt.xrecibo,
         fsuscripcion: getCharge.fsuscripcion
     };
+}
+
+router.route('/ubii/update').post((req, res) => {
+    if(!req.header('Authorization')){
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } });
+        return;
+    }else{
+        operationUpdateReceiptPayment(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            console.log(err.message)
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationUpdateReceiptPayment' } });
+        });
+    }
+});
+
+const operationUpdateReceiptPayment = async(authHeader, requestBody) => {
+    if(authHeader == 'SKDJK23J4KJ2352304923059'){
+        let orden = requestBody.paymentData.orderId.split("_");
+        let paymentData = {
+            orderId: parseInt(orden[1]),
+            ctipopago: requestBody.paymentData.ctipopago,
+            xreferencia: requestBody.paymentData.xreferencia,
+            fcobro: requestBody.paymentData.fcobro,
+            mprima_pagada: requestBody.paymentData.mprima_pagada
+        }
+        console.log(paymentData);
+        let updateReceiptPayment = await bd.updateReceiptPaymentBrokerQuery(paymentData);
+        if(updateReceiptPayment.error){ return { status: false, code: 500, message: updateReceiptPayment.error }; }
+        if(updateReceiptPayment.result.rowsAffected > 0){ return { status: true }; }
+        else{ 
+            return { status: false, code: 404, message: 'Receipt Not Found.' }; }
+    
+    } else { return { status: false, code: 401, condition: 'token-expired', expired: true }; }
 }
 
 module.exports = router;

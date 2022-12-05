@@ -81,11 +81,11 @@ const operationDetailCollection = async(authHeader, requestBody) => {
                 status: true, 
                 ccliente: detailCollection.result.recordset[0].CCLIENTE,
                 xcliente: detailCollection.result.recordset[0].XCLIENTE,
-                xdocidentidadcliente: detailCollection.result.recordset[0].XDOCIDENTIDADCLIENTE,
+                xdocidentidadcliente: detailCollection.result.recordset[0].XDOCIDENTIDAD,
                 xemail: detailCollection.result.recordset[0].XEMAIL,
                 xtelefono: detailCollection.result.recordset[0].XTELEFONO,
-                fdesde_pol: detailCollection.result.recordset[0].FDESDE_POL,
-                fhasta_pol: detailCollection.result.recordset[0].FHASTA_POL,
+                fdesde_rec: detailCollection.result.recordset[0].FDESDE_REC,
+                fhasta_rec: detailCollection.result.recordset[0].FHASTA_REC,
                 xvehiculo: xvehiculo,
                 xplaca: detailCollection.result.recordset[0].XPLACA,
                 xestatusgeneral: detailCollection.result.recordset[0].XESTATUSGENERAL,
@@ -95,7 +95,6 @@ const operationDetailCollection = async(authHeader, requestBody) => {
 }
 
 router.route('/ubii/update').post((req, res) => {
-    console.log('hola');
     if(!req.header('Authorization')){
         res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } });
         return;
@@ -114,12 +113,16 @@ router.route('/ubii/update').post((req, res) => {
 });
 
 const operationUpdateReceiptPayment = async(authHeader, requestBody) => {
-    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
-    console.log(requestBody.paymentData);
-    let updateReceiptPayment = await bd.updateReceiptPaymentQuery(requestBody.paymentData);
-    if(updateReceiptPayment.error){ return { status: false, code: 500, message: updateReceiptPayment.error }; }
-    if(updateReceiptPayment.result.rowsAffected > 0){ return { status: true }; }
-    else{ return { status: false, code: 404, message: 'Receipt Not Found.' }; }
+    if(authHeader == 'SKDJK23J4KJ2352304923059'){
+    
+        console.log(requestBody.paymentData);
+        let updateReceiptPayment = await bd.updateReceiptPaymentQuery(requestBody.paymentData);
+        if(updateReceiptPayment.error){ return { status: false, code: 500, message: updateReceiptPayment.error }; }
+        if(updateReceiptPayment.result.rowsAffected > 0){ return { status: true }; }
+        else{ 
+            return { status: false, code: 404, message: 'Receipt Not Found.' }; }
+    
+    } else { return { status: false, code: 401, condition: 'token-expired', expired: true }; }
 }
 
 router.route('/update').post((req, res) => {
