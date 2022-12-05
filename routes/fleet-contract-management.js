@@ -522,6 +522,7 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
         ccompania: requestBody.ccompania,
         ccontratoflota: requestBody.ccontratoflota
     };
+    console.log(fleetContractData);
     let getFleetContractData = await bd.getFleetContractDataQuery(fleetContractData).then((res) => res);
     if(getFleetContractData.error){ return { status: false, code: 500, message: getFleetContractData.error }; }
     if(getFleetContractData.result.rowsAffected > 0){
@@ -1592,8 +1593,10 @@ const operationCreateContractBroker = async(requestBody) => {
     console.log(lastFleetContract);
     let lastReceipt = await bd.getLastReceipt(requestBody.xplaca.toUpperCase(), lastFleetContract.ccontratoflota);
     if(lastReceipt.error){ return { status: false, code: 500, message: lastReceipt.error }; }
+    console.log(lastReceipt);
     let getCharge = await bd.getCharge(lastReceipt.ccarga);
     if(getCharge.error){ return { status: false, code: 500, message: getCharge.error }; }
+    console.log(getCharge);
     return { 
         status: true, 
         code: 200, 
@@ -1632,8 +1635,16 @@ router.route('/ubii/update').post((req, res) => {
 
 const operationUpdateReceiptPayment = async(authHeader, requestBody) => {
     if(authHeader == 'SKDJK23J4KJ2352304923059'){
-        console.log(requestBody.paymentData);
-        let updateReceiptPayment = await bd.updateReceiptPaymentBrokerQuery(requestBody.paymentData);
+        let orden = requestBody.paymentData.orderId.split("_");
+        let paymentData = {
+            orderId: parseInt(orden[1]),
+            ctipopago: requestBody.paymentData.ctipopago,
+            xreferencia: requestBody.paymentData.xreferencia,
+            fcobro: requestBody.paymentData.fcobro,
+            mprima_pagada: requestBody.paymentData.mprima_pagada
+        }
+        console.log(paymentData);
+        let updateReceiptPayment = await bd.updateReceiptPaymentBrokerQuery(paymentData);
         if(updateReceiptPayment.error){ return { status: false, code: 500, message: updateReceiptPayment.error }; }
         if(updateReceiptPayment.result.rowsAffected > 0){ return { status: true }; }
         else{ 
