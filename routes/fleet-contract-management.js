@@ -1588,7 +1588,7 @@ const operationCreateContractBroker = async(requestBody) => {
         cversion: requestBody.cversion ? requestBody.cversion : undefined,
         cano: requestBody.cano ? requestBody.cano : undefined,
         ncapacidad_p: requestBody.ncapacidad_p,
-        ccolor: requestBody.ccolor ? requestBody.ccolor : undefined,
+        xcolor: requestBody.xcolor ? requestBody.xcolor : undefined,
         xserialcarroceria: requestBody.xserialcarroceria.toUpperCase(),
         xserialmotor: requestBody.xserialmotor.toUpperCase(),
         xcobertura: requestBody.xcobertura.toUpperCase(),
