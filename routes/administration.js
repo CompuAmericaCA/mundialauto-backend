@@ -15,6 +15,7 @@ router.route('/search').post((req, res) => {
             }
             res.json({ data: result });
         }).catch((err) => {
+            console.log(err.message)
             res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationSearchAdministrationPaymentRecord' } });
         });
     }
@@ -23,9 +24,9 @@ router.route('/search').post((req, res) => {
 const operationSearchAdministrationPaymentRecord = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
     let searchData = {
-        corden: requestBody.corden,
-        cfiniquito: requestBody.cfiniquito,
-        ccompania: requestBody.ccompania
+        ffactura: requestBody.ffactura,
+        frecepcion: requestBody.frecepcion,
+        fvencimiento: requestBody.fvencimiento
     }
     let searchAdministrationPaymentRecord = await bd.searchAdministrationPaymentRecordQuery(searchData).then((res) => res);
     if(searchAdministrationPaymentRecord.error){ return { status: false, code: 500, message: searchAdministrationPaymentRecord.error }; }
@@ -35,26 +36,29 @@ const operationSearchAdministrationPaymentRecord = async(authHeader, requestBody
         let jsonListSettlement = [];
         for(let i = 0; i < searchSettlementAdministrationPaymentRecord.result.recordset.length; i++){
             jsonListSettlement.push({
-                cfiniquito: searchSettlementAdministrationPaymentRecord.result.recordset[i].CFINIQUITO,
-                xobservacion: searchSettlementAdministrationPaymentRecord.result.recordset[i].XOBSERVACION,
-                xdanos: searchSettlementAdministrationPaymentRecord.result.recordset[i].XDANOS,
-                mmontofiniquito: searchSettlementAdministrationPaymentRecord.result.recordset[i].MMONTOFINIQUITO,
-                xcausafiniquito: searchSettlementAdministrationPaymentRecord.result.recordset[i].XCAUSAFINIQUITO,
-                xmoneda: searchSettlementAdministrationPaymentRecord.result.recordset[i].xmoneda
+                cfactura: searchSettlementAdministrationPaymentRecord.result.recordset[i].CFACTURA,
+                xcliente: searchSettlementAdministrationPaymentRecord.result.recordset[i].XCLIENTE,
+                xnombre: searchSettlementAdministrationPaymentRecord.result.recordset[i].XNOMBRE,
+                mmontofactura: searchSettlementAdministrationPaymentRecord.result.recordset[i].MMONTOFACTURA,
+                ncontrol: searchSettlementAdministrationPaymentRecord.result.recordset[i].NCONTROL,
+                nfactura: searchSettlementAdministrationPaymentRecord.result.recordset[i].NFACTURA,
+                ffactura: searchSettlementAdministrationPaymentRecord.result.recordset[i].FFACTURA,
+                frecepcion: searchSettlementAdministrationPaymentRecord.result.recordset[i].FRECEPCION,
+                fvencimiento: searchSettlementAdministrationPaymentRecord.result.recordset[i].FVENCIMIENTO,
             });
         }
         let jsonList = [];
         for(let i = 0; i < searchAdministrationPaymentRecord.result.recordset.length; i++){
             jsonList.push({
-                corden: searchAdministrationPaymentRecord.result.recordset[i].CORDEN,
-                xobservacion: searchAdministrationPaymentRecord.result.recordset[i].XOBSERVACION,
-                xdanos: searchAdministrationPaymentRecord.result.recordset[i].XDANOS,
-                xservicio: searchAdministrationPaymentRecord.result.recordset[i].XSERVICIO,
-                xservicioadicional: searchAdministrationPaymentRecord.result.recordset[i].XSERVICIOADICIONAL,
-                mmontototal: searchAdministrationPaymentRecord.result.recordset[i].MMONTOTOTAL,
-                mtotal: searchAdministrationPaymentRecord.result.recordset[i].MTOTAL,
-                xmoneda: searchAdministrationPaymentRecord.result.recordset[i].xmoneda,
-                xmonedacotizacion: searchAdministrationPaymentRecord.result.recordset[i].XMONEDACOTIZACION
+                cfactura: searchAdministrationPaymentRecord.result.recordset[i].CFACTURA,
+                xcliente: searchAdministrationPaymentRecord.result.recordset[i].XCLIENTE,
+                xnombre: searchAdministrationPaymentRecord.result.recordset[i].XNOMBRE,
+                mmontofactura: searchAdministrationPaymentRecord.result.recordset[i].MMONTOFACTURA,
+                ncontrol: searchAdministrationPaymentRecord.result.recordset[i].NCONTROL,
+                nfactura: searchAdministrationPaymentRecord.result.recordset[i].NFACTURA,
+                ffactura: searchAdministrationPaymentRecord.result.recordset[i].FFACTURA,
+                frecepcion: searchAdministrationPaymentRecord.result.recordset[i].FRECEPCION,
+                fvencimiento: searchAdministrationPaymentRecord.result.recordset[i].FVENCIMIENTO
             });
         }
         return { status: true, list: jsonList, settlementList: jsonListSettlement };
@@ -109,6 +113,7 @@ router.route('/service-order').post((req, res) => {
             }
             res.json({ data: result });
         }).catch((err) => {
+            console.log(err.message)
             res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationServiceOrderFromBillLoading' } });
         });
     }
@@ -126,16 +131,43 @@ const operationServiceOrderFromBillLoading = async(authHeader, requestBody) => {
     if(searchServiceOrderFromBillLoading.error){ return  { status: false, code: 500, message: searchServiceOrderFromBillLoading.error }; }
     if(searchServiceOrderFromBillLoading.result.rowsAffected > 0){
         let jsonList = [];
+        let xservicio, xmonedagrua, xmonedacoti, mmontototal, mtotal;
         for(let i = 0; i < searchServiceOrderFromBillLoading.result.recordset.length; i++){
+            if(searchServiceOrderFromBillLoading.result.recordset[i].XSERVICIOADICIONAL){
+                xservicio = searchServiceOrderFromBillLoading.result.recordset[i].XSERVICIOADICIONAL
+            }else{
+                xservicio = searchServiceOrderFromBillLoading.result.recordset[i].XSERVICIO
+            }
+            if(searchServiceOrderFromBillLoading.result.recordset[i].XMONEDAGRUA){
+                xmonedagrua = searchServiceOrderFromBillLoading.result.recordset[i].XMONEDAGRUA
+            }else{
+                xmonedagrua = 'SIN ESPECIFICACIÓN'
+            }
+            if(searchServiceOrderFromBillLoading.result.recordset[i].XMONEDACOTI){
+                xmonedacoti = searchServiceOrderFromBillLoading.result.recordset[i].XMONEDACOTI
+            }else{
+                xmonedacoti = 'SIN ESPECIFICACIÓN'
+            }
+            if(searchServiceOrderFromBillLoading.result.recordset[i].MMONTOTOTAL){
+                mmontototal = searchServiceOrderFromBillLoading.result.recordset[i].MMONTOTOTAL
+            }else{
+                mmontototal = 0
+            }
+            if(searchServiceOrderFromBillLoading.result.recordset[i].MTOTAL){
+                mtotal = searchServiceOrderFromBillLoading.result.recordset[i].MTOTAL
+            }else{
+                mtotal = 0
+            }
             jsonList.push({
                 corden: searchServiceOrderFromBillLoading.result.recordset[i].CORDEN,
                 ccontratoflota: searchServiceOrderFromBillLoading.result.recordset[i].CCONTRATOFLOTA,
                 xcliente: searchServiceOrderFromBillLoading.result.recordset[i].XCLIENTE,
                 xnombre: searchServiceOrderFromBillLoading.result.recordset[i].XNOMBRE,
-                xservicioadicional: searchServiceOrderFromBillLoading.result.recordset[i].XSERVICIOADICIONAL,
-                xservicio: searchServiceOrderFromBillLoading.result.recordset[i].XSERVICIO,
-                mtotal: searchServiceOrderFromBillLoading.result.recordset[i].MTOTAL,
-                mmontototal: searchServiceOrderFromBillLoading.result.recordset[i].MMONTOTOTAL
+                xservicio: xservicio,
+                mtotal: mtotal,
+                mmontototal: mmontototal,
+                xmonedagrua: xmonedagrua,
+                xmonedacoti: xmonedacoti,
             });
         }
         return { status: true, list: jsonList };
@@ -166,7 +198,6 @@ const operationSearchExchangeRate = async(authHeader, requestBody) => {
         ccompania: requestBody.ccompania,
         fingreso: requestBody.fingreso ? requestBody.fingreso: undefined,
     }
-    console.log(searchData)
     let searchExchangeRate = await bd.searchExchangeRateQuery(searchData).then((res) => res);
     if(searchExchangeRate.error){ return  { status: false, code: 500, message: searchExchangeRate.error }; }
     if(searchExchangeRate.result.rowsAffected > 0){
@@ -213,6 +244,39 @@ const operationCreateExchangeRate = async(authHeader, requestBody) => {
     if(createCreateExchangeRate.result.rowsAffected > 0){ return { status: true }; }
     else{ return { status: false, code: 404, message: 'Service Order not found.' }; }
     
+}
+
+router.route('/last-exchange-rate').post((req, res) => {
+    if(!req.header('Authorization')){
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } });
+        return;
+    }else{
+        operationGetLastExchangeRate(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            console.log(err.message)
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationGetLastExchangeRate' } });
+        });
+    }
+});
+
+const operationGetLastExchangeRate = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let lastExchangeRate = await bd.lastExchangeRateQuery().then((res) => res);
+    if(lastExchangeRate.error){ return  { status: false, code: 500, message: lastExchangeRate.error }; }
+    if(lastExchangeRate.result.rowsAffected > 0){
+        let tasaCambio = {
+            ctasa_cambio: lastExchangeRate.result.recordset[0].CTASA,
+            mtasa_cambio: lastExchangeRate.result.recordset[0].MTASA_CAMBIO,
+            fingreso: lastExchangeRate.result.recordset[0].FINGRESO
+        }
+        console.log(tasaCambio);
+        return { status: true, tasaCambio: tasaCambio };
+    }else{ return { status: false, code: 404, message: 'Exchange Rate not found.' }; }
 }
 
 module.exports = router;
