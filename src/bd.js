@@ -21,7 +21,7 @@ module.exports = {
                 .input('bactivo', sql.Bit, true)
                 .query('select * from VWAUTENTICACIONUSUARIO where XEMAIL = @xemail and BACTIVO = @bactivo');
             //sql.close();
-            console.log(result)
+       
             return { result: result };
         }
         catch(err){
@@ -3350,7 +3350,7 @@ module.exports = {
         try{
             let pool = await sql.connect(config);
             let result = await pool.request()
-                .input('cpais', sql.Numeric(4, 0), cpais = 58)
+                .input('cpais', sql.Numeric(4, 0), cpais)
                 .query('select CESTADO, XESTADO, BACTIVO from MAESTADO where CPAIS = @cpais');
             //sql.close();
             return { result: result };
@@ -8518,7 +8518,7 @@ module.exports = {
         }
     },
 
-    createIndividualContractQuery: async(userData) => {
+    createIndividualContractQuery: async(userData, paymentList) => {
         try{
             let rowsAffected = 0;
             let pool = await sql.connect(config);
@@ -8566,7 +8566,12 @@ module.exports = {
                 .input('cpais', sql.Numeric(11, 0), userData.cpais)
                 .input('icedula', sql.NVarChar, userData.icedula)
                 .input('ivigencia', sql.Int, userData.ivigencia)
-                .query('insert into TMEMISION_INDIVIDUAL(XNOMBRE, XAPELLIDO, CANO, XCOLOR, CMARCA, CMODELO, CVERSION, XRIF_CLIENTE, EMAIL, XTELEFONO_PROP, XDIRECCIONFISCAL, XSERIALMOTOR, XSERIALCARROCERIA, XPLACA, XTELEFONO_EMP, CPLAN, CCORREDOR, XCEDULA, XCOBERTURA, NCAPACIDAD_P, XTIPO, FINICIO, CMETODOLOGIAPAGO, MSUMA_ASEG, PCASCO, MPRIMA_CASCO, MCATASTROFICO, PDESCUENTO, IFRACCIONAMIENTO, NCUOTAS, MPRIMA_BLINDAJE, MSUMA_BLINDAJE, MPRIMA_BRUTA, PCATASTROFICO, PMOTIN, MMOTIN, PBLINDAJE, CESTADO, CCIUDAD, CPAIS, ICEDULA, FEMISION, IVIGENCIA) values (@xnombre, @xapellido, @cano, @xcolor, @cmarca, @cmodelo, @cversion, @xrif_cliente, @email, @xtelefono_prop, @xdireccionfiscal, @xserialmotor, @xserialcarroceria, @xplaca, @xtelefono_emp, @cplan, @ccorredor, @xcedula, @xcobertura, @ncapacidad_p, @xtipo, @finicio, @cmetodologiapago, @msuma_aseg, @pcasco, @mprima_casco, @mcatastrofico, @pdescuento, @ifraccionamiento, @ncuotas, @mprima_blindaje, @msuma_blindaje, @mprima_bruta,@pcatastrofico ,@pmotin, @mmotin, @pblindaje, @cestado, @cciudad, @cpais, @icedula, @femision, @ivigencia)')
+                .input('ctipopago', sql.Int, paymentList.ctipopago)
+                .input('cbanco', sql.Int, paymentList.cbanco)
+                .input('xreferencia', sql.NVarChar, paymentList.xreferencia)
+                .input('fcobro', sql.DateTime, paymentList.fcobro)
+                .input('mprima_pagada', sql.Numeric(18, 2), paymentList.mprima_pagada)
+                .query('insert into TMEMISION_INDIVIDUAL(XNOMBRE, XAPELLIDO, CANO, XCOLOR, CMARCA, CMODELO, CVERSION, XRIF_CLIENTE, EMAIL, XTELEFONO_PROP, XDIRECCIONFISCAL, XSERIALMOTOR, XSERIALCARROCERIA, XPLACA, XTELEFONO_EMP, CPLAN, CCORREDOR, XCEDULA, XCOBERTURA, NCAPACIDAD_P, XTIPO, FINICIO, CMETODOLOGIAPAGO, MSUMA_ASEG, PCASCO, MPRIMA_CASCO, MCATASTROFICO, PDESCUENTO, IFRACCIONAMIENTO, NCUOTAS, MPRIMA_BLINDAJE, MSUMA_BLINDAJE, MPRIMA_BRUTA, PCATASTROFICO, PMOTIN, MMOTIN, PBLINDAJE, CESTADO, CCIUDAD, CPAIS, ICEDULA, FEMISION, IVIGENCIA, CTIPOPAGO, XREFERENCIA, FCOBRO, CBANCO, MPRIMA_PAGADA) values (@xnombre, @xapellido, @cano, @xcolor, @cmarca, @cmodelo, @cversion, @xrif_cliente, @email, @xtelefono_prop, @xdireccionfiscal, @xserialmotor, @xserialcarroceria, @xplaca, @xtelefono_emp, @cplan, @ccorredor, @xcedula, @xcobertura, @ncapacidad_p, @xtipo, @finicio, @cmetodologiapago, @msuma_aseg, @pcasco, @mprima_casco, @mcatastrofico, @pdescuento, @ifraccionamiento, @ncuotas, @mprima_blindaje, @msuma_blindaje, @mprima_bruta,@pcatastrofico ,@pmotin, @mmotin, @pblindaje, @cestado, @cciudad, @cpais, @icedula, @femision, @ivigencia, @ctipopago, @xreferencia, @fcobro, @cbanco, @mprima_pagada)')
             //sql.close();
             return { result: { rowsAffected: rowsAffected, status: true } };
         }
@@ -8574,7 +8579,7 @@ module.exports = {
             return { error: err.message };
         }
     },
-    createContractBrokerQuery: async(userData) => {
+    createContractBrokerQuery: async(userData, paymentList) => {
         try{
             let rowsAffected = 0;
             let pool = await sql.connect(config);
@@ -8622,7 +8627,13 @@ module.exports = {
                 .input('cpais', sql.Numeric(11, 0), userData.cpais)
                 .input('icedula', sql.NVarChar, userData.icedula)
                 .input('ivigencia', sql.Int, userData.ivigencia)
-                .query('insert into TMEMISION_CORREDOR(XNOMBRE, XAPELLIDO, CANO, XCOLOR, CMARCA, CMODELO, CVERSION, XRIF_CLIENTE, EMAIL, XTELEFONO_PROP, XDIRECCIONFISCAL, XSERIALMOTOR, XSERIALCARROCERIA, XPLACA, XTELEFONO_EMP, CPLAN, CCORREDOR, XCEDULA, XCOBERTURA, NCAPACIDAD_P, XTIPO, FINICIO, CMETODOLOGIAPAGO, MSUMA_ASEG, PCASCO, MPRIMA_CASCO, MCATASTROFICO, PDESCUENTO, IFRACCIONAMIENTO, NCUOTAS, MPRIMA_BLINDAJE, MSUMA_BLINDAJE, MPRIMA_BRUTA, PCATASTROFICO, PMOTIN, MMOTIN, PBLINDAJE, CESTADO, CCIUDAD, CPAIS, ICEDULA, FEMISION, IVIGENCIA) values (@xnombre, @xapellido, @cano, @xcolor, @cmarca, @cmodelo, @cversion, @xrif_cliente, @email, @xtelefono_prop, @xdireccionfiscal, @xserialmotor, @xserialcarroceria, @xplaca, @xtelefono_emp, @cplan, @ccorredor, @xcedula, @xcobertura, @ncapacidad_p, @xtipo, @finicio, @cmetodologiapago, @msuma_aseg, @pcasco, @mprima_casco, @mcatastrofico, @pdescuento, @ifraccionamiento, @ncuotas, @mprima_blindaje, @msuma_blindaje, @mprima_bruta,@pcatastrofico ,@pmotin, @mmotin, @pblindaje, @cestado, @cciudad, @cpais, @icedula, @femision, @ivigencia)')
+                .input('ccodigo_ubii', sql.Int, userData.ccodigo_ubii ? paymentList.ccodigo_ubii: undefined)
+                .input('ctipopago', sql.Int, paymentList.ctipopago ? paymentList.ctipopago: undefined)
+                .input('cbanco', sql.Int, paymentList.cbanco ? paymentList.cbanco: undefined)
+                .input('xreferencia', sql.NVarChar, paymentList.xreferencia ? paymentList.xreferencia: undefined)
+                .input('fcobro', sql.DateTime, paymentList.fcobro ? paymentList.fcobro: undefined)
+                .input('mprima_pagada', sql.Numeric(18, 2), paymentList.mprima_pagada ? paymentList.mprima_pagada: undefined)
+                .query('insert into TMEMISION_INDIVIDUAL(XNOMBRE, XAPELLIDO, CANO, XCOLOR, CMARCA, CMODELO, CVERSION, XRIF_CLIENTE, EMAIL, XTELEFONO_PROP, XDIRECCIONFISCAL, XSERIALMOTOR, XSERIALCARROCERIA, XPLACA, XTELEFONO_EMP, CPLAN, CCORREDOR, XCEDULA, XCOBERTURA, NCAPACIDAD_P, XTIPO, FINICIO, CMETODOLOGIAPAGO, MSUMA_ASEG, PCASCO, MPRIMA_CASCO, MCATASTROFICO, PDESCUENTO, IFRACCIONAMIENTO, NCUOTAS, MPRIMA_BLINDAJE, MSUMA_BLINDAJE, MPRIMA_BRUTA, PCATASTROFICO, PMOTIN, MMOTIN, PBLINDAJE, CESTADO, CCIUDAD, CPAIS, ICEDULA, FEMISION, IVIGENCIA, CCODIGO_UBII, CTIPOPAGO, XREFERENCIA, FCOBRO, CBANCO, MPRIMA_PAGADA) values (@xnombre, @xapellido, @cano, @xcolor, @cmarca, @cmodelo, @cversion, @xrif_cliente, @email, @xtelefono_prop, @xdireccionfiscal, @xserialmotor, @xserialcarroceria, @xplaca, @xtelefono_emp, @cplan, @ccorredor, @xcedula, @xcobertura, @ncapacidad_p, @xtipo, @finicio, @cmetodologiapago, @msuma_aseg, @pcasco, @mprima_casco, @mcatastrofico, @pdescuento, @ifraccionamiento, @ncuotas, @mprima_blindaje, @msuma_blindaje, @mprima_bruta,@pcatastrofico ,@pmotin, @mmotin, @pblindaje, @cestado, @cciudad, @cpais, @icedula, @femision, @ivigencia,@ccodigo_ubii, @ctipopago, @xreferencia, @fcobro, @cbanco, @mprima_pagada)')
             //sql.close();
             return { result: { rowsAffected: rowsAffected, status: true } };
         }
@@ -11240,7 +11251,7 @@ module.exports = {
                 .input('cpais', sql.Numeric(4, 0), searchData.cpais)
                 .input('ccompania', sql.Int, searchData.ccompania)
                 .input('ctipoplan', sql.Int, searchData.ctipoplan)
-                .query('select CPLAN, XPLAN from POPLAN where CPAIS = @cpais and CCOMPANIA = @ccompania and CTIPOPLAN = @ctipoplan and BACTIVO = 1');
+                .query('select CPLAN, XPLAN, BINTERNACIONAL from POPLAN where CPAIS = @cpais and CCOMPANIA = @ccompania and CTIPOPLAN = @ctipoplan and BACTIVO = 1');
             //sql.close();
             return { result: result };
         }catch(err){
@@ -12158,10 +12169,8 @@ module.exports = {
         try{
             let pool = await sql.connect(config);
             let result = await pool.request()
-                .input('cpais', sql.Int, searchData.cpais)
-                .input('ccompania', sql.Int, searchData.ccompania)
                 .input('crecibo', sql.Int, searchData.crecibo)
-                .query('select * from VWBUSCARPROPIETARIOXRECIBO where CRECIBO = @crecibo and CPAIS = @cpais and CCOMPANIA = @ccompania');
+                .query('select * from VWBUSCARRECIBO where CRECIBO = @crecibo');
             //sql.close();
             return { result: result };
         }catch(err){
@@ -12197,21 +12206,41 @@ module.exports = {
         try{
             let rowsAffected = 0;
             let pool = await sql.connect(config);
-            for(let i = 0; i < collectionDataList.length; i++){
-                let update = await pool.request()
-                .input('crecibo', sql.Int, paymentData.crecibo)
-                .input('ctipopago', sql.Int, paymentData.ctipopago)
-                .input('xreferencia', sql.NVarChar, paymentData.xreferencia)
-                .input('fcobro', sql.DateTime, paymentData.fcobro)
-                .input('mprima_pagada', sql.Numeric(17,2), paymentData.mprima_pagada)
-                .input('cestatusgeneral', sql.Int, 12)
-                .query('update SURECIBO set XREFERENCIA = @xreferencia, CTIPOPAGO = @ctipopago, FCOBRO = @fcobro, MPRIMA_PAGADA = @mprima_pagada, CESTATUSGENERAL = @cestatusgeneral where CRECIBO = @crecibo');
-                rowsAffected = rowsAffected + update.rowsAffected;
-            }
+            let update = await pool.request()
+            .input('crecibo', sql.Int, paymentData.crecibo)
+            .input('ctipopago', sql.Int, paymentData.ctipopago)
+            .input('xreferencia', sql.NVarChar, paymentData.xreferencia)
+            .input('fcobro', sql.DateTime, paymentData.fcobro)
+            .input('mprima_pagada', sql.Numeric(17,2), paymentData.mprima_pagada)
+            .input('cestatusgeneral', sql.Int, 12)
+            .query('update SURECIBO set XREFERENCIA = @xreferencia, CTIPOPAGO = @ctipopago, FCOBRO = @fcobro, MPRIMA_PAGADA = @mprima_pagada, CESTATUSGENERAL = @cestatusgeneral where CRECIBO = @crecibo');
+            rowsAffected = rowsAffected + update.rowsAffected;
             //sql.close();
             return { result: { rowsAffected: rowsAffected } };
         }
         catch(err){
+            console.log(err.message);
+            return { error: err.message };
+        }
+    },
+    updateReceiptPaymentBrokerQuery: async(paymentData) => {
+        try{
+            let rowsAffected = 0;
+            let pool = await sql.connect(config);
+            let update = await pool.request()
+            .input('orderId', sql.Int, paymentData.orderId)
+            .input('ctipopago', sql.Int, paymentData.ctipopago)
+            .input('xreferencia', sql.NVarChar, paymentData.xreferencia)
+            .input('fcobro', sql.DateTime, paymentData.fcobro)
+            .input('mprima_pagada', sql.Numeric(17,2), paymentData.mprima_pagada)
+            .input('cestatusgeneral', sql.Int, 12)
+            .query('update SURECIBO set XREFERENCIA = @xreferencia, CTIPOPAGO = @ctipopago, FCOBRO = @fcobro, MPRIMA_PAGADA = @mprima_pagada, CESTATUSGENERAL = @cestatusgeneral where CCODIGO_UBII = @orderId');
+            rowsAffected = rowsAffected + update.rowsAffected;
+            //sql.close();
+            return { result: { rowsAffected: rowsAffected } };
+        }
+        catch(err){
+            console.log(err.message);
             return { error: err.message };
         }
     },
@@ -12532,6 +12561,29 @@ createAccesoriesFromFleetContractIndividual: async(accessory) => {
         return { error: err.message };
     }
 },
+AddPaymentData: async(payment, userData) => {
+    try{
+        let rowsAffected = 0;
+        let pool = await sql.connect(config);
+        for(let i = 0; i < payment.length; i++){
+            let insert = await pool.request()
+                .input('femision', sql.DateTime, userData.femision)
+                .input('xserialcarroceria', sql.Int, userData.ccarga)
+                .input('ctipopago', sql.Int, payment[i].ctipopago)
+                .input('xreferencia', sql.Numeric(18, 2), payment[i].xreferencia)
+                .input('fcobro', sql.Numeric(18, 2), payment[i].fcobro)
+                .input('cbanco', sql.Numeric(18, 2), payment[i].cbanco)
+                .input('mprima_pagada', sql.Numeric(18, 2), payment[i].mprima_pagada)
+                .query('insert into TMEMISION_INDIVIDUAL (CTIPOPAGO, XREFERENCIA, FCOBRO, CBANCO, MPRIMA_PAGADA) values (@ctipopago, @xreferencia, @fcobro, @cbanco, @mprima_pagada) ')
+            rowsAffected = rowsAffected + insert.rowsAffected;
+        }
+        //sql.close();
+        return { result: { rowsAffected: rowsAffected } };
+    }
+    catch(err){
+        return { error: err.message };
+    }
+},
 ValidateVersionDataQuery: async(searchData) => {
     try{
         let pool = await sql.connect(config);
@@ -12548,11 +12600,12 @@ ValidateVersionDataQuery: async(searchData) => {
 },
 searchAdministrationPaymentRecordQuery: async(searchData) => {
     try{
-        let query = `select * from VWBUSCARORDENSERVICIOXFLOTA WHERE CCOMPANIA = @ccompania${ searchData.corden ? " and CORDEN = @corden" : '' } AND MTOTAL > 0 OR MMONTOTOTAL > 0`;
+        let query = `select DISTINCT CFACTURA, XCLIENTE, XNOMBRE, MMONTOFACTURA, NCONTROL, NFACTURA, FFACTURA, FRECEPCION, FVENCIMIENTO from VWBUSCARFACTURASREGISTRADAS WHERE CORDEN > 0${ searchData.ffactura ? " and FFACTURA = @ffactura" : '' }${ searchData.frecepcion ? " and FRECEPCION = @frecepcion" : '' }${ searchData.fvencimiento ? " and FVENCIMIENTO = @fvencimiento" : '' }`;
         let pool = await sql.connect(config);
         let result = await pool.request()
-            .input('ccompania', sql.Int, searchData.ccompania)
-            .input('corden', sql.Int, searchData.corden)
+            .input('ffactura', sql.DateTime, searchData.ffactura ? searchData.ffactura: undefined)
+            .input('frecepcion', sql.DateTime, searchData.frecepcion ? searchData.frecepcion: undefined)
+            .input('fvencimiento', sql.DateTime, searchData.fvencimiento ? searchData.fvencimiento: undefined)
             .query(query);
         //sql.close();
         return { result: result };
@@ -12574,11 +12627,12 @@ serviceOrderValrepQuery: async() => {
 },
 searchSettlementAdministrationPaymentRecordQuery: async(searchData) => {
     try{
-        let query = `select * from VWBUSCARFINIQUITO WHERE CCOMPANIA = @ccompania${ searchData.cfiniquito ? " and CFINIQUITO = @cfiniquito" : '' } AND MMONTOFINIQUITO > 0`;
+        let query = `select DISTINCT CFACTURA, XCLIENTE, XNOMBRE, MMONTOFACTURA, NCONTROL, NFACTURA, FFACTURA, FRECEPCION, FVENCIMIENTO from VWBUSCARFACTURASREGISTRADAS WHERE CFINIQUITO > 0${ searchData.ffactura ? " and FFACTURA = @ffactura" : '' }${ searchData.frecepcion ? " and FRECEPCION = @frecepcion" : '' }${ searchData.fvencimiento ? " and FVENCIMIENTO = @fvencimiento" : '' }`;
         let pool = await sql.connect(config);
         let result = await pool.request()
-            .input('ccompania', sql.Int, searchData.ccompania)
-            .input('cfiniquito', sql.Int, searchData.cfiniquito)
+            .input('ffactura', sql.DateTime, searchData.ffactura ? searchData.ffactura: undefined)
+            .input('frecepcion', sql.DateTime, searchData.frecepcion ? searchData.frecepcion: undefined)
+            .input('fvencimiento', sql.DateTime, searchData.fvencimiento ? searchData.fvencimiento: undefined)
             .query(query);
         //sql.close();
         return { result: result };
@@ -12750,6 +12804,18 @@ ValidateCliente: async(searchData) => {
         return { error: err.message };
     }
 },
+Validatepayment: async(searchData) => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+            .input('ccodigo_ubii', sql.NVarChar, searchData.ccodigo_ubii)
+            .query('select CESTATUSGENERAL from SURECIBO WHERE CCODIGO_UBII = @ccodigo_ubii ');
+        console.log(result)
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+},
 searchBrokerIndividualQuery: async(searchData) => {
     try{
         let query = `select * from MACORREDORES WHERE CCORREDOR = @ccorredor`;
@@ -12769,9 +12835,11 @@ SearchPlanValue: async(searchData) => {
         let result = await pool.request()
         .input('cmetodologiapago', sql.NVarChar, searchData.cmetodologiapago)
         .input('cplan_rc', sql.NVarChar, searchData.cplan_rc)
+        .input('xtipo', sql.NVarChar, searchData.xtipo)
         .execute('tmBCalculo_Recibo');
          let query= await pool.request()
-        .query('select MPRIMA from TMCALCULO_RECIBO');
+        .query('select * from TMCALCULO_RECIBO');
+        console.log(query)
         return { result: query };
               
     }catch(err){
@@ -12786,6 +12854,18 @@ searchExchangeRateQuery: async(searchData) => {
             .input('cpais', sql.Int, searchData.cpais)
             .input('ccompania', sql.Int, searchData.ccompania)
             .input('fingreso', sql.DateTime, searchData.fingreso ? searchData.fingreso: 1)
+            .query(query);
+        //sql.close();
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+},
+lastExchangeRateQuery: async() => {
+    try{
+        let query = 'SELECT TOP 1 * FROM ADTASACAMBIO ORDER BY CTASA DESC';
+        let pool = await sql.connect(config);
+        let result = await pool.request()
             .query(query);
         //sql.close();
         return { result: result };
@@ -12812,6 +12892,129 @@ createCreateExchangeRateQuery: async(dataList) => {
     catch(err){
         return { error: err.message };
     }
+},
+detailExchangeRateQuery: async(searchData) => {
+    try{
+        let query = `select * from ADTASACAMBIO WHERE CCOMPANIA = @ccompania AND CPAIS = @cpais AND CTASA = @ctasa`;
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+            .input('cpais', sql.Int, searchData.cpais)
+            .input('ccompania', sql.Int, searchData.ccompania)
+            .input('ctasa', sql.Int, searchData.ctasa)
+            .query(query);
+        //sql.close();
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+},
+searchSettlementFromBillLoadingQuery: async(searchData) => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+            .input('ccompania', sql.Int, searchData.ccompania)
+            .input('ccliente', sql.Int, searchData.ccliente)
+            .query('SELECT * FROM VWBUSCARFINIQUITOXFACTURA WHERE CCOMPANIA = @ccompania AND CCLIENTE = @ccliente');
+        //sql.close()
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+},
+codeBillLoadingQuery: async() => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+            .query('select MAX(CFACTURA) AS CFACTURA from ADREGISTROFACTURA');
+        //sql.close();
+        console.log(result)
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+},
+createBillLoadingServiceOrderQuery: async(serviceOrderList, billLoadingData) => {
+    try{
+        let rowsAffected = 0;
+        let pool = await sql.connect(config);
+        for(let i = 0; i < serviceOrderList.length; i++){
+            let insert = await pool.request()
+                .input('corden', sql.Int, serviceOrderList[i].corden)
+                .input('cpais', sql.Int, billLoadingData.cpais)
+                .input('ccompania', sql.Int, billLoadingData.ccompania)
+                .input('cusuario', sql.Int, billLoadingData.cusuario)
+                .input('cfactura', sql.Int, billLoadingData.cfactura)
+                .input('cproveedor', sql.Int, billLoadingData.cproveedor)
+                .input('xtipopagador', sql.NVarChar, billLoadingData.xtipopagador)
+                .input('cpagador', sql.Int, billLoadingData.cpagador)
+                .input('ffactura', sql.DateTime, billLoadingData.ffactura)
+                .input('frecepcion', sql.DateTime, billLoadingData.frecepcion)
+                .input('fvencimiento', sql.DateTime, billLoadingData.fvencimiento)
+                .input('nfactura', sql.Numeric(18, 0), billLoadingData.nfactura)
+                .input('ncontrol', sql.Numeric(18, 0), billLoadingData.ncontrol)
+                .input('mmontofactura', sql.Numeric(18, 2), billLoadingData.mmontofactura)
+                .input('xobservacion', sql.NVarChar, billLoadingData.xobservacion)
+                .input('cmoneda', sql.Int, billLoadingData.cmoneda)
+                .input('xrutaarchivo', sql.NVarChar, billLoadingData.xrutaarchivo)
+                .input('fcreacion', sql.DateTime, new Date())
+                .query('INSERT INTO ADREGISTROFACTURA (CFACTURA, CORDEN, CPROVEEDOR, CPAGADOR, XTIPOPAGADOR, XOBSERVACION, FFACTURA, FRECEPCION, FVENCIMIENTO, NFACTURA, NCONTROL, MMONTOFACTURA, CMONEDA, XRUTAARCHIVO, CPAIS, CCOMPANIA, CUSUARIOCREACION, FCREACION) VALUES (@cfactura, @corden, @cproveedor, @cpagador, @xtipopagador, @xobservacion, @ffactura, @frecepcion, @fvencimiento, @nfactura, @ncontrol, @mmontofactura, @cmoneda, @xrutaarchivo, @cpais, @ccompania, @cusuario, @fcreacion)')
+            rowsAffected = rowsAffected + insert.rowsAffected;
+        }
+        //sql.close();
+        return { result: { rowsAffected: rowsAffected } };
+    }
+    catch(err){
+        return { error: err.message };
+    }
+},
+createBillLoadingSettlementQuery: async(settlementList, billLoadingData) => {
+    try{
+        let rowsAffected = 0;
+        let pool = await sql.connect(config);
+        for(let i = 0; i < settlementList.length; i++){
+            let insert = await pool.request()
+                .input('cfiniquito', sql.Int, settlementList[i].cfiniquito)
+                .input('cpais', sql.Int, billLoadingData.cpais)
+                .input('ccompania', sql.Int, billLoadingData.ccompania)
+                .input('cusuario', sql.Int, billLoadingData.cusuario)
+                .input('cfactura', sql.Int, billLoadingData.cfactura)
+                .input('cproveedor', sql.Int, billLoadingData.cproveedor)
+                .input('xtipopagador', sql.NVarChar, billLoadingData.xtipopagador)
+                .input('cpagador', sql.Int, billLoadingData.cpagador)
+                .input('ffactura', sql.DateTime, billLoadingData.ffactura)
+                .input('frecepcion', sql.DateTime, billLoadingData.frecepcion)
+                .input('fvencimiento', sql.DateTime, billLoadingData.fvencimiento)
+                .input('nfactura', sql.Numeric(18, 0), billLoadingData.nfactura)
+                .input('ncontrol', sql.Numeric(18, 0), billLoadingData.ncontrol)
+                .input('mmontofactura', sql.Numeric(18, 2), billLoadingData.mmontofactura)
+                .input('xobservacion', sql.NVarChar, billLoadingData.xobservacion)
+                .input('cmoneda', sql.Int, billLoadingData.cmoneda)
+                .input('xrutaarchivo', sql.NVarChar, billLoadingData.xrutaarchivo)
+                .input('fcreacion', sql.DateTime, new Date())
+                .query('INSERT INTO ADREGISTROFACTURA (CFACTURA, CFINIQUITO, CPROVEEDOR, CPAGADOR, XTIPOPAGADOR, XOBSERVACION, FFACTURA, FRECEPCION, FVENCIMIENTO, NFACTURA, NCONTROL, MMONTOFACTURA, CMONEDA, XRUTAARCHIVO, CPAIS, CCOMPANIA, CUSUARIOCREACION, FCREACION) VALUES (@cfactura, @cfiniquito, @cproveedor, @cpagador, @xtipopagador, @xobservacion, @ffactura, @frecepcion, @fvencimiento, @nfactura, @ncontrol, @mmontofactura, @cmoneda, @xrutaarchivo, @cpais, @ccompania, @cusuario, @fcreacion)')
+            rowsAffected = rowsAffected + insert.rowsAffected;
+        }
+        //sql.close();
+        return { result: { rowsAffected: rowsAffected } };
+    }
+    catch(err){
+        console.log(err.message)
+        return { error: err.message };
+    }
+},
+queryTypeMetodologiaContract: async(searchData) => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+        .input('ccompania', sql.Int, searchData.ccompania)
+        .input('cpais', sql.Int, searchData.cpais)
+        .input('binternacional', sql.Bit, searchData.binternacional)
+        .query('select * from MAMETODOLOGIAPAGO WHERE CCOMPANIA = @ccompania AND CPAIS = @cpais AND BACTIVO = 1 AND BINTERNACIONAL = @binternacional');
+    //sql.close();
+    return { result: result };
+}catch(err){
+    return { error: err.message };
+}
 },
 }
 

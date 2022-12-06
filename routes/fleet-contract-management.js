@@ -508,7 +508,6 @@ router.route('/detail').post((req, res) => {
             }
             res.json({ data: result });
         }).catch((err) => {
-            console.log(err.message)
             res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationDetailFleetContractManagement' } });
         });
     }
@@ -522,6 +521,7 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
         ccompania: requestBody.ccompania,
         ccontratoflota: requestBody.ccontratoflota
     };
+    console.log(fleetContractData);
     let getFleetContractData = await bd.getFleetContractDataQuery(fleetContractData).then((res) => res);
     if(getFleetContractData.error){ return { status: false, code: 500, message: getFleetContractData.error }; }
     if(getFleetContractData.result.rowsAffected > 0){
@@ -1074,7 +1074,6 @@ router.route('/create/individualContract').post((req, res) => {
         }
         res.json({ data: result });
     }).catch((err) => {
-        console.log(err.message)
         res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationContract' } });
     });
 });
@@ -1123,12 +1122,17 @@ const operationCreateIndividualContract = async(requestBody) => {
         icedula: requestBody.icedula ? requestBody.icedula : undefined,
         femision: requestBody.femision ,
         ivigencia: requestBody.ivigencia ? requestBody.ivigencia : undefined,
-
     };
+    let paymentList = {
+        ctipopago: requestBody.payment.ctipopago,
+        xreferencia: requestBody.payment.xreferencia,
+        fcobro: requestBody.payment.fcobro,
+        cbanco: requestBody.payment.cbanco,
+        mprima_pagada: requestBody.payment.mprima_pagada
+    }
     if(userData){
-        let operationCreateIndividualContract = await bd.createIndividualContractQuery(userData).then((res) => res);
-        if(operationCreateIndividualContract.error){ console.log(operationCreateIndividualContract.error);return { status: false, code: 500, message: operationCreateIndividualContract.error }; }
-
+        let operationCreateIndividualContract = await bd.createIndividualContractQuery(userData, paymentList).then((res) => res);
+        if(operationCreateIndividualContract.error){ return { status: false, code: 500, message: operationCreateIndividualContract.error }; }
     }
     if(requestBody.accessory){
         if(requestBody.accessory.create){
@@ -1147,7 +1151,6 @@ const operationCreateIndividualContract = async(requestBody) => {
     }
     let lastFleetContract = await bd.getLastFleetContract();
     if(lastFleetContract.error){ return { status: false, code: 500, message: lastFleetContract.error }; }
-    console.log(lastFleetContract);
     let lastReceipt = await bd.getLastReceipt(requestBody.xplaca.toUpperCase(), lastFleetContract.ccontratoflota);
     if(lastReceipt.error){ return { status: false, code: 500, message: lastReceipt.error }; }
     let getCharge = await bd.getCharge(lastReceipt.ccarga);
@@ -1263,7 +1266,6 @@ router.route('/tarifa-casco').post((req, res) => {
             }
             res.json({ data: result });
         }).catch((err) => {
-            console.log(err.message)
             res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationTarifaCasco' } });
         });
     }
@@ -1330,7 +1332,6 @@ router.route('/value-plan').post((req, res) => {
             }
             res.json({ data: result });
         }).catch((err) => {
-            console.log(err.message)
             res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationPlanValue' } });
         });
     }
@@ -1340,17 +1341,21 @@ const operationValuePlan = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
     let searchData = {
         cplan_rc: requestBody.cplan,
-        cmetodologiapago: requestBody.ivigencia,
+        cmetodologiapago: requestBody.cmetodologiapago,
+        xtipo: requestBody.xtipo
     };
-
     let valueplan = await bd.SearchPlanValue(searchData).then((res) => res);
     if(valueplan.error){ return { status: false, code: 500, message: ValuePlan.error }; }
     if(valueplan.result.rowsAffected > 0){
-        return { status : true,
-                mprima: valueplan.result.recordset[0].MPRIMA,
-                
+                console.log(valueplan.result.recordset[0].MPRIMA.toFixed(2))
+               
+        return { 
+                status : true,
+                mprima: valueplan.result.recordset[0].MPRIMA.toFixed(2),
+                ccubii: valueplan.result.recordset[0].CCUBII,
+  
                };
-        
+                     
     }else{ return { status: false, code: 404, message: 'value not found.' }; }
 
     
@@ -1367,7 +1372,6 @@ router.route('/update-coverage').post((req, res) => {
             }
             res.json({ data: result });
         }).catch((err) => {
-            console.log(err.message)
             res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationUpdateFleetContractCoverage' } });
         });
     }
@@ -1395,7 +1399,6 @@ const operationUpdateFleetContractCoverage = async(authHeader, requestBody) => {
             mprima: requestBody.coverage.update.mprima,
             msuma_aseg: requestBody.coverage.update.msuma_aseg
         })
-        console.log(coverageList)
         let updateCoverageFromFleetContract = await bd.updateCoverageFromFleetContractQuery(coverageList).then((res) => res);
         if(updateCoverageFromFleetContract.error){ return { status: false, code: 500, message: updateCoverageFromFleetContract.error }; }
     }
@@ -1425,7 +1428,6 @@ router.route('/detail-coverage').post((req, res) => {
             }
             res.json({ data: result });
         }).catch((err) => {
-            console.log(err.message)
             res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationDetailCoverage' } });
         });
     }
@@ -1453,7 +1455,7 @@ const operationDetailCoverage = async(authHeader, requestBody) => {
 }
 
 
-router.route('/validation').post((req, res) => {
+router.route('/validationexistingcustomer').post((req, res) => {
     if(!req.header('Authorization')){ 
         res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
         return;
@@ -1465,7 +1467,6 @@ router.route('/validation').post((req, res) => {
             }
             res.json({ data: result });
         }).catch((err) => {
-            console.log(err.message)
             res.status(404).json({ data: { status: false, code: 404, message: err.message, hint: 'operationSearchClient' } });
         });
     }
@@ -1495,6 +1496,45 @@ const operationValidationUser = async(authHeader, requestBody) => {
     }
 }
 
+router.route('/contractvalidationpaid').post((req, res) => {
+    if(!req.header('Authorization')){ 
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
+        return;
+    }else{
+        operationcontractvalidationpaid(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){ 
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            console.log(err.message)
+            res.status(404).json({ data: { status: false, code: 404, message: err.message, hint: 'operationvalidationpaid' } });
+        });
+    }
+});
+
+
+const operationcontractvalidationpaid = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let searchData = {
+        ccodigo_ubii: requestBody.ccodigo_ubii,
+       
+    };
+    let query = await bd.Validatepayment(searchData).then((res) => res);
+    console.log(query)
+    if(query.error){ return { status: false, code: 404, message: operationvalidationpaid.error };  }
+    if(query.result.rowsAffected > 0){
+    return { status: true,
+            cestatusgeneral : query.result.recordset[0].CESTAUSGENERAL
+            }
+    }
+    else if(query.result.rowsAffected < 0){
+        return { status: false,
+            }
+    }
+}
+
 
 router.route('/create/Contract-Broker').post((req, res) => {
     operationCreateContractBroker(req.body).then((result) => {
@@ -1511,74 +1551,65 @@ router.route('/create/Contract-Broker').post((req, res) => {
 
 const operationCreateContractBroker = async(requestBody) => {
     let userData = {
+        icedula: requestBody.icedula ? requestBody.icedula : undefined,
+        xrif_cliente: requestBody.xrif_cliente ? requestBody.xrif_cliente : undefined,
         xnombre: requestBody.xnombre.toUpperCase(),
         xapellido: requestBody.xapellido.toUpperCase(),
-        cano: requestBody.cano ? requestBody.cano : undefined,
-        ccolor: requestBody.ccolor ? requestBody.ccolor : undefined,
+        xtelefono_emp: requestBody.xtelefono_emp,
+        xtelefono_prop: requestBody.xtelefono_prop ? requestBody.xtelefono_prop : undefined,
+        email: requestBody.email ? requestBody.email : undefined,
+        cpais: requestBody.cpais ? requestBody.cpais : undefined,
+        cestado: requestBody.cestado ? requestBody.cestado : undefined,
+        cciudad: requestBody.cciudad ? requestBody.cciudad : undefined,
+        xdireccionfiscal: requestBody.xdireccionfiscal.toUpperCase(),
+        xplaca: requestBody.xplaca.toUpperCase(),
         cmarca: requestBody.cmarca ? requestBody.cmarca : undefined,
         cmodelo: requestBody.cmodelo ? requestBody.cmodelo : undefined,
         cversion: requestBody.cversion ? requestBody.cversion : undefined,
-        xrif_cliente: requestBody.xrif_cliente ? requestBody.xrif_cliente : undefined,
-        email: requestBody.email ? requestBody.email : undefined,
-        xtelefono_prop: requestBody.xtelefono_prop ? requestBody.xtelefono_prop : undefined,
-        xdireccionfiscal: requestBody.xdireccionfiscal.toUpperCase(),
-        xserialmotor: requestBody.xserialmotor.toUpperCase(),
+        cano: requestBody.cano ? requestBody.cano : undefined,
+        ncapacidad_p: requestBody.ncapacidad_p,
+        xcolor: requestBody.xcolor ? requestBody.xcolor : undefined,
         xserialcarroceria: requestBody.xserialcarroceria.toUpperCase(),
-        xplaca: requestBody.xplaca.toUpperCase(),
-        xtelefono_emp: requestBody.xtelefono_emp,
+        xserialmotor: requestBody.xserialmotor.toUpperCase(),
+        xcobertura: requestBody.xcobertura.toUpperCase(),
+        xtipo: requestBody.xtipo.toUpperCase(),
         cplan: requestBody.cplan,
+        cmetodologiapago: requestBody.cmetodologiapago ? requestBody.cmetodologiapago : undefined,
+        femision: requestBody.femision ,
+        ncobro: requestBody.ncobro ,
+        corden: requestBody.corden,
         ccorredor: requestBody.ccorredor ? requestBody.ccorredor : undefined,
         xcedula:requestBody.xcedula,
-        xcobertura: requestBody.xcobertura.toUpperCase(),
-        ncapacidad_p: requestBody.ncapacidad_p,
-        xtipo: requestBody.xtipo.toUpperCase(),
-        cmetodologiapago: requestBody.cmetodologiapago ? requestBody.cmetodologiapago : undefined,
-        msuma_aseg: requestBody.msuma_aseg ? requestBody.msuma_aseg : undefined,
-        pcasco: requestBody.pcasco ? requestBody.pcasco : undefined,
-        mprima_casco: requestBody.mprima_casco ? requestBody.mprima_casco : undefined,
-        mcatastrofico: requestBody.mcatastrofico ? requestBody.mcatastrofico : undefined,
-        pdescuento: requestBody.pdescuento ? requestBody.pdescuento : undefined,
-        mprima_bruta: requestBody.mprima_bruta ? requestBody.mprima_bruta : undefined,
-        mprima_blindaje: requestBody.mprima_blindaje ? requestBody.mprima_blindaje : undefined,
-        msuma_blindaje: requestBody.msuma_blindaje ? requestBody.msuma_blindaje : undefined,
-        pcatastrofico: requestBody.pcatastrofico ? requestBody.pcatastrofico : undefined,
-        pmotin: requestBody.pmotin ? requestBody.pmotin : undefined,
-        mmotin: requestBody.mmotin ? requestBody.mmotin : undefined,
-        pblindaje: requestBody.pblindaje ? requestBody.pblindaje : undefined,
-        cestado: requestBody.cestado ? requestBody.cestado : undefined,
-        cciudad: requestBody.cciudad ? requestBody.cciudad : undefined,
-        cpais: requestBody.cpais ? requestBody.cpais : undefined,
-        icedula: requestBody.icedula ? requestBody.icedula : undefined,
-        femision: requestBody.femision ,
+        // ctipopago: requestBody.ctipopago,
+        // xreferencia: requestBody.xreferencia,
+        // fcobro:requestBody.fcobro,
+        // mprima_pagada: requestBody.mprima_pagada,
+        //ccodigo_ubii: requestBody.ccodigo_ubii
     };
     console.log(userData)
-    if(userData){
-        let operationCreateIndividualContract = await bd.createContractBrokerQueryyy(userData).then((res) => res);
-        if(operationCreateIndividualContract.error){ console.log(operationCreateIndividualContract.error);return { status: false, code: 500, message: operationCreateIndividualContract.error }; }
-
-    }
-    if(requestBody.accessory){
-        if(requestBody.accessory.create){
-            let accessory = [];
-            for(let i = 0; i < requestBody.accessory.create.length; i++){
-                accessory.push({
-                    caccesorio:  requestBody.accessory.create[i].caccesorio,
-                    msuma_accesorio:  requestBody.accessory.create[i].msuma_aseg,
-                    mprima_accesorio:  requestBody.accessory.create[i].mprima,
-                    ptasa:  requestBody.accessory.create[i].ptasa
-                })
-            }
-            let createAccesories = await bd.createAccesoriesFromFleetContractIndividual(accessory).then((res) => res);
-            if(createAccesories.error){ return { status: false, code: 500, message: createAccesories.error }; }
+    let paymentList = {}
+    if(requestBody.payment){
+        paymentList = {
+            ctipopago: requestBody.payment.ctipopago,
+            xreferencia: requestBody.payment.xreferencia,
+            fcobro: requestBody.payment.fcobro,
+            cbanco: requestBody.payment.cbanco,
+            mprima_pagada: requestBody.payment.mprima_pagada
         }
+    }
+    console.log(paymentList)
+    if(userData){
+        let operationCreateIndividualContract = await bd.createContractBrokerQuery(userData, paymentList).then((res) => res);
+        if(operationCreateIndividualContract.error){ console.log(operationCreateIndividualContract.error);return { status: false, code: 500, message: operationCreateIndividualContract.error }; }
     }
     let lastFleetContract = await bd.getLastFleetContract();
     if(lastFleetContract.error){ return { status: false, code: 500, message: lastFleetContract.error }; }
-    console.log(lastFleetContract);
     let lastReceipt = await bd.getLastReceipt(requestBody.xplaca.toUpperCase(), lastFleetContract.ccontratoflota);
     if(lastReceipt.error){ return { status: false, code: 500, message: lastReceipt.error }; }
+    console.log(lastReceipt);
     let getCharge = await bd.getCharge(lastReceipt.ccarga);
     if(getCharge.error){ return { status: false, code: 500, message: getCharge.error }; }
+    console.log(getCharge);
     return { 
         status: true, 
         code: 200, 
@@ -1595,6 +1626,44 @@ const operationCreateContractBroker = async(requestBody) => {
         xrecibo: lastReceipt.xrecibo,
         fsuscripcion: getCharge.fsuscripcion
     };
+}
+
+router.route('/ubii/update').post((req, res) => {
+    if(!req.header('Authorization')){
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } });
+        return;
+    }else{
+        operationUpdateReceiptPayment(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            console.log(err.message)
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationUpdateReceiptPayment' } });
+        });
+    }
+});
+
+const operationUpdateReceiptPayment = async(authHeader, requestBody) => {
+    if(authHeader == 'SKDJK23J4KJ2352304923059'){
+        let orden = requestBody.paymentData.orderId.split("_");
+        let paymentData = {
+            orderId: parseInt(orden[1]),
+            ctipopago: requestBody.paymentData.ctipopago,
+            xreferencia: requestBody.paymentData.xreferencia,
+            fcobro: requestBody.paymentData.fcobro,
+            mprima_pagada: requestBody.paymentData.mprima_pagada
+        }
+        console.log(paymentData);
+        let updateReceiptPayment = await bd.updateReceiptPaymentBrokerQuery(paymentData);
+        if(updateReceiptPayment.error){ return { status: false, code: 500, message: updateReceiptPayment.error }; }
+        if(updateReceiptPayment.result.rowsAffected > 0){ return { status: true }; }
+        else{ 
+            return { status: false, code: 404, message: 'Receipt Not Found.' }; }
+    
+    } else { return { status: false, code: 401, condition: 'token-expired', expired: true }; }
 }
 
 module.exports = router;

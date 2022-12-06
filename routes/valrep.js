@@ -197,7 +197,9 @@ const operationValrepState = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
     if(!helper.validateRequestObj(requestBody, ['cpais'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
     let cpais = requestBody.cpais;
+
     let query = await bd.stateValrepQuery(cpais).then((res) => res);
+
     if(query.error){ return { status: false, code: 500, message: query.error }; }
     let jsonArray = [];
     for(let i = 0; i < query.result.recordset.length; i++){
@@ -2599,7 +2601,7 @@ const operationValrepPlan = async(authHeader, requestBody) => {
     if(query.error){ return { status: false, code: 500, message: query.error }; }
     let jsonArray = [];
     for(let i = 0; i < query.result.recordset.length; i++){
-        jsonArray.push({ cplan: query.result.recordset[i].CPLAN, xplan: query.result.recordset[i].XPLAN, bactivo: query.result.recordset[i].BACTIVO });
+        jsonArray.push({ cplan: query.result.recordset[i].CPLAN, xplan: query.result.recordset[i].XPLAN, binternacional: query.result.recordset[i].BINTERNACIONAL, bactivo: query.result.recordset[i].BACTIVO, control: i });
     }
     return { status: true, list: jsonArray }
 }
@@ -2925,6 +2927,43 @@ const operationValrepTypeMetodologia = async(authHeader, requestBody) => {
     };
 
     let query = await bd.TypeMetodologia(searchData).then((res) => res);
+    if(query.error){ return { status: false, code: 500, message: query.error }; }
+    let jsonArray = [];
+    for(let i = 0; i < query.result.recordset.length; i++){
+        jsonArray.push({ 
+            cmetodologiapago: query.result.recordset[i].CMETODOLOGIAPAGO,
+            xmetodologiapago: query.result.recordset[i].XMETODOLOGIAPAGO });
+    }
+
+    return { status: true, list: jsonArray }
+}
+
+router.route('/metodologia-pago-contract').post((req, res) => {
+    if(!req.header('Authorization')){ 
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
+        return;
+    }else{
+        operationValrepTypeMetodologiaContract(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){ 
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationValrepTypeMetodologiaContract' } });
+        });
+    }
+});
+
+const operationValrepTypeMetodologiaContract = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let searchData = {
+        ccompania: requestBody.ccompania,
+        cpais: requestBody.cpais,
+        binternacional: requestBody.binternacional
+    };
+
+    let query = await bd.queryTypeMetodologiaContract(searchData).then((res) => res);
     if(query.error){ return { status: false, code: 500, message: query.error }; }
     let jsonArray = [];
     for(let i = 0; i < query.result.recordset.length; i++){
