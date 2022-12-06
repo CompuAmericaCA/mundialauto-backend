@@ -537,10 +537,10 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
             telefonopropietario = getFleetContractOwnerData.result.recordset[0].XTELEFONOCASA
         }
         if(getFleetContractOwnerData.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Fleet Contract Owner not found.' }; }
-        let getFleetContractOwnerVehicleData = await bd.getFleetContractOwnerVehicleDataQuery(getFleetContractData.result.recordset[0].CPROPIETARIO, getFleetContractData.result.recordset[0].CVEHICULOPROPIETARIO).then((res) => res);
+        /*let getFleetContractOwnerVehicleData = await bd.getFleetContractOwnerVehicleDataQuery(getFleetContractData.result.recordset[0].CPROPIETARIO, getFleetContractData.result.recordset[0].CVEHICULOPROPIETARIO).then((res) => res);
         if(getFleetContractOwnerVehicleData.error){ console.log(getFleetContractOwnerVehicleData.error); return { status: false, code: 500, message: getFleetContractOwnerVehicleData.error }; }
         if(getFleetContractOwnerVehicleData.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Fleet Contract Owner Vehicle not found.' }; }
-        /*let searchQuoteByFleet = await bd.searchQuoteByFleetQuery(fleetContractData).then((res) => res);
+        *//*let searchQuoteByFleet = await bd.searchQuoteByFleetQuery(fleetContractData).then((res) => res);
         if(searchQuoteByFleet.error){ return { status: false, code: 500, message: searchQuoteByFleet.error }; }
         if(searchQuoteByFleet.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Quote By Fleet not found.' }; }*/
         /*let accesories = [];
