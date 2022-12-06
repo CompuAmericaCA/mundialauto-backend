@@ -1584,25 +1584,17 @@ const operationCreateContractBroker = async(requestBody) => {
         // xreferencia: requestBody.xreferencia,
         // fcobro:requestBody.fcobro,
         // mprima_pagada: requestBody.mprima_pagada,
-        ccodigo_ubii: requestBody.ccodigo_ubii
+        //ccodigo_ubii: requestBody.ccodigo_ubii
     };
     console.log(userData)
     let paymentList = {}
-    if(requestBody.payment.ctipopago){
+    if(requestBody.payment){
         paymentList = {
             ctipopago: requestBody.payment.ctipopago,
             xreferencia: requestBody.payment.xreferencia,
             fcobro: requestBody.payment.fcobro,
             cbanco: requestBody.payment.cbanco,
             mprima_pagada: requestBody.payment.mprima_pagada
-        }
-    }else{
-        paymentList = {
-            ctipopago: requestBody.ctipopago,
-            xreferencia: requestBody.xreferencia,
-            fcobro: requestBody.fcobro,
-            // cbanco: requestBody.cbanco,
-            mprima_pagada: requestBody.mprima_pagada
         }
     }
     console.log(paymentList)
