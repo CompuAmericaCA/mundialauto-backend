@@ -144,7 +144,7 @@ module.exports = {
         try{
             let pool = await sql.connect(config);
             let result = await pool.request()
-                .query('select CPAIS, XPAIS, BACTIVO from MAPAIS');
+                .query('select CPAIS, XPAIS, BACTIVO from MAPAIS WHERE BACTIVO = 1');
             //sql.close();
             return { result: result };
         }catch(err){
