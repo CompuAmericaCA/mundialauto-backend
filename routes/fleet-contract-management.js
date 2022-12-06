@@ -1544,6 +1544,7 @@ router.route('/create/Contract-Broker').post((req, res) => {
         }
         res.json({ data: result });
     }).catch((err) => {
+        console.log(err.message)
         res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationContract' } });
     });
 });
@@ -1579,36 +1580,32 @@ const operationCreateContractBroker = async(requestBody) => {
         corden: requestBody.corden,
         ccorredor: requestBody.ccorredor ? requestBody.ccorredor : undefined,
         xcedula:requestBody.xcedula,
-        ctipopago: requestBody.ctipopago,
-        xreferencia: requestBody.xreferencia,
-        fcobro:requestBody.fcobro,
-        mprima_pagada: requestBody.mprima_pagada,
+        // ctipopago: requestBody.ctipopago,
+        // xreferencia: requestBody.xreferencia,
+        // fcobro:requestBody.fcobro,
+        // mprima_pagada: requestBody.mprima_pagada,
         ccodigo_ubii: requestBody.ccodigo_ubii
     };
-    let paymentList = {
-        ctipopago: requestBody.payment.ctipopago,
-        xreferencia: requestBody.payment.xreferencia,
-        fcobro: requestBody.payment.fcobro,
-        cbanco: requestBody.payment.cbanco,
-        mprima_pagada: requestBody.payment.mprima_pagada
+    console.log(userData)
+    let paymentList = {}
+    if(requestBody.payment.ctipopago){
+        paymentList = {
+            ctipopago: requestBody.payment.ctipopago,
+            xreferencia: requestBody.payment.xreferencia,
+            fcobro: requestBody.payment.fcobro,
+            cbanco: requestBody.payment.cbanco,
+            mprima_pagada: requestBody.payment.mprima_pagada
+        }
+    }else{
+        paymentList = {
+            ctipopago: requestBody.ctipopago,
+            xreferencia: requestBody.xreferencia,
+            fcobro: requestBody.fcobro,
+            // cbanco: requestBody.cbanco,
+            mprima_pagada: requestBody.mprima_pagada
+        }
     }
-    // if(requestBody.payment){
-    //     if(requestBody.payment.add){
-    //         let payment = [];
-    //         for(let i = 0; i < requestBody.payment.add.length; i++){
-    //             payment.push({
-    //                 ctipopago:  requestBody.payment.add[i].ctipopago,
-    //                 xreferencia:  requestBody.payment.add[i].xreferencia,
-    //                 fcobro:  requestBody.payment.add[i].fcobro,
-    //                 cbanco:  requestBody.payment.add[i].cbanco,
-    //                 mprima_pagada:  requestBody.payment.add[i].mprima_pagada
-    //             })
-    //         }
-    //         let id =  requestBody.xcedula
-    //         let addpayment = await bd.AddPaymentData(payment,id).then((res) => res);
-    //         if(addpayment.error){ return { status: false, code: 500, message: addpayment.error }; }
-    //     }
-    // }
+    console.log(paymentList)
     if(userData){
         let operationCreateIndividualContract = await bd.createContractBrokerQuery(userData, paymentList).then((res) => res);
         if(operationCreateIndividualContract.error){ console.log(operationCreateIndividualContract.error);return { status: false, code: 500, message: operationCreateIndividualContract.error }; }
