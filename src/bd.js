@@ -8566,11 +8566,11 @@ module.exports = {
                 .input('cpais', sql.Numeric(11, 0), userData.cpais)
                 .input('icedula', sql.NVarChar, userData.icedula)
                 .input('ivigencia', sql.Int, userData.ivigencia)
-                .input('ctipopago', sql.Int, paymentList.ctipopago)
-                .input('cbanco', sql.Int, paymentList.cbanco)
-                .input('xreferencia', sql.NVarChar, paymentList.xreferencia)
-                .input('fcobro', sql.DateTime, paymentList.fcobro)
-                .input('mprima_pagada', sql.Numeric(18, 2), paymentList.mprima_pagada)
+                .input('ctipopago', sql.Int, paymentList.ctipopago ? paymentList.ctipopago: 0)
+                .input('cbanco', sql.Int, paymentList.cbanco ? paymentList.cbanco: 0)
+                .input('xreferencia', sql.NVarChar, paymentList.xreferencia ? paymentList.xreferencia: 0)
+                .input('fcobro', sql.DateTime, paymentList.fcobro ? paymentList.fcobro: 0)
+                .input('mprima_pagada', sql.Numeric(18, 2), paymentList.mprima_pagada ? paymentList.mprima_pagada: 0)
                 .query('insert into TMEMISION_INDIVIDUAL(XNOMBRE, XAPELLIDO, CANO, XCOLOR, CMARCA, CMODELO, CVERSION, XRIF_CLIENTE, EMAIL, XTELEFONO_PROP, XDIRECCIONFISCAL, XSERIALMOTOR, XSERIALCARROCERIA, XPLACA, XTELEFONO_EMP, CPLAN, CCORREDOR, XCEDULA, XCOBERTURA, NCAPACIDAD_P, XTIPO, FINICIO, CMETODOLOGIAPAGO, MSUMA_ASEG, PCASCO, MPRIMA_CASCO, MCATASTROFICO, PDESCUENTO, IFRACCIONAMIENTO, NCUOTAS, MPRIMA_BLINDAJE, MSUMA_BLINDAJE, MPRIMA_BRUTA, PCATASTROFICO, PMOTIN, MMOTIN, PBLINDAJE, CESTADO, CCIUDAD, CPAIS, ICEDULA, FEMISION, IVIGENCIA, CTIPOPAGO, XREFERENCIA, FCOBRO, CBANCO, MPRIMA_PAGADA) values (@xnombre, @xapellido, @cano, @xcolor, @cmarca, @cmodelo, @cversion, @xrif_cliente, @email, @xtelefono_prop, @xdireccionfiscal, @xserialmotor, @xserialcarroceria, @xplaca, @xtelefono_emp, @cplan, @ccorredor, @xcedula, @xcobertura, @ncapacidad_p, @xtipo, @finicio, @cmetodologiapago, @msuma_aseg, @pcasco, @mprima_casco, @mcatastrofico, @pdescuento, @ifraccionamiento, @ncuotas, @mprima_blindaje, @msuma_blindaje, @mprima_bruta,@pcatastrofico ,@pmotin, @mmotin, @pblindaje, @cestado, @cciudad, @cpais, @icedula, @femision, @ivigencia, @ctipopago, @xreferencia, @fcobro, @cbanco, @mprima_pagada)')
             //sql.close();
             return { result: { rowsAffected: rowsAffected, status: true } };

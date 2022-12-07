@@ -1074,7 +1074,8 @@ router.route('/create/individualContract').post((req, res) => {
         }
         res.json({ data: result });
     }).catch((err) => {
-        res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationContract' } });
+        console.log(err.message)
+        res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationCreateIndividualContract' } });
     });
 });
 
@@ -1123,12 +1124,23 @@ const operationCreateIndividualContract = async(requestBody) => {
         femision: requestBody.femision ,
         ivigencia: requestBody.ivigencia ? requestBody.ivigencia : undefined,
     };
-    let paymentList = {
-        ctipopago: requestBody.payment.ctipopago,
-        xreferencia: requestBody.payment.xreferencia,
-        fcobro: requestBody.payment.fcobro,
-        cbanco: requestBody.payment.cbanco,
-        mprima_pagada: requestBody.payment.mprima_pagada
+    let paymentList = {};
+    if(requestBody.payment){
+        paymentList = {
+            ctipopago: requestBody.payment.ctipopago,
+            xreferencia: requestBody.payment.xreferencia,
+            fcobro: requestBody.payment.fcobro,
+            cbanco: requestBody.payment.cbanco,
+            mprima_pagada: requestBody.payment.mprima_pagada
+        }
+    }else{
+        paymentList = {
+            ctipopago:  requestBody.ctipopago ? requestBody.ctipopago: undefined,
+            xreferencia:  requestBody.xreferencia ? requestBody.xreferencia: undefined,
+            fcobro: requestBody.fcobro ? requestBody.fcobro: undefined,
+            cbanco: requestBody.cbanco ? requestBody.cbanco: undefined,
+            mprima_pagada: requestBody.mprima_pagada ? requestBody.mprima_pagada: undefined
+        }
     }
     if(userData){
         let operationCreateIndividualContract = await bd.createIndividualContractQuery(userData, paymentList).then((res) => res);
@@ -1281,23 +1293,23 @@ const operationTarifaCasco = async(authHeader, requestBody) => {
         xcobertura:requestBody.xcobertura,
     };
     if(requestBody.xcobertura == 'AMPLIA'){
-    let query = await bd.SearchTarifaCasco(searchData).then((res) => res);
-    if(query.error){ return { status: false, code: 500, message: operationTarifaCasco.error };  }
-    if(query.result){
-        let tarifa = await bd.SearchTarifas(searchData).then((res) => res);
-        if(tarifa.error){ return { status: false, code: 500, message: operationTarifas.error };}
-        let jsonList = [];
-        for(let i = 0; i < tarifa.result.recordset.length; i++){
-            jsonList.push({ptarifa: tarifa.result.recordset[i].PTARIFA});
+        let query = await bd.SearchTarifaCasco(searchData).then((res) => res);
+        if(query.error){ return { status: false, code: 500, message: operationTarifaCasco.error };  }
+        if(query.result){
+            let tarifa = await bd.SearchTarifas(searchData).then((res) => res);
+            if(tarifa.error){ return { status: false, code: 500, message: operationTarifas.error };}
+            let jsonList = [];
+            for(let i = 0; i < tarifa.result.recordset.length; i++){
+                jsonList.push({ptarifa: tarifa.result.recordset[i].PTARIFA});
+            }
+            return { status: true,
+                    ptasa_casco: query.result.recordset[0].PTASA_CASCO,
+                    ptarifa: jsonList
+                    }
         }
         return { status: true,
-                  ptasa_casco: query.result.recordset[0].PTASA_CASCO,
-                 ptarifa: jsonList
+                ptasa_casco: query.result.recordset[0].PTASA_CASCO
                 }
-    }
-    return { status: true,
-             ptasa_casco: query.result.recordset[0].PTASA_CASCO
-            }
     }
     
     else if(requestBody.xcobertura == 'PERDIDA TOTAL'){
