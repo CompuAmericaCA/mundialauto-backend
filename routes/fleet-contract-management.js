@@ -1592,6 +1592,21 @@ const operationCreateContractBroker = async(requestBody) => {
         corden: requestBody.corden,
         ccorredor: requestBody.ccorredor ? requestBody.ccorredor : undefined,
         xcedula:requestBody.xcedula,
+        ivigencia: requestBody.ivigencia ? requestBody.ivigencia : undefined,
+        msuma_aseg: requestBody.msuma_aseg ? requestBody.msuma_aseg : undefined,
+        pcasco: requestBody.pcasco ? requestBody.pcasco : undefined,
+        mprima_casco: requestBody.mprima_casco ? requestBody.mprima_casco : undefined,
+        mcatastrofico: requestBody.mcatastrofico ? requestBody.mcatastrofico : undefined,
+        pdescuento: requestBody.pdescuento ? requestBody.pdescuento : undefined,
+        ifraccionamiento: requestBody.ifraccionamiento ? requestBody.ifraccionamiento : undefined,
+        ncuotas: requestBody.ncuotas ? requestBody.ncuotas : undefined,
+        mprima_bruta: requestBody.mprima_bruta ? requestBody.mprima_bruta : undefined,
+        mprima_blindaje: requestBody.mprima_blindaje ? requestBody.mprima_blindaje : undefined,
+        msuma_blindaje: requestBody.msuma_blindaje ? requestBody.msuma_blindaje : undefined,
+        pcatastrofico: requestBody.pcatastrofico ? requestBody.pcatastrofico : undefined,
+        pmotin: requestBody.pmotin ? requestBody.pmotin : undefined,
+        mmotin: requestBody.mmotin ? requestBody.mmotin : undefined,
+        pblindaje: requestBody.pblindaje ? requestBody.pblindaje : undefined,
         // ctipopago: requestBody.ctipopago,
         // xreferencia: requestBody.xreferencia,
         // fcobro:requestBody.fcobro,
@@ -1599,7 +1614,7 @@ const operationCreateContractBroker = async(requestBody) => {
         //ccodigo_ubii: requestBody.ccodigo_ubii
     };
     console.log(userData)
-    let paymentList = {}
+    let paymentList = {};
     if(requestBody.payment){
         paymentList = {
             ctipopago: requestBody.payment.ctipopago,
@@ -1607,6 +1622,14 @@ const operationCreateContractBroker = async(requestBody) => {
             fcobro: requestBody.payment.fcobro,
             cbanco: requestBody.payment.cbanco,
             mprima_pagada: requestBody.payment.mprima_pagada
+        }
+    }else{
+        paymentList = {
+            ctipopago:  requestBody.ctipopago ? requestBody.ctipopago: undefined,
+            xreferencia:  requestBody.xreferencia ? requestBody.xreferencia: undefined,
+            fcobro: requestBody.fcobro ? requestBody.fcobro: undefined,
+            cbanco: requestBody.cbanco ? requestBody.cbanco: undefined,
+            mprima_pagada: requestBody.mprima_pagada ? requestBody.mprima_pagada: undefined
         }
     }
     console.log(paymentList)
