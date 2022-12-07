@@ -300,7 +300,7 @@ const operationValrepBrand = async(authHeader, requestBody) => {
     if(query.error){ return { status: false, code: 500, message: query.error }; }
     let jsonArray = [];
     for(let i = 0; i < query.result.recordset.length; i++){
-        jsonArray.push({ cmarca: query.result.recordset[i].CMARCA, xmarca: query.result.recordset[i].XMARCA, bactivo: query.result.recordset[i].BACTIVO });
+        jsonArray.push({ cmarca: query.result.recordset[i].CMARCA, xmarca: query.result.recordset[i].XMARCA, bactivo: query.result.recordset[i].BACTIVO, control: i });
     }
     return { status: true, list: jsonArray }
 }
@@ -333,7 +333,7 @@ const operationValrepModel = async(authHeader, requestBody) => {
     if(query.error){ return { status: false, code: 500, message: query.error }; }
     let jsonArray = [];
     for(let i = 0; i < query.result.recordset.length; i++){
-        jsonArray.push({ cmodelo: query.result.recordset[i].CMODELO, xmodelo: query.result.recordset[i].XMODELO, bactivo: query.result.recordset[i].BACTIVO });
+        jsonArray.push({ cmodelo: query.result.recordset[i].CMODELO, xmodelo: query.result.recordset[i].XMODELO, bactivo: query.result.recordset[i].BACTIVO, control: i });
     }
     return { status: true, list: jsonArray }
 }
@@ -2205,7 +2205,6 @@ const operationValrepVersion = async(authHeader, requestBody) => {
         cmarca: requestBody.cmarca ? requestBody.cmarca : undefined,
         cmodelo: requestBody.cmodelo ? requestBody.cmodelo : undefined,
     };
-
     let query = await bd.versionValrepQuery(searchData).then((res) => res);
     if(query.error){ return { status: false, code: 500, message: query.error }; }
     let jsonArray = [];

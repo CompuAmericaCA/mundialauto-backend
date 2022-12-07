@@ -279,4 +279,175 @@ const operationGetLastExchangeRate = async(authHeader, requestBody) => {
     }else{ return { status: false, code: 404, message: 'Exchange Rate not found.' }; }
 }
 
+router.route('/detail-exchange-rate').post((req, res) => {
+    if(!req.header('Authorization')){
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } });
+        return;
+    }else{
+        operationDetailExchangeRate(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationDetailExchangeRate' } });
+        });
+    }
+});
+
+const operationDetailExchangeRate = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let searchData = {
+        cpais: requestBody.cpais,
+        ccompania: requestBody.ccompania,
+        ctasa: requestBody.ctasa
+    }
+    let detailExchangeRate = await bd.detailExchangeRateQuery(searchData).then((res) => res);
+    if(detailExchangeRate.error){ return  { status: false, code: 500, message: detailExchangeRate.error }; }
+    if(detailExchangeRate.result.rowsAffected > 0){
+        return { status: true, 
+                 ctasa: detailExchangeRate.result.recordset[0].CTASA,
+                 mtasa_cambio: detailExchangeRate.result.recordset[0].MTASA_CAMBIO,
+                 fingreso: detailExchangeRate.result.recordset[0].FINGRESO
+               };
+    }else{ return { status: false, code: 404, message: 'Notification not found.' }; }
+}
+
+router.route('/settlement').post((req, res) => {
+    if(!req.header('Authorization')){
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } });
+        return;
+    }else{
+        operationSettlementFromBillLoading(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            console.log(err.message)
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationSettlementFromBillLoading' } });
+        });
+    }
+});
+
+const operationSettlementFromBillLoading = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let searchData = {
+        ccompania: requestBody.ccompania,
+        ccliente: requestBody.ccliente
+    }
+    let searchSettlementFromBillLoading = await bd.searchSettlementFromBillLoadingQuery(searchData).then((res) => res);
+    if(searchSettlementFromBillLoading.error){ return  { status: false, code: 500, message: searchSettlementFromBillLoading.error }; }
+    if(searchSettlementFromBillLoading.result.rowsAffected > 0){
+        let jsonList = [];
+        for(let i = 0; i < searchSettlementFromBillLoading.result.recordset.length; i++){
+            jsonList.push({
+                cfiniquito: searchSettlementFromBillLoading.result.recordset[i].CFINIQUITO,
+                xcliente: searchSettlementFromBillLoading.result.recordset[i].XCLIENTE,
+                xdanos: searchSettlementFromBillLoading.result.recordset[i].XDANOS,
+                mmontofiniquito: searchSettlementFromBillLoading.result.recordset[i].MMONTOFINIQUITO,
+                xmoneda: searchSettlementFromBillLoading.result.recordset[i].xmoneda,
+            });
+        }
+        return { status: true, list: jsonList };
+    }else{ return { status: false, code: 404, message: 'Notification not found.' }; }
+}
+
+router.route('/code-bill-loading').post((req, res) => {
+    if(!req.header('Authorization')){
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } });
+        return;
+    }else{
+        operationCodeBillLoading(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationCodeBillLoading' } });
+        });
+    }
+});
+
+const operationCodeBillLoading = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let codeBillLoading = await bd.codeBillLoadingQuery().then((res) => res);
+    if(codeBillLoading.error){ return  { status: false, code: 500, message: codeBillLoading.error }; }
+    if(codeBillLoading.result.rowsAffected > 0){
+        return { status: true, 
+            cfactura: codeBillLoading.result.recordset[0].CFACTURA + 1,
+          };
+    }else{ return { status: false, code: 404, message: 'Notification not found.' }; }
+}
+
+router.route('/create-bill-loading').post((req, res) => {
+    if(!req.header('Authorization')){
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } });
+        return;
+    }else{
+        operationCreateBillLoading(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            console.log(err.message)
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationCreateBillLoading' } });
+        });
+    }
+});
+
+const operationCreateBillLoading = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let billLoadingData = {
+        cpais: requestBody.cpais,
+        ccompania: requestBody.ccompania,
+        cusuario: requestBody.cusuario,
+        cproveedor: requestBody.cproveedor,
+        xtipopagador: requestBody.xtipopagador,
+        cpagador: requestBody.cpagador,
+        ffactura: requestBody.ffactura,
+        frecepcion: requestBody.frecepcion,
+        fvencimiento: requestBody.fvencimiento,
+        nfactura: requestBody.nfactura,
+        ncontrol:requestBody.ncontrol,
+        mmontofactura: requestBody.mmontofactura,
+        xobservacion: requestBody.xobservacion.toUpperCase(),
+        cfactura: requestBody.cfactura,
+        xrutaarchivo: requestBody.xrutaarchivo,
+        cmoneda: requestBody.cmoneda
+    }
+    if(requestBody.serviceorder){
+        if(requestBody.serviceorder.create && requestBody.serviceorder.create.length > 0){
+            let serviceOrderList = [];
+            for(let i = 0; i < requestBody.serviceorder.create.length; i++){
+                serviceOrderList.push({
+                    corden: requestBody.serviceorder.create[i].corden
+                })
+            }
+            let createBillLoadingServiceOrder = await bd.createBillLoadingServiceOrderQuery(serviceOrderList, billLoadingData).then((res) => res);
+            if(createBillLoadingServiceOrder.error){ return { status: false, code: 500, message: createBillLoadingServiceOrder.error }; }
+            
+        }
+    }
+    if(requestBody.settlement){
+        if(requestBody.settlement.create && requestBody.settlement.create.length > 0){
+            let settlementList = [];
+            for(let i = 0; i < requestBody.settlement.create.length; i++){
+                settlementList.push({
+                    cfiniquito: requestBody.settlement.create[i].cfiniquito
+                })
+            }
+            let createBillLoadingSettlement = await bd.createBillLoadingSettlementQuery(settlementList, billLoadingData).then((res) => res);
+            if(createBillLoadingSettlement.error){ return { status: false, code: 500, message: createBillLoadingSettlement.error }; }
+            
+        }
+    }
+    return { status: true, ccontratoflota: billLoadingData.cfactura }; 
+}
+
 module.exports = router;
