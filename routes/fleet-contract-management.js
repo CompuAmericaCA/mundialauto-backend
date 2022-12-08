@@ -508,6 +508,7 @@ router.route('/detail').post((req, res) => {
             }
             res.json({ data: result });
         }).catch((err) => {
+            console.log(err.message)
             res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationDetailFleetContractManagement' } });
         });
     }
@@ -1124,6 +1125,7 @@ const operationCreateIndividualContract = async(requestBody) => {
         femision: requestBody.femision ,
         ivigencia: requestBody.ivigencia ? requestBody.ivigencia : undefined,
     };
+    console.log(userData)
     let paymentList = {};
     if(requestBody.payment){
         paymentList = {
