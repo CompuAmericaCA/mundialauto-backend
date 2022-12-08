@@ -8519,6 +8519,7 @@ module.exports = {
     },
 
     createIndividualContractQuery: async(userData, paymentList) => {
+        console.log(userData.cpais)
         try{
             let rowsAffected = 0;
             let pool = await sql.connect(config);
@@ -8784,7 +8785,7 @@ module.exports = {
                 .input('cpais', sql.Numeric(4, 0), fleetContractData.cpais)
                 .input('ccompania', sql.Int, fleetContractData.ccompania)
                 .input('cpropietario', sql.Int, cpropietario)
-                .query('select * from VWBUSCARPROPIETARIOXCONTRATOFLOTADATA where CPAIS = @cpais and CCOMPANIA = @ccompania and CPROPIETARIO = @cpropietario');
+                .query('select * from VWBUSCARPROPIETARIOXCONTRATOFLOTADATA where  CCOMPANIA = @ccompania and CPROPIETARIO = @cpropietario');
             //sql.close();
             return { result: result };
         }catch(err){
