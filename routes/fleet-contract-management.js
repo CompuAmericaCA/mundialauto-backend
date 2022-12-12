@@ -516,7 +516,7 @@ router.route('/detail').post((req, res) => {
 
 const operationDetailFleetContractManagement = async(authHeader, requestBody) => { 
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
-    if(!helper.validateRequestObj(requestBody, ['cpais', 'ccompania', 'ccontratoflota'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
+    //if(!helper.validateRequestObj(requestBody, ['cpais', 'ccompania', 'ccontratoflota'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
     let fleetContractData = {
         cpais: requestBody.cpais,
         ccompania: requestBody.ccompania,
@@ -1504,8 +1504,12 @@ const operationValidationUser = async(authHeader, requestBody) => {
              xtelefonocelular:  query.result.recordset[0].XTELEFONOCELULAR,
              xtelefonocasa:  query.result.recordset[0].XTELEFONOCASA,
              ccorredor:  query.result.recordset[0].CCORREDOR,
+             cpais:  query.result.recordset[0].CPAIS,
+             xpais:  query.result.recordset[0].XPAIS,
              cestado:  query.result.recordset[0].CESTADO,
+             xestado:  query.result.recordset[0].XESTADO,
              cciudad:  query.result.recordset[0].CCIUDAD,
+             xciudad:  query.result.recordset[0].XCIUDAD,
             }
     }
 }
@@ -1609,13 +1613,9 @@ const operationCreateContractBroker = async(requestBody) => {
         pmotin: requestBody.pmotin ? requestBody.pmotin : undefined,
         mmotin: requestBody.mmotin ? requestBody.mmotin : undefined,
         pblindaje: requestBody.pblindaje ? requestBody.pblindaje : undefined,
-        // ctipopago: requestBody.ctipopago,
-        // xreferencia: requestBody.xreferencia,
-        // fcobro:requestBody.fcobro,
-        // mprima_pagada: requestBody.mprima_pagada,
+        cproductor: requestBody.cproductor ? requestBody.cproductor : undefined,
         //ccodigo_ubii: requestBody.ccodigo_ubii
     };
-    console.log(userData)
     let paymentList = {};
     if(requestBody.payment){
         paymentList = {
@@ -1623,7 +1623,11 @@ const operationCreateContractBroker = async(requestBody) => {
             xreferencia: requestBody.payment.xreferencia,
             fcobro: requestBody.payment.fcobro,
             cbanco: requestBody.payment.cbanco,
-            mprima_pagada: requestBody.payment.mprima_pagada
+            mprima_pagada: requestBody.payment.mprima_pagada,
+            mprima_bs: requestBody.payment.mprima_bs,
+            xnota: requestBody.payment.xnota,
+            mtasa_cambio: requestBody.payment.mtasa_cambio,
+            ftasa_cambio: requestBody.payment.ftasa_cambio,
         }
     }else{
         paymentList = {
@@ -1631,10 +1635,13 @@ const operationCreateContractBroker = async(requestBody) => {
             xreferencia:  requestBody.xreferencia ? requestBody.xreferencia: undefined,
             fcobro: requestBody.fcobro ? requestBody.fcobro: undefined,
             cbanco: requestBody.cbanco ? requestBody.cbanco: undefined,
-            mprima_pagada: requestBody.mprima_pagada ? requestBody.mprima_pagada: undefined
+            mprima_pagada: requestBody.mprima_pagada ? requestBody.mprima_pagada: undefined,
+            mprima_bs: requestBody.mprima_bs ? requestBody.mprima_bs: undefined,
+            xnota: requestBody.xnota ? equestBody.xnota: undefined,
+            mtasa_cambio: requestBody.mtasa_cambio ? requestBody.mtasa_cambio: undefined,
+            ftasa_cambio: requestBody.ftasa_cambio ? requestBody.ftasa_cambio: undefined,
         }
     }
-    console.log(paymentList)
     if(userData){
         let operationCreateIndividualContract = await bd.createContractBrokerQuery(userData, paymentList).then((res) => res);
         if(operationCreateIndividualContract.error){ console.log(operationCreateIndividualContract.error);return { status: false, code: 500, message: operationCreateIndividualContract.error }; }
