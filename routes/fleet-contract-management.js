@@ -1124,6 +1124,7 @@ const operationCreateIndividualContract = async(requestBody) => {
         icedula: requestBody.icedula ? requestBody.icedula : undefined,
         femision: requestBody.femision ,
         ivigencia: requestBody.ivigencia ? requestBody.ivigencia : undefined,
+        cproductor: requestBody.cproductor ? requestBody.cproductor : undefined,
     };
     console.log(userData)
     let paymentList = {};
@@ -1133,7 +1134,12 @@ const operationCreateIndividualContract = async(requestBody) => {
             xreferencia: requestBody.payment.xreferencia,
             fcobro: requestBody.payment.fcobro,
             cbanco: requestBody.payment.cbanco,
-            mprima_pagada: requestBody.payment.mprima_pagada
+            cbanco_destino: requestBody.payment.cbanco_destino,
+            mprima_pagada: requestBody.payment.mprima_pagada,
+            mprima_bs: requestBody.payment.mprima_bs,
+            xnota: requestBody.payment.xnota,
+            mtasa_cambio: requestBody.payment.mtasa_cambio,
+            ftasa_cambio: requestBody.payment.ftasa_cambio,
         }
     }else{
         paymentList = {
@@ -1141,7 +1147,12 @@ const operationCreateIndividualContract = async(requestBody) => {
             xreferencia:  requestBody.xreferencia ? requestBody.xreferencia: undefined,
             fcobro: requestBody.fcobro ? requestBody.fcobro: undefined,
             cbanco: requestBody.cbanco ? requestBody.cbanco: undefined,
-            mprima_pagada: requestBody.mprima_pagada ? requestBody.mprima_pagada: undefined
+            cbanco_destino: requestBody.cbanco_destino ? requestBody.cbanco_destino: undefined,
+            mprima_pagada: requestBody.mprima_pagada ? requestBody.mprima_pagada: undefined,
+            mprima_bs: requestBody.mprima_bs ? requestBody.mprima_bs: undefined,
+            xnota: requestBody.xnota ? equestBody.xnota: undefined,
+            mtasa_cambio: requestBody.mtasa_cambio ? requestBody.mtasa_cambio: undefined,
+            ftasa_cambio: requestBody.ftasa_cambio ? requestBody.ftasa_cambio: undefined,
         }
     }
     if(userData){
@@ -1623,6 +1634,7 @@ const operationCreateContractBroker = async(requestBody) => {
             xreferencia: requestBody.payment.xreferencia,
             fcobro: requestBody.payment.fcobro,
             cbanco: requestBody.payment.cbanco,
+            cbanco_destino: requestBody.payment.cbanco_destino,
             mprima_pagada: requestBody.payment.mprima_pagada,
             mprima_bs: requestBody.payment.mprima_bs,
             xnota: requestBody.payment.xnota,
@@ -1635,6 +1647,7 @@ const operationCreateContractBroker = async(requestBody) => {
             xreferencia:  requestBody.xreferencia ? requestBody.xreferencia: undefined,
             fcobro: requestBody.fcobro ? requestBody.fcobro: undefined,
             cbanco: requestBody.cbanco ? requestBody.cbanco: undefined,
+            cbanco_destino: requestBody.cbanco_destino ? requestBody.cbanco_destino: undefined,
             mprima_pagada: requestBody.mprima_pagada ? requestBody.mprima_pagada: undefined,
             mprima_bs: requestBody.mprima_bs ? requestBody.mprima_bs: undefined,
             xnota: requestBody.xnota ? equestBody.xnota: undefined,
@@ -1650,10 +1663,8 @@ const operationCreateContractBroker = async(requestBody) => {
     if(lastFleetContract.error){ return { status: false, code: 500, message: lastFleetContract.error }; }
     let lastReceipt = await bd.getLastReceipt(requestBody.xplaca.toUpperCase(), lastFleetContract.ccontratoflota);
     if(lastReceipt.error){ return { status: false, code: 500, message: lastReceipt.error }; }
-    console.log(lastReceipt);
     let getCharge = await bd.getCharge(lastReceipt.ccarga);
     if(getCharge.error){ return { status: false, code: 500, message: getCharge.error }; }
-    console.log(getCharge);
     return { 
         status: true, 
         code: 200, 

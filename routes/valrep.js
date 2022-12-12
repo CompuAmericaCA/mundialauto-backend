@@ -756,6 +756,34 @@ const operationValrepBank = async(authHeader, requestBody) => {
     return { status: true, list: jsonArray }
 }
 
+router.route('/destinationBank').post((req, res) => {
+    if(!req.header('Authorization')){ 
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
+        return;
+    }else{
+        operationValrepDestinationBank(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){ 
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationValrepDestinationBank' } });
+        });
+    }
+});
+
+const operationValrepDestinationBank = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let query = await bd.destinationBankValrepQuery().then((res) => res);
+    if(query.error){ return { status: false, code: 500, message: query.error }; }
+    let jsonArray = [];
+    for(let i = 0; i < query.result.recordset.length; i++){
+        jsonArray.push({ cbanco_destino: query.result.recordset[i].CBANCO_DESTINO, xbanco_destino: query.result.recordset[i].XBANCO });
+    }
+    return { status: true, list: jsonArray }
+}
+
 router.route('/bank-account-type').post((req, res) => {
     if(!req.header('Authorization')){ 
         res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })

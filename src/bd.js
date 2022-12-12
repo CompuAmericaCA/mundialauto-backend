@@ -8542,6 +8542,7 @@ module.exports = {
                 .input('cplan', sql.Numeric(11, 0), userData.cplan)
                 .input('ccorredor', sql.Numeric(11, 0), userData.ccorredor)
                 .input('xcedula', sql.NVarChar, userData.xcedula)
+                .input('cproductor', sql.Numeric(11, 0), userData.cproductor)
                 .input('xcobertura', sql.NVarChar, userData.xcobertura)
                 .input('ncapacidad_p', sql.NVarChar, userData.ncapacidad_p)
                 .input('xtipo', sql.NVarChar, userData.xtipo)
@@ -8569,10 +8570,15 @@ module.exports = {
                 .input('ivigencia', sql.Int, userData.ivigencia)
                 .input('ctipopago', sql.Int, paymentList.ctipopago ? paymentList.ctipopago: 0)
                 .input('cbanco', sql.Int, paymentList.cbanco ? paymentList.cbanco: 0)
+                .input('cbanco_destino', sql.Int, paymentList.cbanco_destino ? paymentList.cbanco_destino: 0)
                 .input('xreferencia', sql.NVarChar, paymentList.xreferencia ? paymentList.xreferencia: 0)
                 .input('fcobro', sql.DateTime, paymentList.fcobro ? paymentList.fcobro: 0)
                 .input('mprima_pagada', sql.Numeric(18, 2), paymentList.mprima_pagada ? paymentList.mprima_pagada: 0)
-                .query('insert into TMEMISION_INDIVIDUAL(XNOMBRE, XAPELLIDO, CANO, XCOLOR, CMARCA, CMODELO, CVERSION, XRIF_CLIENTE, EMAIL, XTELEFONO_PROP, XDIRECCIONFISCAL, XSERIALMOTOR, XSERIALCARROCERIA, XPLACA, XTELEFONO_EMP, CPLAN, CCORREDOR, XCEDULA, XCOBERTURA, NCAPACIDAD_P, XTIPO, FINICIO, CMETODOLOGIAPAGO, MSUMA_ASEG, PCASCO, MPRIMA_CASCO, MCATASTROFICO, PDESCUENTO, IFRACCIONAMIENTO, NCUOTAS, MPRIMA_BLINDAJE, MSUMA_BLINDAJE, MPRIMA_BRUTA, PCATASTROFICO, PMOTIN, MMOTIN, PBLINDAJE, CESTADO, CCIUDAD, CPAIS, ICEDULA, FEMISION, IVIGENCIA, CTIPOPAGO, XREFERENCIA, FCOBRO, CBANCO, MPRIMA_PAGADA) values (@xnombre, @xapellido, @cano, @xcolor, @cmarca, @cmodelo, @cversion, @xrif_cliente, @email, @xtelefono_prop, @xdireccionfiscal, @xserialmotor, @xserialcarroceria, @xplaca, @xtelefono_emp, @cplan, @ccorredor, @xcedula, @xcobertura, @ncapacidad_p, @xtipo, @finicio, @cmetodologiapago, @msuma_aseg, @pcasco, @mprima_casco, @mcatastrofico, @pdescuento, @ifraccionamiento, @ncuotas, @mprima_blindaje, @msuma_blindaje, @mprima_bruta,@pcatastrofico ,@pmotin, @mmotin, @pblindaje, @cestado, @cciudad, @cpais, @icedula, @femision, @ivigencia, @ctipopago, @xreferencia, @fcobro, @cbanco, @mprima_pagada)')
+                .input('mprima_bs', sql.Numeric(18, 2), paymentList.mprima_bs ? paymentList.mprima_bs: undefined)
+                .input('xnota', sql.NVarChar, paymentList.xnota ? paymentList.xnota: undefined)
+                .input('mtasa_cambio', sql.Numeric(18, 2), paymentList.mtasa_cambio ? paymentList.mtasa_cambio: undefined)
+                .input('ftasa_cambio', sql.DateTime, paymentList.ftasa_cambio ? paymentList.ftasa_cambio: undefined)
+                .query('insert into TMEMISION_INDIVIDUAL(XNOMBRE, XAPELLIDO, CANO, XCOLOR, CMARCA, CMODELO, CVERSION, XRIF_CLIENTE, EMAIL, XTELEFONO_PROP, XDIRECCIONFISCAL, XSERIALMOTOR, XSERIALCARROCERIA, XPLACA, XTELEFONO_EMP, CPLAN, CCORREDOR, XCEDULA, XCOBERTURA, NCAPACIDAD_P, XTIPO, FINICIO, CMETODOLOGIAPAGO, MSUMA_ASEG, PCASCO, MPRIMA_CASCO, MCATASTROFICO, PDESCUENTO, IFRACCIONAMIENTO, NCUOTAS, MPRIMA_BLINDAJE, MSUMA_BLINDAJE, MPRIMA_BRUTA, PCATASTROFICO, PMOTIN, MMOTIN, PBLINDAJE, CESTADO, CCIUDAD, CPAIS, ICEDULA, FEMISION, IVIGENCIA, CTIPOPAGO, XREFERENCIA, FCOBRO, CBANCO, CBANCO_DESTINO, MPRIMA_PAGADA, MPRIMA_BS, XNOTA, MTASA_CAMBIO, FTASA_CAMBIO) values (@xnombre, @xapellido, @cano, @xcolor, @cmarca, @cmodelo, @cversion, @xrif_cliente, @email, @xtelefono_prop, @xdireccionfiscal, @xserialmotor, @xserialcarroceria, @xplaca, @xtelefono_emp, @cplan, @ccorredor, @xcedula, @xcobertura, @ncapacidad_p, @xtipo, @finicio, @cmetodologiapago, @msuma_aseg, @pcasco, @mprima_casco, @mcatastrofico, @pdescuento, @ifraccionamiento, @ncuotas, @mprima_blindaje, @msuma_blindaje, @mprima_bruta,@pcatastrofico ,@pmotin, @mmotin, @pblindaje, @cestado, @cciudad, @cpais, @icedula, @femision, @ivigencia, @ctipopago, @xreferencia, @fcobro, @cbanco, @cbanco_destino, @mprima_pagada, @mprima_bs, @xnota, @mtasa_cambio, @ftasa_cambio)')
             //sql.close();
             return { result: { rowsAffected: rowsAffected, status: true } };
         }
@@ -8602,8 +8608,8 @@ module.exports = {
                 .input('xtelefono_emp', sql.NVarChar, userData.xtelefono_emp)
                 .input('cplan', sql.Numeric(11, 0), userData.cplan)
                 .input('ccorredor', sql.Numeric(11, 0), userData.ccorredor)
-                .input('cproductor', sql.Numeric(11, 0), userData.cproductor)
                 .input('xcedula', sql.NVarChar, userData.xcedula)
+                .input('cproductor', sql.Numeric(11, 0), userData.cproductor)
                 .input('xcobertura', sql.NVarChar, userData.xcobertura)
                 .input('ncapacidad_p', sql.NVarChar, userData.ncapacidad_p)
                 .input('xtipo', sql.NVarChar, userData.xtipo)
@@ -8632,6 +8638,7 @@ module.exports = {
                 .input('ccodigo_ubii', sql.Int, userData.ccodigo_ubii ? paymentList.ccodigo_ubii: undefined)
                 .input('ctipopago', sql.Int, paymentList.ctipopago ? paymentList.ctipopago: undefined)
                 .input('cbanco', sql.Int, paymentList.cbanco ? paymentList.cbanco: undefined)
+                .input('cbanco_destino', sql.Int, paymentList.cbanco_destino ? paymentList.cbanco_destino: 0)
                 .input('xreferencia', sql.NVarChar, paymentList.xreferencia ? paymentList.xreferencia: undefined)
                 .input('fcobro', sql.DateTime, paymentList.fcobro ? paymentList.fcobro: undefined)
                 .input('mprima_pagada', sql.Numeric(18, 2), paymentList.mprima_pagada ? paymentList.mprima_pagada: undefined)
@@ -8639,7 +8646,7 @@ module.exports = {
                 .input('xnota', sql.NVarChar, paymentList.xnota ? paymentList.xnota: undefined)
                 .input('mtasa_cambio', sql.Numeric(18, 2), paymentList.mtasa_cambio ? paymentList.mtasa_cambio: undefined)
                 .input('ftasa_cambio', sql.DateTime, paymentList.ftasa_cambio ? paymentList.ftasa_cambio: undefined)
-                .query('insert into TMEMISION_INDIVIDUAL(XNOMBRE, XAPELLIDO, CANO, XCOLOR, CMARCA, CMODELO, CVERSION, XRIF_CLIENTE, EMAIL, XTELEFONO_PROP, XDIRECCIONFISCAL, XSERIALMOTOR, XSERIALCARROCERIA, XPLACA, XTELEFONO_EMP, CPLAN, CPRODUCTOR, CCORREDOR, XCEDULA, XCOBERTURA, NCAPACIDAD_P, XTIPO, FINICIO, CMETODOLOGIAPAGO, MSUMA_ASEG, PCASCO, MPRIMA_CASCO, MCATASTROFICO, PDESCUENTO, IFRACCIONAMIENTO, NCUOTAS, MPRIMA_BLINDAJE, MSUMA_BLINDAJE, MPRIMA_BRUTA, PCATASTROFICO, PMOTIN, MMOTIN, PBLINDAJE, CESTADO, CCIUDAD, CPAIS, ICEDULA, FEMISION, IVIGENCIA, CCODIGO_UBII, CTIPOPAGO, XREFERENCIA, FCOBRO, CBANCO, MPRIMA_PAGADA, MPRIMA_BS, XNOTA, MTASA_CAMBIO, FTASA_CAMBIO) values (@xnombre, @xapellido, @cano, @xcolor, @cmarca, @cmodelo, @cversion, @xrif_cliente, @email, @xtelefono_prop, @xdireccionfiscal, @xserialmotor, @xserialcarroceria, @xplaca, @xtelefono_emp, @cplan, @cproductor, @ccorredor, @xcedula, @xcobertura, @ncapacidad_p, @xtipo, @finicio, @cmetodologiapago, @msuma_aseg, @pcasco, @mprima_casco, @mcatastrofico, @pdescuento, @ifraccionamiento, @ncuotas, @mprima_blindaje, @msuma_blindaje, @mprima_bruta,@pcatastrofico ,@pmotin, @mmotin, @pblindaje, @cestado, @cciudad, @cpais, @icedula, @femision, @ivigencia,@ccodigo_ubii, @ctipopago, @xreferencia, @fcobro, @cbanco, @mprima_pagada, @mprima_bs, @xnota, @mtasa_cambio, @ftasa_cambio)')
+                .query('insert into TMEMISION_INDIVIDUAL(XNOMBRE, XAPELLIDO, CANO, XCOLOR, CMARCA, CMODELO, CVERSION, XRIF_CLIENTE, EMAIL, XTELEFONO_PROP, XDIRECCIONFISCAL, XSERIALMOTOR, XSERIALCARROCERIA, XPLACA, XTELEFONO_EMP, CPLAN, CPRODUCTOR, CCORREDOR, XCEDULA, XCOBERTURA, NCAPACIDAD_P, XTIPO, FINICIO, CMETODOLOGIAPAGO, MSUMA_ASEG, PCASCO, MPRIMA_CASCO, MCATASTROFICO, PDESCUENTO, IFRACCIONAMIENTO, NCUOTAS, MPRIMA_BLINDAJE, MSUMA_BLINDAJE, MPRIMA_BRUTA, PCATASTROFICO, PMOTIN, MMOTIN, PBLINDAJE, CESTADO, CCIUDAD, CPAIS, ICEDULA, FEMISION, IVIGENCIA, CCODIGO_UBII, CTIPOPAGO, XREFERENCIA, FCOBRO, CBANCO, CBANCO_DESTINO, MPRIMA_PAGADA, MPRIMA_BS, XNOTA, MTASA_CAMBIO, FTASA_CAMBIO) values (@xnombre, @xapellido, @cano, @xcolor, @cmarca, @cmodelo, @cversion, @xrif_cliente, @email, @xtelefono_prop, @xdireccionfiscal, @xserialmotor, @xserialcarroceria, @xplaca, @xtelefono_emp, @cplan, @cproductor, @ccorredor, @xcedula, @xcobertura, @ncapacidad_p, @xtipo, @finicio, @cmetodologiapago, @msuma_aseg, @pcasco, @mprima_casco, @mcatastrofico, @pdescuento, @ifraccionamiento, @ncuotas, @mprima_blindaje, @msuma_blindaje, @mprima_bruta,@pcatastrofico ,@pmotin, @mmotin, @pblindaje, @cestado, @cciudad, @cpais, @icedula, @femision, @ivigencia,@ccodigo_ubii, @ctipopago, @xreferencia, @fcobro, @cbanco, @cbanco_destino, @mprima_pagada, @mprima_bs, @xnota, @mtasa_cambio, @ftasa_cambio)')
             //sql.close();
             return { result: { rowsAffected: rowsAffected, status: true } };
         }
@@ -12952,7 +12959,8 @@ createBillLoadingServiceOrderQuery: async(serviceOrderList, billLoadingData) => 
                 .input('cfactura', sql.Int, billLoadingData.cfactura)
                 .input('cproveedor', sql.Int, billLoadingData.cproveedor)
                 .input('xtipopagador', sql.NVarChar, billLoadingData.xtipopagador)
-                .input('cpagador', sql.Int, billLoadingData.cpagador)
+                .input('xpagador', sql.NVarChar, billLoadingData.xpagador)
+                .input('crecibidor', sql.Int, billLoadingData.crecibidor)
                 .input('ffactura', sql.DateTime, billLoadingData.ffactura)
                 .input('frecepcion', sql.DateTime, billLoadingData.frecepcion)
                 .input('fvencimiento', sql.DateTime, billLoadingData.fvencimiento)
@@ -12963,7 +12971,7 @@ createBillLoadingServiceOrderQuery: async(serviceOrderList, billLoadingData) => 
                 .input('cmoneda', sql.Int, billLoadingData.cmoneda)
                 .input('xrutaarchivo', sql.NVarChar, billLoadingData.xrutaarchivo)
                 .input('fcreacion', sql.DateTime, new Date())
-                .query('INSERT INTO ADREGISTROFACTURA (CFACTURA, CORDEN, CPROVEEDOR, CPAGADOR, XTIPOPAGADOR, XOBSERVACION, FFACTURA, FRECEPCION, FVENCIMIENTO, NFACTURA, NCONTROL, MMONTOFACTURA, CMONEDA, XRUTAARCHIVO, CPAIS, CCOMPANIA, CUSUARIOCREACION, FCREACION) VALUES (@cfactura, @corden, @cproveedor, @cpagador, @xtipopagador, @xobservacion, @ffactura, @frecepcion, @fvencimiento, @nfactura, @ncontrol, @mmontofactura, @cmoneda, @xrutaarchivo, @cpais, @ccompania, @cusuario, @fcreacion)')
+                .query('INSERT INTO ADREGISTROFACTURA (CFACTURA, CORDEN, CPROVEEDOR, CRECIBIDOR, XTIPOPAGADOR, XPAGADOR, XOBSERVACION, FFACTURA, FRECEPCION, FVENCIMIENTO, NFACTURA, NCONTROL, MMONTOFACTURA, CMONEDA, XRUTAARCHIVO, CPAIS, CCOMPANIA, CUSUARIOCREACION, FCREACION) VALUES (@cfactura, @corden, @cproveedor, @crecibidor, @xtipopagador, @xpagador, @xobservacion, @ffactura, @frecepcion, @fvencimiento, @nfactura, @ncontrol, @mmontofactura, @cmoneda, @xrutaarchivo, @cpais, @ccompania, @cusuario, @fcreacion)')
             rowsAffected = rowsAffected + insert.rowsAffected;
         }
         //sql.close();
@@ -13021,6 +13029,18 @@ queryTypeMetodologiaContract: async(searchData) => {
 }catch(err){
     return { error: err.message };
 }
+},
+
+destinationBankValrepQuery: async() => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+            .query('select * from MABANCO_DESTINO WHERE BACTIVO = 1');
+        //sql.close();
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
 },
 }
 
