@@ -6664,7 +6664,7 @@ module.exports = {
         try{
             let pool = await sql.connect(config);
             let result = await pool.request()
-                .query('SELECT CCARGA, XPOLIZA, XCLIENTE, FINGRESO FROM VWBUSCARFECHACARGAXCLIENTE');
+                .query('SELECT CCARGA, XPOLIZA, XCLIENTE, FINGRESO, XPLACA FROM VWBUSCARFECHACARGAXCLIENTE');
             //sql.close();
             return { result: result };
         }catch(err){
