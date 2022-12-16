@@ -90,7 +90,8 @@ const operationDetailCollection = async(authHeader, requestBody) => {
                 xplaca: detailCollection.result.recordset[0].XPLACA,
                 xestatusgeneral: detailCollection.result.recordset[0].XESTATUSGENERAL,
                 mprima: mprima,
-                mprima_pagada: detailCollection.result.recordset[0].MPRIMA_ANUAL
+                mprima_pagada: detailCollection.result.recordset[0].MPRIMA_ANUAL,
+                ccodigo_ubii: detailCollection.result.recordset[0].CCODIGO_UBII
                };
 }
 
