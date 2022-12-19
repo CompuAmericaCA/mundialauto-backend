@@ -1160,19 +1160,18 @@ const operationCreateIndividualContract = async(requestBody) => {
         if(operationCreateIndividualContract.error){ return { status: false, code: 500, message: operationCreateIndividualContract.error }; }
     }
     if(requestBody.accessory){
-        if(requestBody.accessory.create){
-            let accessory = [];
-            for(let i = 0; i < requestBody.accessory.create.length; i++){
-                accessory.push({
-                    caccesorio:  requestBody.accessory.create[i].caccesorio,
-                    msuma_accesorio:  requestBody.accessory.create[i].msuma_aseg,
-                    mprima_accesorio:  requestBody.accessory.create[i].mprima,
-                    ptasa:  requestBody.accessory.create[i].ptasa
-                })
-            }
-            let createAccesories = await bd.createAccesoriesFromFleetContractIndividual(accessory).then((res) => res);
-            if(createAccesories.error){ return { status: false, code: 500, message: createAccesories.error }; }
+        let accessoryData = [];
+        for(let i = 0; i < requestBody.accessory.length; i++){
+            accessoryData.push({
+                caccesorio:  requestBody.accessory[i].caccesorio,
+                msuma_accesorio:  requestBody.accessory[i].msuma_aseg,
+                mprima_accesorio:  requestBody.accessory[i].mprima,
+                ptasa:  requestBody.accessory[i].ptasa
+            })
         }
+        console.log(accessoryData)
+        let createAccesories = await bd.createAccesoriesFromFleetContractIndividual(accessoryData).then((res) => res);
+        if(createAccesories.error){ return { status: false, code: 500, message: createAccesories.error }; }
     }
     let lastFleetContract = await bd.getLastFleetContract();
     if(lastFleetContract.error){ return { status: false, code: 500, message: lastFleetContract.error }; }
