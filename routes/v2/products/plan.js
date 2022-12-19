@@ -287,6 +287,8 @@ const operationDetailPlan = async(authHeader, requestBody) => {
         cplan: getPlanData.result.recordset[0].CPLAN,
         xplan: getPlanData.result.recordset[0].XPLAN,
         mcosto: getPlanData.result.recordset[0].MCOSTO,
+        parys: detailPlanRcv.result.recordset[0].PARYS, 
+        paseguradora: detailPlanRcv.result.recordset[0].PASEGURADORA, 
         ctipoplan: getPlanData.result.recordset[0].CTIPOPLAN,
         bactivo: getPlanData.result.recordset[0].BACTIVO,
         paymentMethodologies: paymentMethodologies,

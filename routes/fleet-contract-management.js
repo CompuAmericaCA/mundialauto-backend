@@ -1125,6 +1125,8 @@ const operationCreateIndividualContract = async(requestBody) => {
         femision: requestBody.femision ,
         ivigencia: requestBody.ivigencia ? requestBody.ivigencia : undefined,
         cproductor: requestBody.cproductor ? requestBody.cproductor : undefined,
+        ccodigo_ubii: requestBody.ccodigo_ubii ? requestBody.ccodigo_ubii : undefined,
+
     };
     console.log(userData)
     let paymentList = {};

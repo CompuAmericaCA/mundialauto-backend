@@ -8519,6 +8519,7 @@ module.exports = {
     },
 
     createIndividualContractQuery: async(userData, paymentList) => {
+
         console.log(userData.cpais)
         try{
             let rowsAffected = 0;
@@ -8556,6 +8557,7 @@ module.exports = {
                 .input('pdescuento', sql.Numeric(17, 2), userData.pdescuento)
                 .input('ifraccionamiento', sql.Bit, userData.ifraccionamiento)
                 .input('ncuotas', sql.Int, userData.ncuotas)
+                .input('ccodigo_ubii', sql.Int, userData.ccodigo_ubii ? paymentList.ccodigo_ubii: undefined)
                 .input('mprima_blindaje', sql.Numeric(11, 0), userData.mprima_blindaje)
                 .input('msuma_blindaje', sql.Numeric(11, 0), userData.msuma_blindaje)
                 .input('mprima_bruta', sql.Numeric(11, 0), userData.mprima_bruta)
@@ -8578,11 +8580,12 @@ module.exports = {
                 .input('xnota', sql.NVarChar, paymentList.xnota ? paymentList.xnota: undefined)
                 .input('mtasa_cambio', sql.Numeric(18, 2), paymentList.mtasa_cambio ? paymentList.mtasa_cambio: undefined)
                 .input('ftasa_cambio', sql.DateTime, paymentList.ftasa_cambio ? paymentList.ftasa_cambio: undefined)
-                .query('insert into TMEMISION_INDIVIDUAL(XNOMBRE, XAPELLIDO, CANO, XCOLOR, CMARCA, CMODELO, CVERSION, XRIF_CLIENTE, EMAIL, XTELEFONO_PROP, XDIRECCIONFISCAL, XSERIALMOTOR, XSERIALCARROCERIA, XPLACA, XTELEFONO_EMP, CPLAN, CCORREDOR, XCEDULA, XCOBERTURA, NCAPACIDAD_P, XTIPO, FINICIO, CMETODOLOGIAPAGO, MSUMA_ASEG, PCASCO, MPRIMA_CASCO, MCATASTROFICO, PDESCUENTO, IFRACCIONAMIENTO, NCUOTAS, MPRIMA_BLINDAJE, MSUMA_BLINDAJE, MPRIMA_BRUTA, PCATASTROFICO, PMOTIN, MMOTIN, PBLINDAJE, CESTADO, CCIUDAD, CPAIS, ICEDULA, FEMISION, IVIGENCIA, CTIPOPAGO, XREFERENCIA, FCOBRO, CBANCO, CBANCO_DESTINO, MPRIMA_PAGADA, MPRIMA_BS, XNOTA, MTASA_CAMBIO, FTASA_CAMBIO) values (@xnombre, @xapellido, @cano, @xcolor, @cmarca, @cmodelo, @cversion, @xrif_cliente, @email, @xtelefono_prop, @xdireccionfiscal, @xserialmotor, @xserialcarroceria, @xplaca, @xtelefono_emp, @cplan, @ccorredor, @xcedula, @xcobertura, @ncapacidad_p, @xtipo, @finicio, @cmetodologiapago, @msuma_aseg, @pcasco, @mprima_casco, @mcatastrofico, @pdescuento, @ifraccionamiento, @ncuotas, @mprima_blindaje, @msuma_blindaje, @mprima_bruta,@pcatastrofico ,@pmotin, @mmotin, @pblindaje, @cestado, @cciudad, @cpais, @icedula, @femision, @ivigencia, @ctipopago, @xreferencia, @fcobro, @cbanco, @cbanco_destino, @mprima_pagada, @mprima_bs, @xnota, @mtasa_cambio, @ftasa_cambio)')
+                .query('insert into TMEMISION_INDIVIDUAL(XNOMBRE, XAPELLIDO, CANO, XCOLOR, CMARCA, CMODELO, CVERSION, XRIF_CLIENTE, EMAIL, XTELEFONO_PROP, XDIRECCIONFISCAL, XSERIALMOTOR, XSERIALCARROCERIA, XPLACA, XTELEFONO_EMP, CPLAN, CCORREDOR, XCEDULA, XCOBERTURA, NCAPACIDAD_P, XTIPO, FINICIO, CMETODOLOGIAPAGO, MSUMA_ASEG, PCASCO, MPRIMA_CASCO, MCATASTROFICO, PDESCUENTO, IFRACCIONAMIENTO, NCUOTAS, MPRIMA_BLINDAJE, MSUMA_BLINDAJE, MPRIMA_BRUTA, PCATASTROFICO, PMOTIN, MMOTIN, PBLINDAJE, CESTADO, CCIUDAD, CPAIS, ICEDULA, FEMISION, IVIGENCIA, CTIPOPAGO, XREFERENCIA, FCOBRO, CBANCO, CBANCO_DESTINO, MPRIMA_PAGADA, MPRIMA_BS, XNOTA, MTASA_CAMBIO, FTASA_CAMBIO,CCODIGO_UBII) values (@xnombre, @xapellido, @cano, @xcolor, @cmarca, @cmodelo, @cversion, @xrif_cliente, @email, @xtelefono_prop, @xdireccionfiscal, @xserialmotor, @xserialcarroceria, @xplaca, @xtelefono_emp, @cplan, @ccorredor, @xcedula, @xcobertura, @ncapacidad_p, @xtipo, @finicio, @cmetodologiapago, @msuma_aseg, @pcasco, @mprima_casco, @mcatastrofico, @pdescuento, @ifraccionamiento, @ncuotas, @mprima_blindaje, @msuma_blindaje, @mprima_bruta,@pcatastrofico ,@pmotin, @mmotin, @pblindaje, @cestado, @cciudad, @cpais, @icedula, @femision, @ivigencia, @ctipopago, @xreferencia, @fcobro, @cbanco, @cbanco_destino, @mprima_pagada, @mprima_bs, @xnota, @mtasa_cambio, @ftasa_cambio,@ccodigo_ubii)')
             //sql.close();
             return { result: { rowsAffected: rowsAffected, status: true } };
         }
         catch(err){
+            console.log(err.message)
             return { error: err.message };
         }
     },
