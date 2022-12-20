@@ -21,7 +21,7 @@ module.exports = {
                 .input('bactivo', sql.Bit, true)
                 .query('select * from VWAUTENTICACIONUSUARIO where XEMAIL = @xemail and BACTIVO = @bactivo');
             //sql.close();
-       
+            console.log(result.recordset[0]);
             return { result: result };
         }
         catch(err){
@@ -8578,11 +8578,12 @@ module.exports = {
                 .input('xnota', sql.NVarChar, paymentList.xnota ? paymentList.xnota: undefined)
                 .input('mtasa_cambio', sql.Numeric(18, 2), paymentList.mtasa_cambio ? paymentList.mtasa_cambio: undefined)
                 .input('ftasa_cambio', sql.DateTime, paymentList.ftasa_cambio ? paymentList.ftasa_cambio: undefined)
-                .query('insert into TMEMISION_INDIVIDUAL(XNOMBRE, XAPELLIDO, CANO, XCOLOR, CMARCA, CMODELO, CVERSION, XRIF_CLIENTE, EMAIL, XTELEFONO_PROP, XDIRECCIONFISCAL, XSERIALMOTOR, XSERIALCARROCERIA, XPLACA, XTELEFONO_EMP, CPLAN, CCORREDOR, XCEDULA, XCOBERTURA, NCAPACIDAD_P, XTIPO, FINICIO, CMETODOLOGIAPAGO, MSUMA_ASEG, PCASCO, MPRIMA_CASCO, MCATASTROFICO, PDESCUENTO, IFRACCIONAMIENTO, NCUOTAS, MPRIMA_BLINDAJE, MSUMA_BLINDAJE, MPRIMA_BRUTA, PCATASTROFICO, PMOTIN, MMOTIN, PBLINDAJE, CESTADO, CCIUDAD, CPAIS, ICEDULA, FEMISION, IVIGENCIA, CTIPOPAGO, XREFERENCIA, FCOBRO, CBANCO, CBANCO_DESTINO, MPRIMA_PAGADA, MPRIMA_BS, XNOTA, MTASA_CAMBIO, FTASA_CAMBIO) values (@xnombre, @xapellido, @cano, @xcolor, @cmarca, @cmodelo, @cversion, @xrif_cliente, @email, @xtelefono_prop, @xdireccionfiscal, @xserialmotor, @xserialcarroceria, @xplaca, @xtelefono_emp, @cplan, @ccorredor, @xcedula, @xcobertura, @ncapacidad_p, @xtipo, @finicio, @cmetodologiapago, @msuma_aseg, @pcasco, @mprima_casco, @mcatastrofico, @pdescuento, @ifraccionamiento, @ncuotas, @mprima_blindaje, @msuma_blindaje, @mprima_bruta,@pcatastrofico ,@pmotin, @mmotin, @pblindaje, @cestado, @cciudad, @cpais, @icedula, @femision, @ivigencia, @ctipopago, @xreferencia, @fcobro, @cbanco, @cbanco_destino, @mprima_pagada, @mprima_bs, @xnota, @mtasa_cambio, @ftasa_cambio)')
+                .query('insert into TMEMISION_INDIVIDUAL(XNOMBRE, XAPELLIDO, CANO, XCOLOR, CMARCA, CMODELO, CVERSION, XRIF_CLIENTE, EMAIL, XTELEFONO_PROP, XDIRECCIONFISCAL, XSERIALMOTOR, XSERIALCARROCERIA, XPLACA, XTELEFONO_EMP, CPLAN, CCORREDOR, XCEDULA, XCOBERTURA, NCAPACIDAD_P, XTIPO, FINICIO, CMETODOLOGIAPAGO, MSUMA_ASEG, PCASCO, MPRIMA_CASCO, MCATASTROFICO, PDESCUENTO, IFRACCIONAMIENTO, NCUOTAS, MPRIMA_BLINDAJE, MSUMA_BLINDAJE, MPRIMA_BRUTA, PCATASTROFICO, PMOTIN, MMOTIN, PBLINDAJE, CESTADO, CCIUDAD, CPAIS, ICEDULA, FEMISION, IVIGENCIA, CTIPOPAGO, XREFERENCIA, FCOBRO, CBANCO, CBANCO_DESTINO, MPRIMA_PAGADA, MPRIMA_BS, XNOTA, MTASA_CAMBIO, FTASA_CAMBIO, CPRODUCTOR) values (@xnombre, @xapellido, @cano, @xcolor, @cmarca, @cmodelo, @cversion, @xrif_cliente, @email, @xtelefono_prop, @xdireccionfiscal, @xserialmotor, @xserialcarroceria, @xplaca, @xtelefono_emp, @cplan, @ccorredor, @xcedula, @xcobertura, @ncapacidad_p, @xtipo, @finicio, @cmetodologiapago, @msuma_aseg, @pcasco, @mprima_casco, @mcatastrofico, @pdescuento, @ifraccionamiento, @ncuotas, @mprima_blindaje, @msuma_blindaje, @mprima_bruta,@pcatastrofico ,@pmotin, @mmotin, @pblindaje, @cestado, @cciudad, @cpais, @icedula, @femision, @ivigencia, @ctipopago, @xreferencia, @fcobro, @cbanco, @cbanco_destino, @mprima_pagada, @mprima_bs, @xnota, @mtasa_cambio, @ftasa_cambio, @cproductor)')
             //sql.close();
             return { result: { rowsAffected: rowsAffected, status: true } };
         }
         catch(err){
+        console.log(err.message)
             return { error: err.message };
         }
     },
@@ -12194,20 +12195,22 @@ module.exports = {
         try{
             let rowsAffected = 0;
             let pool = await sql.connect(config);
-            for(let i = 0; i < collectionDataList.length; i++){
-                let update = await pool.request()
-                .input('crecibo', sql.Int, collectionDataList[i].crecibo)
-                .input('ctipopago', sql.Int, collectionDataList[i].ctipopago)
-                .input('cbanco', sql.Int, collectionDataList[i].cbanco)
-                .input('xreferencia', sql.NVarChar, collectionDataList[i].xreferencia)
-                .input('fcobro', sql.DateTime, collectionDataList[i].fcobro)
-                .input('mprima_pagada', sql.Numeric(17,2), collectionDataList[i].mprima_pagada)
-                .input('ccompania', sql.Int, collectionDataList[i].ccompania)
-                .input('cpais', sql.Int, collectionDataList[i].cpais)
-                .input('cestatusgeneral', sql.Int, collectionDataList[i].cestatusgeneral)
-                .query('update SURECIBO set XREFERENCIA = @xreferencia, CTIPOPAGO = @ctipopago, CBANCO = @cbanco, FCOBRO = @fcobro, MPRIMA_PAGADA = @mprima_pagada, CESTATUSGENERAL = @cestatusgeneral where CRECIBO = @crecibo AND CCOMPANIA = @ccompania AND CPAIS = @cpais');
-                rowsAffected = rowsAffected + update.rowsAffected;
-            }
+            let update = await pool.request()
+            .input('crecibo', sql.Int, collectionDataList.crecibo)
+            .input('ctipopago', sql.Int, collectionDataList.ctipopago)
+            .input('cbanco', sql.Int, collectionDataList.cbanco)
+            .input('xreferencia', sql.NVarChar, collectionDataList.xreferencia)
+            .input('fcobro', sql.DateTime, collectionDataList.fcobro)
+            .input('mprima_pagada', sql.Numeric(17,2), collectionDataList.mprima_pagada)
+            .input('ccompania', sql.Int, collectionDataList.ccompania)
+            .input('cpais', sql.Int, collectionDataList.cpais)
+            .input('cestatusgeneral', sql.Int, collectionDataList.cestatusgeneral)
+            .input('xnota', sql.NVarChar, collectionDataList.xnota)
+            .input('cbanco_destino', sql.Int, collectionDataList.cbanco_destino)
+            .input('mtasa_cambio', sql.Numeric(18,2), collectionDataList.mtasa_cambio)
+            .input('ftasa_cambio', sql.DateTime, collectionDataList.ftasa_cambio)
+            .query('update SURECIBO set XREFERENCIA = @xreferencia, CTIPOPAGO = @ctipopago, CBANCO = @cbanco, FCOBRO = @fcobro, MPRIMA_PAGADA = @mprima_pagada, CESTATUSGENERAL = @cestatusgeneral, XNOTA = @xnota, CBANCO_DESTINO = @cbanco_destino, MTASA_CAMBIO = @mtasa_cambio, FTASA_CAMBIO = @ftasa_cambio where CRECIBO = @crecibo AND CCOMPANIA = @ccompania AND CPAIS = @cpais');
+            rowsAffected = rowsAffected + update.rowsAffected;
             //sql.close();
             return { result: { rowsAffected: rowsAffected } };
         }
@@ -12554,16 +12557,16 @@ TypeMetodologia: async(searchData) => {
         return { error: err.message };
     }
 },
-createAccesoriesFromFleetContractIndividual: async(accessory) => {
+createAccesoriesFromFleetContractIndividual: async(accessoryData) => {
     try{
         let rowsAffected = 0;
         let pool = await sql.connect(config);
-        for(let i = 0; i < accessory.length; i++){
+        for(let i = 0; i < accessoryData.length; i++){
             let insert = await pool.request()
-                .input('caccesorio', sql.Int, accessory[i].caccesorio)
-                .input('msuma_accesorio', sql.Numeric(18, 2), accessory[i].msuma_accesorio)
-                .input('mprima_accesorio', sql.Numeric(18, 2), accessory[i].mprima_accesorio)
-                .input('ptasa', sql.Numeric(18, 2), accessory[i].ptasa)
+                .input('caccesorio', sql.Int, accessoryData[i].caccesorio)
+                .input('msuma_accesorio', sql.Numeric(18, 2), accessoryData[i].msuma_accesorio)
+                .input('mprima_accesorio', sql.Numeric(18, 2), accessoryData[i].mprima_accesorio)
+                .input('ptasa', sql.Numeric(18, 2), accessoryData[i].ptasa)
                 .query('insert into TMACCESORIOS (CACCESORIO, MSUMA_ACCESORIO, MPRIMA_ACCESORIO, PTASA) values (@caccesorio, @msuma_accesorio, @mprima_accesorio, @ptasa)')
             rowsAffected = rowsAffected + insert.rowsAffected;
         }
@@ -13030,12 +13033,24 @@ queryTypeMetodologiaContract: async(searchData) => {
     return { error: err.message };
 }
 },
-
 destinationBankValrepQuery: async() => {
     try{
         let pool = await sql.connect(config);
         let result = await pool.request()
             .query('select * from MABANCO_DESTINO WHERE BACTIVO = 1');
+        //sql.close();
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+},
+destinationBankQuery: async(searchData) => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+        .input('cpais', sql.Int, searchData.cpais)
+        .input('ctipopago', sql.Int, searchData.ctipopago)
+        .query('select * from MABANCO_DESTINO WHERE CPAIS = @cpais AND CTIPOPAGO = @ctipopago AND BACTIVO = 1');
         //sql.close();
         return { result: result };
     }catch(err){
