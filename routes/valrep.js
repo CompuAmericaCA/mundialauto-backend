@@ -779,7 +779,7 @@ const operationValrepDestinationBank = async(authHeader, requestBody) => {
     if(query.error){ return { status: false, code: 500, message: query.error }; }
     let jsonArray = [];
     for(let i = 0; i < query.result.recordset.length; i++){
-        jsonArray.push({ cbanco_destino: query.result.recordset[i].CBANCO_DESTINO, xbanco_destino: query.result.recordset[i].XBANCO });
+        jsonArray.push({ cbanco_destino: query.result.recordset[i].CBANCO_DESTINO, xbanco_destino: query.result.recordset[i].XBANCO});
     }
     return { status: true, list: jsonArray }
 }
