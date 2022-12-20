@@ -12195,20 +12195,22 @@ module.exports = {
         try{
             let rowsAffected = 0;
             let pool = await sql.connect(config);
-            for(let i = 0; i < collectionDataList.length; i++){
-                let update = await pool.request()
-                .input('crecibo', sql.Int, collectionDataList[i].crecibo)
-                .input('ctipopago', sql.Int, collectionDataList[i].ctipopago)
-                .input('cbanco', sql.Int, collectionDataList[i].cbanco)
-                .input('xreferencia', sql.NVarChar, collectionDataList[i].xreferencia)
-                .input('fcobro', sql.DateTime, collectionDataList[i].fcobro)
-                .input('mprima_pagada', sql.Numeric(17,2), collectionDataList[i].mprima_pagada)
-                .input('ccompania', sql.Int, collectionDataList[i].ccompania)
-                .input('cpais', sql.Int, collectionDataList[i].cpais)
-                .input('cestatusgeneral', sql.Int, collectionDataList[i].cestatusgeneral)
-                .query('update SURECIBO set XREFERENCIA = @xreferencia, CTIPOPAGO = @ctipopago, CBANCO = @cbanco, FCOBRO = @fcobro, MPRIMA_PAGADA = @mprima_pagada, CESTATUSGENERAL = @cestatusgeneral where CRECIBO = @crecibo AND CCOMPANIA = @ccompania AND CPAIS = @cpais');
-                rowsAffected = rowsAffected + update.rowsAffected;
-            }
+            let update = await pool.request()
+            .input('crecibo', sql.Int, collectionDataList.crecibo)
+            .input('ctipopago', sql.Int, collectionDataList.ctipopago)
+            .input('cbanco', sql.Int, collectionDataList.cbanco)
+            .input('xreferencia', sql.NVarChar, collectionDataList.xreferencia)
+            .input('fcobro', sql.DateTime, collectionDataList.fcobro)
+            .input('mprima_pagada', sql.Numeric(17,2), collectionDataList.mprima_pagada)
+            .input('ccompania', sql.Int, collectionDataList.ccompania)
+            .input('cpais', sql.Int, collectionDataList.cpais)
+            .input('cestatusgeneral', sql.Int, collectionDataList.cestatusgeneral)
+            .input('xnota', sql.NVarChar, collectionDataList.xnota)
+            .input('cbanco_destino', sql.Int, collectionDataList.cbanco_destino)
+            .input('mtasa_cambio', sql.Numeric(18,2), collectionDataList.mtasa_cambio)
+            .input('ftasa_cambio', sql.DateTime, collectionDataList.ftasa_cambio)
+            .query('update SURECIBO set XREFERENCIA = @xreferencia, CTIPOPAGO = @ctipopago, CBANCO = @cbanco, FCOBRO = @fcobro, MPRIMA_PAGADA = @mprima_pagada, CESTATUSGENERAL = @cestatusgeneral, XNOTA = @xnota, CBANCO_DESTINO = @cbanco_destino, MTASA_CAMBIO = @mtasa_cambio, FTASA_CAMBIO = @ftasa_cambio where CRECIBO = @crecibo AND CCOMPANIA = @ccompania AND CPAIS = @cpais');
+            rowsAffected = rowsAffected + update.rowsAffected;
             //sql.close();
             return { result: { rowsAffected: rowsAffected } };
         }
@@ -13031,12 +13033,24 @@ queryTypeMetodologiaContract: async(searchData) => {
     return { error: err.message };
 }
 },
-
 destinationBankValrepQuery: async() => {
     try{
         let pool = await sql.connect(config);
         let result = await pool.request()
             .query('select * from MABANCO_DESTINO WHERE BACTIVO = 1');
+        //sql.close();
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+},
+destinationBankQuery: async(searchData) => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+        .input('cpais', sql.Int, searchData.cpais)
+        .input('ctipopago', sql.Int, searchData.ctipopago)
+        .query('select * from MABANCO_DESTINO WHERE CPAIS = @cpais AND CTIPOPAGO = @ctipopago AND BACTIVO = 1');
         //sql.close();
         return { result: result };
     }catch(err){
