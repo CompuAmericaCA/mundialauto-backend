@@ -1414,7 +1414,8 @@ const operationValuePlan = async(authHeader, requestBody) => {
     let searchData = {
         cplan_rc: requestBody.cplan,
         cmetodologiapago: requestBody.cmetodologiapago,
-        xtipo: requestBody.xtipo
+        xtipo: requestBody.xtipo,
+        igrua: requestBody.igrua,
     };
     let valueplan = await bd.SearchPlanValue(searchData).then((res) => res);
     if(valueplan.error){ return { status: false, code: 500, message: ValuePlan.error }; }
