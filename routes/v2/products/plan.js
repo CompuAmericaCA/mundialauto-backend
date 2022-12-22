@@ -281,20 +281,20 @@ const operationDetailPlan = async(authHeader, requestBody) => {
             servicesInsurers.push(serviceInsurer);
         }
     }
-    console.log(servicesInsurers);
+    console.log( getPlanData.result.recordset[0].PASEGURADORA,getPlanData.result.recordset[0].PARYS);
     return { 
         status: true,
         cplan: getPlanData.result.recordset[0].CPLAN,
         xplan: getPlanData.result.recordset[0].XPLAN,
         mcosto: getPlanData.result.recordset[0].MCOSTO,
-        parys: detailPlanRcv.result.recordset[0].PARYS, 
-        paseguradora: detailPlanRcv.result.recordset[0].PASEGURADORA, 
         ctipoplan: getPlanData.result.recordset[0].CTIPOPLAN,
         bactivo: getPlanData.result.recordset[0].BACTIVO,
         paymentMethodologies: paymentMethodologies,
         insurers: insurers,
         services: services,
-        servicesInsurers: servicesInsurers
+        servicesInsurers: servicesInsurers,
+        parys: getPlanData.result.recordset[0].PARYS, 
+        paseguradora: getPlanData.result.recordset[0].PASEGURADORA,
     }
 }
 
@@ -745,7 +745,9 @@ const operationUpdatePlan = async(authHeader, requestBody) => {
     let planData = {
         cplan: requestBody.cplan,
         xplan: requestBody.xplan.toUpperCase(),
-        bactivo: requestBody.bactivo,
+        bactivo: requestBody.bactivo,       
+        parys: requestBody.parys,
+        paseguradora: requestBody.paseguradora,
         cpais: requestBody.cpais,
         ccompania: requestBody.ccompania,
         ctipoplan: requestBody.ctipoplan,

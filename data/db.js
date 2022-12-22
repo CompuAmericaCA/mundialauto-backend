@@ -571,9 +571,11 @@ module.exports = {
                 .input('ctipoplan', sql.Int, planData.ctipoplan)
                 .input('xplan', sql.NVarChar, planData.xplan)
                 .input('bactivo', sql.Bit, planData.bactivo)
+                .input('parys', sql.Numeric(4, 2), planData.parys)
+                .input('paseguradora', sql.Numeric(4, 2), planData.paseguradora)
                 .input('cusuariomodificacion', sql.Int, planData.cusuariomodificacion)
                 .input('fmodificacion', sql.DateTime, new Date())
-                .query('update POPLAN set XPLAN = @xplan, CTIPOPLAN = @ctipoplan, BACTIVO = @bactivo, CUSUARIOMODIFICACION = @cusuariomodificacion, FMODIFICACION = @fmodificacion where CPLAN = @cplan and CPAIS = @cpais and CCOMPANIA = @ccompania');
+                .query('update POPLAN set XPLAN = @xplan, CTIPOPLAN = @ctipoplan, BACTIVO = @bactivo,PARYS = @parys,PASEGURADORA = @paseguradora, CUSUARIOMODIFICACION = @cusuariomodificacion, FMODIFICACION = @fmodificacion where CPLAN = @cplan and CPAIS = @cpais and CCOMPANIA = @ccompania');
             //sql.close();
             return { result: result };
         }catch(err){
