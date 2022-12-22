@@ -486,4 +486,57 @@ const operationDestinationBank = async(authHeader, requestBody) => {
     return { status: true, list: jsonArray }
 }
 
+router.route('/search-bill').post((req, res) => {
+    if(!req.header('Authorization')){ 
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
+        return;
+    }else{
+        operationSearchBill(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){ 
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            console.log(err.message)
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationSearchBill' } });
+        });
+    }
+});
+
+const operationSearchBill = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let searchData = {
+        cfactura: requestBody.cfactura
+    }
+    let searchServiceOrderByBill = await bd.searchServiceOrderByBillQuery(searchData).then((res) => res);
+    if(searchServiceOrderByBill.error){ return { status: false, code: 500, message: query.error }; }
+        let searchSettlementByBill = await bd.searchSettlementByBillQuery(searchData).then((res) => res);
+        if(searchSettlementByBill.error){ return { status: false, code: 500, message: query.error }; }
+
+        //Lista de Ordenes de Servicio
+        let serviceOrderList = [];
+        for(let i = 0; i < searchServiceOrderByBill.result.recordset.length; i++){
+            serviceOrderList.push({ 
+                corden: searchServiceOrderByBill.result.recordset[i].CORDEN,
+                xnombre: searchServiceOrderByBill.result.recordset[i].XNOMBRE,
+                mmontofactura: searchServiceOrderByBill.result.recordset[i].MMONTOFACTURA,
+                xtipopagador: searchServiceOrderByBill.result.recordset[i].XTIPOPAGADOR
+            });
+        }
+
+        //Lista de Finiquitos
+        let settlementList = [];
+        for(let i = 0; i < searchSettlementByBill.result.recordset.length; i++){
+            settlementList.push({ 
+                cfiniquito: searchSettlementByBill.result.recordset[i].CFINIQUITO,
+                xnombre: searchSettlementByBill.result.recordset[i].XNOMBRE,
+                mmontofactura: searchSettlementByBill.result.recordset[i].MMONTOFACTURA,
+                xtipopagador: searchSettlementByBill.result.recordset[i].XTIPOPAGADOR
+            });
+        }
+
+    return { status: true, serviceOrder: serviceOrderList, settlement: settlementList}
+}
+
 module.exports = router;
