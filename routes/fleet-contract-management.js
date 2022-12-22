@@ -1144,6 +1144,7 @@ const operationCreateIndividualContract = async(requestBody) => {
             xnota: requestBody.payment.xnota,
             mtasa_cambio: requestBody.payment.mtasa_cambio,
             ftasa_cambio: requestBody.payment.ftasa_cambio,
+            cestatusgeneral: requestBody.payment.cestatusgeneral,
         }
     }else{
         paymentList = {
@@ -1157,6 +1158,7 @@ const operationCreateIndividualContract = async(requestBody) => {
             xnota: requestBody.xnota ? equestBody.xnota: undefined,
             mtasa_cambio: requestBody.mtasa_cambio ? requestBody.mtasa_cambio: undefined,
             ftasa_cambio: requestBody.ftasa_cambio ? requestBody.ftasa_cambio: undefined,
+            cestatusgeneral: requestBody.cestatusgeneral ? requestBody.cestatusgeneral: undefined,
         }
     }
     if(userData){
