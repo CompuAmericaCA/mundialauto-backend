@@ -77,6 +77,7 @@ const operationDetailCollection = async(authHeader, requestBody) => {
     if(detailCollection.error){ return { status: false}; }
         let xvehiculo = detailCollection.result.recordset[0].XMARCA + ' ' + detailCollection.result.recordset[0].XMODELO + ' ' + detailCollection.result.recordset[0].XVERSION
         let mprima = detailCollection.result.recordset[0].MPRIMA_ANUAL + ' ' + detailCollection.result.recordset[0].xmoneda
+        
         return {    
                 status: true, 
                 ccliente: detailCollection.result.recordset[0].CCLIENTE,
