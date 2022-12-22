@@ -1663,7 +1663,7 @@ const operationValrepCharge = async(authHeader, requestBody) => {
         let mm = dateFormat.getMonth() + 1;
         let yyyy = dateFormat.getFullYear();
         let fingreso = dd + '/' + mm + '/' + yyyy;
-        jsonArray.push({ xcliente: query.result.recordset[i].XCLIENTE, ccliente: query.result.recordset[0].CCLIENTE, xpoliza: query.result.recordset[i].XPOLIZA, ccarga: query.result.recordset[i].CCARGA, fingreso: fingreso });
+        jsonArray.push({ xcliente: query.result.recordset[i].XCLIENTE, ccliente: query.result.recordset[0].CCLIENTE, xpoliza: query.result.recordset[i].XPOLIZA, ccarga: query.result.recordset[i].CCARGA, fingreso: fingreso, xplaca: query.result.recordset[i].XPLACA });
     }
     return { status: true, list: jsonArray }
 }

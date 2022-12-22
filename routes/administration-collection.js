@@ -77,6 +77,7 @@ const operationDetailCollection = async(authHeader, requestBody) => {
     if(detailCollection.error){ return { status: false}; }
         let xvehiculo = detailCollection.result.recordset[0].XMARCA + ' ' + detailCollection.result.recordset[0].XMODELO + ' ' + detailCollection.result.recordset[0].XVERSION
         let mprima = detailCollection.result.recordset[0].MPRIMA_ANUAL + ' ' + detailCollection.result.recordset[0].xmoneda
+        
         return {    
                 status: true, 
                 ccliente: detailCollection.result.recordset[0].CCLIENTE,
@@ -90,7 +91,8 @@ const operationDetailCollection = async(authHeader, requestBody) => {
                 xplaca: detailCollection.result.recordset[0].XPLACA,
                 xestatusgeneral: detailCollection.result.recordset[0].XESTATUSGENERAL,
                 mprima: mprima,
-                mprima_pagada: detailCollection.result.recordset[0].MPRIMA_ANUAL
+                mprima_pagada: detailCollection.result.recordset[0].MPRIMA_ANUAL,
+                ccodigo_ubii: detailCollection.result.recordset[0].CCODIGO_UBII
                };
 }
 

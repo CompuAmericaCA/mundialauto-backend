@@ -1099,6 +1099,8 @@ const operationCreateIndividualContract = async(requestBody) => {
         xtelefono_emp: requestBody.xtelefono_emp,
         cplan: requestBody.cplan,
         ccorredor: requestBody.ccorredor ? requestBody.ccorredor : undefined,
+        mgrua: requestBody.mgrua ? requestBody.mgrua : undefined,
+
         xcedula:requestBody.xcedula,
         xcobertura: requestBody.xcobertura.toUpperCase(),
         ncapacidad_p: requestBody.ncapacidad_p,
@@ -1125,6 +1127,8 @@ const operationCreateIndividualContract = async(requestBody) => {
         femision: requestBody.femision ,
         ivigencia: requestBody.ivigencia ? requestBody.ivigencia : undefined,
         cproductor: requestBody.cproductor ? requestBody.cproductor : undefined,
+        ccodigo_ubii: requestBody.ccodigo_ubii ? requestBody.ccodigo_ubii : undefined,
+
     };
     console.log(userData)
     let paymentList = {};
@@ -1346,6 +1350,48 @@ const operationTarifaCasco = async(authHeader, requestBody) => {
                 }
     }       
 }
+
+router.route('/tarifa-casco/validation').post((req, res) => {
+    if(!req.header('Authorization')){ 
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
+        return;
+    }else{
+        operationValidateTarifaCasco(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){ 
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationValidateTarifaCasco' } });
+        });
+    }
+});
+
+const operationValidateTarifaCasco = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let searchData = {
+        xtipo: requestBody.xtipo,
+        cano: parseInt(requestBody.cano),
+        xcobertura:requestBody.xcobertura,
+    };
+    if(requestBody.xcobertura == 'AMPLIA'){
+        let query = await bd.ValidateTarifaCasco(searchData).then((res) => res);
+        if(query.error){ return { status: false, code: 505, message: operationValidateTarifaCasco.error };  }
+        console.log(query.result.recordset)
+        return { status: true,
+            cano: query.result.recordset
+        }
+    }
+    else if(requestBody.xcobertura == 'PERDIDA'){
+        let query = await bd.ValidateTarifaPerdida(searchData).then((res) => res);
+        if(query.error){ return { status: false, code: 505, message: query.error }; }
+
+        return { status: true,
+            cano: query.result.recordset
+        }
+    }       
+}
 router.route('/value-plan').post((req, res) => {
     if(!req.header('Authorization')){ 
         res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
@@ -1373,12 +1419,49 @@ const operationValuePlan = async(authHeader, requestBody) => {
     let valueplan = await bd.SearchPlanValue(searchData).then((res) => res);
     if(valueplan.error){ return { status: false, code: 500, message: ValuePlan.error }; }
     if(valueplan.result.rowsAffected > 0){
-                console.log(valueplan.result.recordset[0].MPRIMA.toFixed(2))
                
         return { 
                 status : true,
                 mprima: valueplan.result.recordset[0].MPRIMA.toFixed(2),
                 ccubii: valueplan.result.recordset[0].CCUBII,
+  
+               };
+                     
+    }else{ return { status: false, code: 404, message: 'value not found.' }; }
+
+    
+}
+
+router.route('/value-grua').post((req, res) => {
+    if(!req.header('Authorization')){ 
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
+        return;
+    }else{
+        operationValueGrua(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){ 
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationPlanValue' } });
+        });
+    }
+});
+
+const operationValueGrua = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let searchData = {
+        cplan_rc: requestBody.cplan,
+        xtipo: requestBody.xtipo
+    };
+    let valuegrua = await bd.SearchPlanGrua(searchData).then((res) => res);
+    if(valuegrua.error){ return { status: false, code: 500, message: valuegrua.error }; }
+    if(valuegrua.result.rowsAffected > 0){
+         console.log(valuegrua.result.recordset[0].MGRUA)
+        return { 
+                status : true,
+                mgrua: valuegrua.result.recordset[0].MGRUA,
   
                };
                      
