@@ -12881,6 +12881,7 @@ SearchPlanValue: async(searchData) => {
         .input('cmetodologiapago', sql.NVarChar, searchData.cmetodologiapago)
         .input('cplan_rc', sql.NVarChar, searchData.cplan_rc)
         .input('xtipo', sql.NVarChar, searchData.xtipo)
+        .input('igrua', sql.Bit, searchData.igrua)
         .execute('tmBCalculo_Recibo');
          let query= await pool.request()
         .query('select * from TMCALCULO_RECIBO');
