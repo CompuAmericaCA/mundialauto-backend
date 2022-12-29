@@ -1710,6 +1710,7 @@ const operationCreateContractBroker = async(requestBody) => {
         mmotin: requestBody.mmotin ? requestBody.mmotin : undefined,
         pblindaje: requestBody.pblindaje ? requestBody.pblindaje : undefined,
         cproductor: requestBody.cproductor ? requestBody.cproductor : undefined,
+        mgrua: requestBody.mgrua ? requestBody.mgrua : undefined,
         //ccodigo_ubii: requestBody.ccodigo_ubii
     };
     let paymentList = {};
@@ -1725,6 +1726,7 @@ const operationCreateContractBroker = async(requestBody) => {
             xnota: requestBody.payment.xnota,
             mtasa_cambio: requestBody.payment.mtasa_cambio,
             ftasa_cambio: requestBody.payment.ftasa_cambio,
+            cestatusgeneral: requestBody.payment.cestatusgeneral,
         }
     }else{
         paymentList = {
@@ -1738,6 +1740,7 @@ const operationCreateContractBroker = async(requestBody) => {
             xnota: requestBody.xnota ? equestBody.xnota: undefined,
             mtasa_cambio: requestBody.mtasa_cambio ? requestBody.mtasa_cambio: undefined,
             ftasa_cambio: requestBody.ftasa_cambio ? requestBody.ftasa_cambio: undefined,
+            cestatusgeneral: requestBody.cestatusgeneral ? requestBody.cestatusgeneral: undefined
         }
     }
     if(userData){
