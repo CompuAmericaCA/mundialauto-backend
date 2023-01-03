@@ -148,7 +148,7 @@ router.route('/update').post((req, res) => {
 const operationUpdateCollection = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
     let collectionDataList = {};
-    for(let i = 0; i < requestBody.pago.length; i++){
+
         collectionDataList = {
             crecibo: requestBody.crecibo,
             ctipopago: requestBody.pago.ctipopago,
@@ -164,10 +164,10 @@ const operationUpdateCollection = async(authHeader, requestBody) => {
             mtasa_cambio: requestBody.pago.mtasa_cambio,
             ftasa_cambio: requestBody.pago.ftasa_cambio,
         }
-    }
+        console.log(collectionDataList)
     let updateCollection = await bd.updateCollectionQuery(collectionDataList).then((res) => res);
     if(updateCollection.error){ return { status: false, code: 500, message: updateCollection.error }; }
-    if(updateCollection.result.rowsAffected > 0){ return { status: true, crecibo: collectionDataList[0].crecibo }; }
+    if(updateCollection.result.rowsAffected > 0){ return { status: true, crecibo: collectionDataList.crecibo }; }
     else{ return { status: false, code: 404, message: 'Service Order not found.' }; }
     
 }
