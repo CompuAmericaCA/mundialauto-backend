@@ -2890,7 +2890,40 @@ const operationTypeVehicle = async( requestBody) => {
     }
     return { status: true, list: jsonArray }
 }
+router.route('/over-limit/type-vehicle').post((req, res) => {
+    if(!req.header('Authorization')){ 
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
+        return;
+    }else{
+        operationOverLimitTypeVehicle(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){ 
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationOverLimitTypeVehicle' } });
+        });
+    }
+});
 
+const operationOverLimitTypeVehicle = async( requestBody) => {
+    let searchData = {
+        ccompania: requestBody.ccompania,
+        cpais: requestBody.cpais,
+        
+    };
+    let query = await bd.OverLimitvehicleQuery(searchData).then((res) => res);
+    if(query.error){ return { status: false, code: 500, message: query.error }; }
+    let jsonArray = [];
+    for(let i = 0; i < query.result.recordset.length; i++){
+        jsonArray.push({ 
+             xgrupo: query.result.recordset[i].XGRUPO,
+             ctarifa_exceso: query.result.recordset[i].CTARIFA_EXCESO
+             });
+    }
+    return { status: true, list: jsonArray }
+}
 router.route('/type-planRCV').post((req, res) => {
     if(!req.header('Authorization')){ 
         res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
