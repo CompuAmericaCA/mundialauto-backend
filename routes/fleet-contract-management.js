@@ -1846,4 +1846,38 @@ const operationUpdateReceiptPayment = async(authHeader, requestBody) => {
     } else { return { status: false, code: 401, condition: 'token-expired', expired: true }; }
 }
 
+router.route('/cancellations').post((req, res) => {
+    if(!req.header('Authorization')){
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } });
+        return;
+    }else{
+        operationCancellations(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationCancellations' } });
+        });
+    }
+})
+
+const operationCancellations = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let searchData = {
+        cpais: requestBody.cpais,
+        ccompania: requestBody.ccompania,
+    };
+    if(requestBody.anulacion){
+        let cancellation = {
+            ccarga: requestBody.anulacion.ccarga,
+            ccausaanulacion: requestBody.anulacion.ccausaanulacion
+        }
+        let cancellationData = await bd.cancellationDataQuery(searchData, cancellation).then((res) => res);
+        if(cancellationData.error){ return { status: false, code: 500, message: cancellationData.error }; }
+    }
+    return { status: true }; 
+}
+
 module.exports = router;
