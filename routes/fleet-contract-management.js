@@ -31,6 +31,7 @@ const operationSearchFleetContractManagement = async(authHeader, requestBody) =>
         xplaca: requestBody.xplaca ? requestBody.xplaca : undefined,
         ccompania: requestBody.ccompania
     };
+   
     let searchFleetContractManagement = await bd.searchFleetContractManagementQuery(searchData).then((res) => res);
     if(searchFleetContractManagement.error){ return  { status: false, code: 500, message: searchFleetContractManagement.error }; }
     if(searchFleetContractManagement.result.rowsAffected > 0){
@@ -1392,6 +1393,42 @@ const operationValidateTarifaCasco = async(authHeader, requestBody) => {
         }
     }       
 }
+router.route('/validate-plate').post((req, res) => {
+    if(!req.header('Authorization')){ 
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
+        return;
+    }else{
+        operationValidatePlate(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){ 
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationValidatePlace' } });
+        });
+    }
+});
+
+const operationValidatePlate = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let searchData = {
+        xplaca: requestBody.xplaca,
+    };
+
+        let query = await bd.ValidatePLate(searchData).then((res) => res);
+        if(query.error){ return { status: false, code: 500, message: operationValidatePLace.error };  }
+        return { status: true,
+                xdocidentidad: query.result.recordset[0].XDOCIDENTIDAD,
+                fdesde_pol: query.result.recordset[0].FDESDE_POL.toLocaleDateString(),
+                fhasta_pol: query.result.recordset[0].FHASTA_POL.toLocaleDateString(),
+                xpoliza: query.result.recordset[0].XPOLIZA,
+                }
+    
+     
+}
+
+
 router.route('/value-plan').post((req, res) => {
     if(!req.header('Authorization')){ 
         res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
@@ -1807,6 +1844,40 @@ const operationUpdateReceiptPayment = async(authHeader, requestBody) => {
             return { status: false, code: 404, message: 'Receipt Not Found.' }; }
     
     } else { return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+}
+
+router.route('/cancellations').post((req, res) => {
+    if(!req.header('Authorization')){
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } });
+        return;
+    }else{
+        operationCancellations(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationCancellations' } });
+        });
+    }
+})
+
+const operationCancellations = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let searchData = {
+        cpais: requestBody.cpais,
+        ccompania: requestBody.ccompania,
+    };
+    if(requestBody.anulacion){
+        let cancellation = {
+            ccarga: requestBody.anulacion.ccarga,
+            ccausaanulacion: requestBody.anulacion.ccausaanulacion
+        }
+        let cancellationData = await bd.cancellationDataQuery(searchData, cancellation).then((res) => res);
+        if(cancellationData.error){ return { status: false, code: 500, message: cancellationData.error }; }
+    }
+    return { status: true }; 
 }
 
 module.exports = router;
