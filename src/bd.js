@@ -13127,5 +13127,26 @@ searchSettlementByBillQuery: async(searchData) => {
         return { error: err.message };
     }
 },
+cancellationDataQuery: async(searchData, cancellation) => {
+    try{
+        let rowsAffected = 0;
+        let pool = await sql.connect(config);
+        let insert = await pool.request()
+        .input('ccarga', sql.Int, cancellation.ccarga)
+        .input('ccausaanulacion', sql.Int, cancellation.ccausaanulacion)
+        .input('cestatusgeneral', sql.Int, 3)
+        .input('cpais', sql.Int, searchData.cpais)
+        .input('ccompania', sql.Int, searchData.ccompania)
+        .input('fanulacion', sql.DateTime, new Date())
+        .query('insert into TMANULACION (CCARGA, CCAUSAANULACION, FANULACION, CESTATUSGENERAL, CPAIS, CCOMPANIA) values (@ccarga, @ccausaanulacion, @fanulacion, @cestatusgeneral, @cpais, @ccompania)');
+        rowsAffected = rowsAffected + insert.rowsAffected;
+        //sql.close();
+        return { result: { rowsAffected: rowsAffected } };
+    }
+    catch(err){
+        console.log(err.message);
+        return { error: err.message };
+    }
+},
 }
 
