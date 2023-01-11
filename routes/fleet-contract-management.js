@@ -1105,7 +1105,7 @@ const operationCreateIndividualContract = async(requestBody) => {
         xcedula:requestBody.xcedula,
         xcobertura: requestBody.xcobertura.toUpperCase(),
         ncapacidad_p: requestBody.ncapacidad_p,
-        ctarifa_exceso: requestBody.xtipo.toUpperCase(),
+        ctarifa_exceso: requestBody.ctarifa_exceso.toUpperCase(),
         cmetodologiapago: requestBody.cmetodologiapago ? requestBody.cmetodologiapago : undefined,
         msuma_aseg: requestBody.msuma_aseg ? requestBody.msuma_aseg : undefined,
         pcasco: requestBody.pcasco ? requestBody.pcasco : undefined,
@@ -1430,6 +1430,7 @@ const operationValidatePlate = async(authHeader, requestBody) => {
 
 
 router.route('/value-plan').post((req, res) => {
+    console.log('hola')
     if(!req.header('Authorization')){ 
         res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
         return;
@@ -1451,9 +1452,11 @@ const operationValuePlan = async(authHeader, requestBody) => {
     let searchData = {
         cplan_rc: requestBody.cplan,
         cmetodologiapago: requestBody.cmetodologiapago,
-        xtipo: requestBody.xtipo,
+        ctarifa_exceso: requestBody.ctarifa_exceso,
         igrua: requestBody.igrua,
+        ncapacidad_p: requestBody.ncapacidad_p
     };
+    console.log(searchData)
     let valueplan = await bd.SearchPlanValue(searchData).then((res) => res);
     if(valueplan.error){ return { status: false, code: 500, message: ValuePlan.error }; }
     if(valueplan.result.rowsAffected > 0){
@@ -1490,8 +1493,7 @@ router.route('/value-grua').post((req, res) => {
 const operationValueGrua = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
     let searchData = {
-        cplan_rc: requestBody.cplan,
-        xtipo: requestBody.xtipo
+        ctarifa_exceso: requestBody.ctarifa_exceso
     };
     let valuegrua = await bd.SearchPlanGrua(searchData).then((res) => res);
     if(valuegrua.error){ return { status: false, code: 500, message: valuegrua.error }; }
