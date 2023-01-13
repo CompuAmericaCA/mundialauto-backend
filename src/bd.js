@@ -8582,8 +8582,9 @@ module.exports = {
                 .input('ftasa_cambio', sql.DateTime, paymentList.ftasa_cambio ? paymentList.ftasa_cambio: undefined)
                 .input('mgrua', sql.NVarChar ,userData.mgrua)
                 .input('cestatusgeneral', sql.Int, paymentList.cestatusgeneral ? paymentList.cestatusgeneral: 13)
+                .input('ctomador', sql.Int, userData.ctomador ? userData.ctomador: 0)
 
-                .query('insert into TMEMISION_INDIVIDUAL(XNOMBRE, XAPELLIDO, CANO, XCOLOR, CMARCA, CMODELO, CVERSION, XRIF_CLIENTE, EMAIL, XTELEFONO_PROP, XDIRECCIONFISCAL, XSERIALMOTOR, XSERIALCARROCERIA, XPLACA, XTELEFONO_EMP, CPLAN, CCORREDOR, XCEDULA, XCOBERTURA, NCAPACIDAD_P, CTARIFA_EXCESO, FINICIO, CMETODOLOGIAPAGO, MSUMA_ASEG, PCASCO, MPRIMA_CASCO, MCATASTROFICO, PDESCUENTO, IFRACCIONAMIENTO, NCUOTAS, MPRIMA_BLINDAJE, MSUMA_BLINDAJE, MPRIMA_BRUTA, PCATASTROFICO, PMOTIN, MMOTIN, PBLINDAJE, CESTADO, CCIUDAD, CPAIS, ICEDULA, FEMISION, IVIGENCIA, CTIPOPAGO, XREFERENCIA, FCOBRO, CBANCO, CBANCO_DESTINO, MPRIMA_PAGADA, MPRIMA_BS, XNOTA, MTASA_CAMBIO, FTASA_CAMBIO,CCODIGO_UBII, MGRUA) values (@xnombre, @xapellido, @cano, @xcolor, @cmarca, @cmodelo, @cversion, @xrif_cliente, @email, @xtelefono_prop, @xdireccionfiscal, @xserialmotor, @xserialcarroceria, @xplaca, @xtelefono_emp, @cplan, @ccorredor, @xcedula, @xcobertura, @ncapacidad_p, @ctarifa_exceso, @finicio, @cmetodologiapago, @msuma_aseg, @pcasco, @mprima_casco, @mcatastrofico, @pdescuento, @ifraccionamiento, @ncuotas, @mprima_blindaje, @msuma_blindaje, @mprima_bruta,@pcatastrofico ,@pmotin, @mmotin, @pblindaje, @cestado, @cciudad, @cpais, @icedula, @femision, @ivigencia, @ctipopago, @xreferencia, @fcobro, @cbanco, @cbanco_destino, @mprima_pagada, @mprima_bs, @xnota, @mtasa_cambio, @ftasa_cambio,@ccodigo_ubii, @mgrua)')            //sql.close();
+                .query('insert into TMEMISION_INDIVIDUAL(XNOMBRE, XAPELLIDO, CANO, XCOLOR, CMARCA, CMODELO, CVERSION, XRIF_CLIENTE, EMAIL, XTELEFONO_PROP, XDIRECCIONFISCAL, XSERIALMOTOR, XSERIALCARROCERIA, XPLACA, XTELEFONO_EMP, CPLAN, CCORREDOR, XCEDULA, XCOBERTURA, NCAPACIDAD_P, CTARIFA_EXCESO, FINICIO, CMETODOLOGIAPAGO, MSUMA_ASEG, PCASCO, MPRIMA_CASCO, MCATASTROFICO, PDESCUENTO, IFRACCIONAMIENTO, NCUOTAS, MPRIMA_BLINDAJE, MSUMA_BLINDAJE, MPRIMA_BRUTA, PCATASTROFICO, PMOTIN, MMOTIN, PBLINDAJE, CESTADO, CCIUDAD, CPAIS, ICEDULA, FEMISION, IVIGENCIA, CTIPOPAGO, XREFERENCIA, FCOBRO, CBANCO, CBANCO_DESTINO, MPRIMA_PAGADA, MPRIMA_BS, XNOTA, MTASA_CAMBIO, FTASA_CAMBIO,CCODIGO_UBII, MGRUA, CTOMADOR) values (@xnombre, @xapellido, @cano, @xcolor, @cmarca, @cmodelo, @cversion, @xrif_cliente, @email, @xtelefono_prop, @xdireccionfiscal, @xserialmotor, @xserialcarroceria, @xplaca, @xtelefono_emp, @cplan, @ccorredor, @xcedula, @xcobertura, @ncapacidad_p, @ctarifa_exceso, @finicio, @cmetodologiapago, @msuma_aseg, @pcasco, @mprima_casco, @mcatastrofico, @pdescuento, @ifraccionamiento, @ncuotas, @mprima_blindaje, @msuma_blindaje, @mprima_bruta,@pcatastrofico ,@pmotin, @mmotin, @pblindaje, @cestado, @cciudad, @cpais, @icedula, @femision, @ivigencia, @ctipopago, @xreferencia, @fcobro, @cbanco, @cbanco_destino, @mprima_pagada, @mprima_bs, @xnota, @mtasa_cambio, @ftasa_cambio,@ccodigo_ubii, @mgrua, @ctomador)')            //sql.close();
             return { result: { rowsAffected: rowsAffected, status: true } };
         }
         catch(err){
@@ -13167,6 +13168,93 @@ cancellationDataQuery: async(searchData, cancellation) => {
     }
     catch(err){
         console.log(err.message);
+        return { error: err.message };
+    }
+},
+searchtakersQuery: async(searchData) => {
+    try{
+        let query = `SELECT * FROM MATOMADORES WHERE CESTATUSGENERAL = @cestatusgeneral${ searchData.xrif ? " AND XRIF = @xrif" : '' }`;
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+            .input('xrif', sql.NVarChar, searchData.xrif)
+            .input('cestatusgeneral', sql.Int, 2)
+            .query(query);
+        //sql.close();
+        return { result: result };
+    }catch(err){
+        console.log(err.message);
+        return { error: err.message };
+    }
+},
+createTakersQuery: async(createData) => {
+    try{
+        let rowsAffected = 0;
+        let pool = await sql.connect(config);
+        let insert = await pool.request()
+            .input('xtomador', sql.NVarChar, createData.xtomador)
+            .input('xprofesion', sql.NVarChar, createData.xprofesion)
+            .input('xrif', sql.NVarChar, createData.xrif)
+            .input('xdomicilio', sql.NVarChar, createData.xdomicilio)
+            .input('cpais', sql.Int, createData.cpais)
+            .input('cestado', sql.Int, createData.cestado)
+            .input('cciudad', sql.Int, createData.cciudad)
+            .input('xzona_postal', sql.NVarChar, createData.xzona_postal)
+            .input('xtelefono', sql.NVarChar, createData.xtelefono)
+            .input('cestatusgeneral', sql.Int, createData.cestatusgeneral)
+            .input('xcorreo', sql.NVarChar, createData.xcorreo)
+            .input('cusuariocreacion', sql.Int, createData.cusuario)
+            .input('fcreacion', sql.DateTime, new Date())
+            .query('insert into MATOMADORES (XTOMADOR, XPROFESION, XRIF, XDOMICILIO, CPAIS, CESTADO, CCIUDAD, XZONA_POSTAL, XTELEFONO, CESTATUSGENERAL, XCORREO, CUSUARIOCREACION, FCREACION) values (@xtomador, @xprofesion, @xrif, @xdomicilio, @cpais, @cestado, @cciudad, @xzona_postal, @xtelefono, @cestatusgeneral, @xcorreo, @cusuariocreacion, @fcreacion)');
+            rowsAffected = rowsAffected + insert.rowsAffected;
+            return { result: { rowsAffected: rowsAffected } };
+        }catch(err){
+        return { error: err.message };
+    }
+},
+detailTakersQuery: async(searchData) => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+        .input('ctomador', sql.Int, searchData.ctomador)
+        .query('select * from VWBUSCARTOMADOR WHERE CTOMADOR = @ctomador');
+        //sql.close();
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+},
+updateTakersQuery: async(createData) => {
+    try{
+        let rowsAffected = 0;
+        let pool = await sql.connect(config);
+        let update = await pool.request()
+            .input('ctomador', sql.Int, createData.ctomador)
+            .input('xtomador', sql.NVarChar, createData.xtomador)
+            .input('xprofesion', sql.NVarChar, createData.xprofesion)
+            .input('xrif', sql.NVarChar, createData.xrif)
+            .input('xdomicilio', sql.NVarChar, createData.xdomicilio)
+            .input('cpais', sql.Int, createData.cpais)
+            .input('cestado', sql.Int, createData.cestado)
+            .input('cciudad', sql.Int, createData.cciudad)
+            .input('xzona_postal', sql.NVarChar, createData.xzona_postal)
+            .input('xtelefono', sql.NVarChar, createData.xtelefono)
+            .input('cestatusgeneral', sql.Int, createData.cestatusgeneral)
+            .input('xcorreo', sql.NVarChar, createData.xcorreo)
+            .query('UPDATE MATOMADORES SET XTOMADOR = @xtomador, XPROFESION = @xprofesion, XRIF = @xrif, XDOMICILIO = @xdomicilio, CPAIS = @cpais, CESTADO = @cestado, CCIUDAD = @cciudad, XZONA_POSTAL = @xzona_postal, XTELEFONO = @xtelefono, CESTATUSGENERAL = @cestatusgeneral, XCORREO = @xcorreo WHERE CTOMADOR = @ctomador');
+            rowsAffected = rowsAffected + update.rowsAffected;
+            return { result: { rowsAffected: rowsAffected } };
+        }catch(err){
+        return { error: err.message };
+    }
+},
+takersValrepQuery: async() => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+            .query('select * from MATOMADORES where CESTATUSGENERAL = 2');
+        //sql.close();
+        return { result: result };
+    }catch(err){
         return { error: err.message };
     }
 },

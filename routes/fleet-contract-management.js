@@ -800,6 +800,15 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
             ncapacidadcargavehiculo: getFleetContractData.result.recordset[0].NCAPACIDADCARGA,
             ncapacidadpasajerosvehiculo: getFleetContractData.result.recordset[0].NCAPACIDADPASAJEROS,
             xplancoberturas: getPlanData.result.recordset[0].XPLAN_RC,
+            xtomador: getFleetContractData.result.recordset[0].XTOMADOR,
+            xprofesion: getFleetContractData.result.recordset[0].XPROFESION,
+            xrif: getFleetContractData.result.recordset[0].XRIF,
+            xdomicilio: getFleetContractData.result.recordset[0].XDOMICILIO,
+            xzona_postal: getFleetContractData.result.recordset[0].XZONA_POSTAL,
+            xtelefono: getFleetContractData.result.recordset[0].XTELEFONO,
+            xcorreo: getFleetContractData.result.recordset[0].XCORREO,
+            xestado: getFleetContractData.result.recordset[0].XESTADO,
+            xciudad: getFleetContractData.result.recordset[0].XCIUDAD,
             xplanservicios: xplanservicios,
             mprimatotal: mprimatotal,
             mprimaprorratatotal: mprimaprorratatotal,
@@ -1129,7 +1138,7 @@ const operationCreateIndividualContract = async(requestBody) => {
         ivigencia: requestBody.ivigencia ? requestBody.ivigencia : undefined,
         cproductor: requestBody.cproductor ? requestBody.cproductor : undefined,
         ccodigo_ubii: requestBody.ccodigo_ubii ? requestBody.ccodigo_ubii : undefined,
-
+        ctomador: requestBody.ctomador ? requestBody.ctomador : undefined,
     };
     console.log(userData)
     let paymentList = {};
