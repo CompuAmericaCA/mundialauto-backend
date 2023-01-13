@@ -5,6 +5,11 @@
         "route": "/api/security"
     },
     {
+        "name": "Takers Route",
+        "router": "../routes/takers",
+        "route": "/api/takers"
+    },
+    {
         "name": "Clauses Route",
         "router": "../routes/clauses",
         "route": "/api/clauses"
