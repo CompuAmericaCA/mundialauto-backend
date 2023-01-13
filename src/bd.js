@@ -8546,7 +8546,7 @@ module.exports = {
                 .input('cproductor', sql.Numeric(11, 0), userData.cproductor)
                 .input('xcobertura', sql.NVarChar, userData.xcobertura)
                 .input('ncapacidad_p', sql.NVarChar, userData.ncapacidad_p)
-                .input('ctarifa_exceso', sql.NVarChar, userData.ctarifa_exceso)
+                .input('ctarifa_exceso', sql.Int, userData.ctarifa_exceso)
                 .input('finicio',  sql.DateTime, new Date())
                 .input('femision',  sql.DateTime, userData.femision)
                 .input('cmetodologiapago', sql.Numeric(11, 0), userData.cmetodologiapago)
@@ -12904,8 +12904,9 @@ SearchPlanValue: async(searchData) => {
         let result = await pool.request()
         .input('cmetodologiapago', sql.NVarChar, searchData.cmetodologiapago)
         .input('cplan_rc', sql.NVarChar, searchData.cplan_rc)
-        .input('xtipo', sql.NVarChar, searchData.xtipo)
+        .input('ctarifa_exceso', sql.Int, searchData.ctarifa_exceso)
         .input('igrua', sql.Bit, searchData.igrua)
+        .input('ncapacidad_p', sql.Int, searchData.ncapacidad_p)
         .execute('tmBCalculo_Recibo');
          let query= await pool.request()
         .query('select * from TMCALCULO_RECIBO');
@@ -12920,9 +12921,8 @@ SearchPlanGrua: async(searchData) => {
     try{
         let pool = await sql.connect(config);
         let result = await pool.request()
-        .input('cplan_rc', sql.NVarChar, searchData.cplan_rc)
-        .input('xtipo', sql.NVarChar, searchData.xtipo)
-        .query('select * from PRPLAN_RC_DETALLE where CPLAN_RC = @cplan_rc and XTIPO = @xtipo');
+        .input('ctarifa_exceso', sql.Int, searchData.ctarifa_exceso)
+        .query('select * from PRTARIFA_EXCESO where CTARIFA_EXCESO = @ctarifa_exceso');
       
         return { result: result };
               
@@ -13167,6 +13167,43 @@ cancellationDataQuery: async(searchData, cancellation) => {
     }
     catch(err){
         console.log(err.message);
+        return { error: err.message };
+    }
+},
+searchtakersQuery: async(searchData) => {
+    try{
+        let query = `SELECT * FROM MATOMADORES WHERE CESTATUSGENERAL = @cestatusgeneral${ searchData.xrif ? " AND XRIF = @xrif" : '' }`;
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+            .input('xrif', sql.NVarChar, searchData.xrif)
+            .input('cestatusgeneral', sql.Int, 2)
+            .query(query);
+        //sql.close();
+        return { result: result };
+    }catch(err){
+        console.log(err.message);
+        return { error: err.message };
+    }
+},
+createTakersQuery: async(createData) => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+            .input('xtomador', sql.NVarChar, createData.xtomador)
+            .input('xprofesion', sql.NVarChar, createData.xprofesion)
+            .input('xrif', sql.NVarChar, createData.xrif)
+            .input('xdomicilio', sql.NVarChar, createData.xdomicilio)
+            .input('cestado', sql.Int, createData.cestado)
+            .input('cciudad', sql.Int, createData.cciudad)
+            .input('xzona_postal', sql.NVarChar, createData.xzona_postal)
+            .input('xtelefono', sql.NVarChar, createData.xtelefono)
+            .input('cestatusgeneral', sql.Int, createData.cestatusgeneral)
+            .input('xcorreo', sql.NVarChar, createData.xcorreo)
+            .input('cusuariocreacion', sql.Int, createData.cusuario)
+            .input('fcreacion', sql.DateTime, new Date())
+            .query('insert into MATOMADORES (XTOMADOR, XPROFESION, XRIF, XDOMICILIO, CESTADO, CCIUDAD, XZONA_POSTAL, XTELEFONO, CESTATUSGENERAL, XCORREO, CUSUARIOCREACION, FCREACION) values (@xtomador, @xprofesion, @xrif, @xdomicilio, @cestado, @cciudad, @xzona_postal, @xtelefono, @cestatusgeneral, @xcorreo, @cusuariocreacion, @fcreacion)');
+            return { result: result };
+        }catch(err){
         return { error: err.message };
     }
 },
