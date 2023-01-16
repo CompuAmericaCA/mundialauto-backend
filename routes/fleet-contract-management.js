@@ -1171,6 +1171,7 @@ const operationCreateIndividualContract = async(requestBody) => {
             cestatusgeneral: requestBody.cestatusgeneral ? requestBody.cestatusgeneral: undefined,
         }
     }
+    
     if(userData){
         let operationCreateIndividualContract = await bd.createIndividualContractQuery(userData, paymentList).then((res) => res);
         if(operationCreateIndividualContract.error){ return { status: false, code: 500, message: operationCreateIndividualContract.error }; }
