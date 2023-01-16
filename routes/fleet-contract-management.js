@@ -1139,6 +1139,7 @@ const operationCreateIndividualContract = async(requestBody) => {
         cproductor: requestBody.cproductor ? requestBody.cproductor : undefined,
         ccodigo_ubii: requestBody.ccodigo_ubii ? requestBody.ccodigo_ubii : undefined,
         ctomador: requestBody.ctomador ? requestBody.ctomador : undefined,
+        cusuario: requestBody.cusuario ? requestBody.cusuario : undefined,
     };
     console.log(userData)
     let paymentList = {};
