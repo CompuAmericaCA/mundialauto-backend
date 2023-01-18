@@ -523,7 +523,6 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
         ccompania: requestBody.ccompania,
         ccontratoflota: requestBody.ccontratoflota
     };
-    console.log(fleetContractData);
     let getFleetContractData = await bd.getFleetContractDataQuery(fleetContractData).then((res) => res);
     if(getFleetContractData.error){ return { status: false, code: 500, message: getFleetContractData.error }; }
     if(getFleetContractData.result.rowsAffected > 0){
@@ -809,6 +808,9 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
             xcorreo: getFleetContractData.result.recordset[0].XCORREO,
             xestado: getFleetContractData.result.recordset[0].XESTADO,
             xciudad: getFleetContractData.result.recordset[0].XCIUDAD,
+            xclase: getFleetContractData.result.recordset[0].XCLASE,
+            nkilometraje: getFleetContractData.result.recordset[0].NKILOMETRAJE,
+            xzona_postal_propietario: getFleetContractData.result.recordset[0].XZONA_POSTAL_PROPIETARIO,
             xplanservicios: xplanservicios,
             mprimatotal: mprimatotal,
             mprimaprorratatotal: mprimaprorratatotal,
@@ -1114,7 +1116,7 @@ const operationCreateIndividualContract = async(requestBody) => {
         xcedula:requestBody.xcedula,
         xcobertura: requestBody.xcobertura.toUpperCase(),
         ncapacidad_p: requestBody.ncapacidad_p,
-        ctarifa_exceso: requestBody.ctarifa_exceso.toUpperCase(),
+        ctarifa_exceso: requestBody.ctarifa_exceso,
         cmetodologiapago: requestBody.cmetodologiapago ? requestBody.cmetodologiapago : undefined,
         msuma_aseg: requestBody.msuma_aseg ? requestBody.msuma_aseg : undefined,
         pcasco: requestBody.pcasco ? requestBody.pcasco : undefined,
@@ -1140,8 +1142,12 @@ const operationCreateIndividualContract = async(requestBody) => {
         ccodigo_ubii: requestBody.ccodigo_ubii ? requestBody.ccodigo_ubii : undefined,
         ctomador: requestBody.ctomador ? requestBody.ctomador : undefined,
         cusuario: requestBody.cusuario ? requestBody.cusuario : undefined,
+        xzona_postal: requestBody.xzona_postal ? requestBody.xzona_postal : undefined,
+        xuso: requestBody.xuso ? requestBody.xuso : undefined,
+        xtipo: requestBody.xtipo ? requestBody.xtipo : undefined,
+        nkilometraje: requestBody.nkilometraje ? requestBody.nkilometraje : undefined,
+        xclase: requestBody.xclase ? requestBody.xclase : undefined,
     };
-    console.log(userData)
     let paymentList = {};
     if(requestBody.payment){
         paymentList = {
@@ -1736,7 +1742,6 @@ const operationCreateContractBroker = async(requestBody) => {
         xserialcarroceria: requestBody.xserialcarroceria.toUpperCase(),
         xserialmotor: requestBody.xserialmotor.toUpperCase(),
         xcobertura: requestBody.xcobertura.toUpperCase(),
-        xtipo: requestBody.xtipo.toUpperCase(),
         cplan: requestBody.cplan,
         cmetodologiapago: requestBody.cmetodologiapago ? requestBody.cmetodologiapago : undefined,
         femision: requestBody.femision ,
@@ -1761,8 +1766,18 @@ const operationCreateContractBroker = async(requestBody) => {
         pblindaje: requestBody.pblindaje ? requestBody.pblindaje : undefined,
         cproductor: requestBody.cproductor ? requestBody.cproductor : undefined,
         mgrua: requestBody.mgrua ? requestBody.mgrua : undefined,
+        ctomador: requestBody.ctomador ? requestBody.ctomador : undefined,
+        cusuario: requestBody.cusuario ? requestBody.cusuario : undefined,
+        ctarifa_exceso: requestBody.ctarifa_exceso,
+        xzona_postal: requestBody.xzona_postal ? requestBody.xzona_postal : undefined,
+        xuso: requestBody.xuso ? requestBody.xuso : undefined,
+        xtipo: requestBody.xtipo ? requestBody.xtipo : undefined,
+        nkilometraje: requestBody.nkilometraje ? requestBody.nkilometraje : undefined,
+        xclase: requestBody.xclase ? requestBody.xclase : undefined,
+
         //ccodigo_ubii: requestBody.ccodigo_ubii
     };
+    console.log(userData)
     let paymentList = {};
     if(requestBody.payment){
         paymentList = {
