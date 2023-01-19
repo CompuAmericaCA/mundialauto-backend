@@ -523,7 +523,6 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
         ccompania: requestBody.ccompania,
         ccontratoflota: requestBody.ccontratoflota
     };
-    console.log(fleetContractData);
     let getFleetContractData = await bd.getFleetContractDataQuery(fleetContractData).then((res) => res);
     if(getFleetContractData.error){ return { status: false, code: 500, message: getFleetContractData.error }; }
     if(getFleetContractData.result.rowsAffected > 0){
@@ -800,6 +799,18 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
             ncapacidadcargavehiculo: getFleetContractData.result.recordset[0].NCAPACIDADCARGA,
             ncapacidadpasajerosvehiculo: getFleetContractData.result.recordset[0].NCAPACIDADPASAJEROS,
             xplancoberturas: getPlanData.result.recordset[0].XPLAN_RC,
+            xtomador: getFleetContractData.result.recordset[0].XTOMADOR,
+            xprofesion: getFleetContractData.result.recordset[0].XPROFESION,
+            xrif: getFleetContractData.result.recordset[0].XRIF,
+            xdomicilio: getFleetContractData.result.recordset[0].XDOMICILIO,
+            xzona_postal: getFleetContractData.result.recordset[0].XZONA_POSTAL,
+            xtelefono: getFleetContractData.result.recordset[0].XTELEFONO,
+            xcorreo: getFleetContractData.result.recordset[0].XCORREO,
+            xestado: getFleetContractData.result.recordset[0].XESTADO,
+            xciudad: getFleetContractData.result.recordset[0].XCIUDAD,
+            xclase: getFleetContractData.result.recordset[0].XCLASE,
+            nkilometraje: getFleetContractData.result.recordset[0].NKILOMETRAJE,
+            xzona_postal_propietario: getFleetContractData.result.recordset[0].XZONA_POSTAL_PROPIETARIO,
             xplanservicios: xplanservicios,
             mprimatotal: mprimatotal,
             mprimaprorratatotal: mprimaprorratatotal,
@@ -1122,7 +1133,7 @@ const operationCreateIndividualContract = async(requestBody) => {
         xcedula:requestBody.xcedula,
         xcobertura: requestBody.xcobertura.toUpperCase(),
         ncapacidad_p: requestBody.ncapacidad_p,
-        ctarifa_exceso: requestBody.xtipo.toUpperCase(),
+        ctarifa_exceso: requestBody.ctarifa_exceso,
         cmetodologiapago: requestBody.cmetodologiapago ? requestBody.cmetodologiapago : undefined,
         msuma_aseg: requestBody.msuma_aseg ? requestBody.msuma_aseg : undefined,
         pcasco: requestBody.pcasco ? requestBody.pcasco : undefined,
@@ -1146,9 +1157,14 @@ const operationCreateIndividualContract = async(requestBody) => {
         ivigencia: requestBody.ivigencia ? requestBody.ivigencia : undefined,
         cproductor: requestBody.cproductor ? requestBody.cproductor : undefined,
         ccodigo_ubii: requestBody.ccodigo_ubii ? requestBody.ccodigo_ubii : undefined,
-
+        ctomador: requestBody.ctomador ? requestBody.ctomador : undefined,
+        cusuario: requestBody.cusuario ? requestBody.cusuario : undefined,
+        xzona_postal: requestBody.xzona_postal ? requestBody.xzona_postal : undefined,
+        xuso: requestBody.xuso ? requestBody.xuso : undefined,
+        xtipo: requestBody.xtipo ? requestBody.xtipo : undefined,
+        nkilometraje: requestBody.nkilometraje ? requestBody.nkilometraje : undefined,
+        xclase: requestBody.xclase ? requestBody.xclase : undefined,
     };
-    console.log(userData)
     let paymentList = {};
     if(requestBody.payment){
         paymentList = {
@@ -1179,6 +1195,7 @@ const operationCreateIndividualContract = async(requestBody) => {
             cestatusgeneral: requestBody.cestatusgeneral ? requestBody.cestatusgeneral: undefined,
         }
     }
+    
     if(userData){
         let operationCreateIndividualContract = await bd.createIndividualContractQuery(userData, paymentList).then((res) => res);
         if(operationCreateIndividualContract.error){ return { status: false, code: 500, message: operationCreateIndividualContract.error }; }
@@ -1447,6 +1464,7 @@ const operationValidatePlate = async(authHeader, requestBody) => {
 
 
 router.route('/value-plan').post((req, res) => {
+    console.log('hola')
     if(!req.header('Authorization')){ 
         res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
         return;
@@ -1468,9 +1486,11 @@ const operationValuePlan = async(authHeader, requestBody) => {
     let searchData = {
         cplan_rc: requestBody.cplan,
         cmetodologiapago: requestBody.cmetodologiapago,
-        xtipo: requestBody.xtipo,
+        ctarifa_exceso: requestBody.ctarifa_exceso,
         igrua: requestBody.igrua,
+        ncapacidad_p: requestBody.ncapacidad_p
     };
+    console.log(searchData)
     let valueplan = await bd.SearchPlanValue(searchData).then((res) => res);
     if(valueplan.error){ return { status: false, code: 500, message: ValuePlan.error }; }
     if(valueplan.result.rowsAffected > 0){
@@ -1507,8 +1527,7 @@ router.route('/value-grua').post((req, res) => {
 const operationValueGrua = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
     let searchData = {
-        cplan_rc: requestBody.cplan,
-        xtipo: requestBody.xtipo
+        ctarifa_exceso: requestBody.ctarifa_exceso
     };
     let valuegrua = await bd.SearchPlanGrua(searchData).then((res) => res);
     if(valuegrua.error){ return { status: false, code: 500, message: valuegrua.error }; }
@@ -1740,7 +1759,6 @@ const operationCreateContractBroker = async(requestBody) => {
         xserialcarroceria: requestBody.xserialcarroceria.toUpperCase(),
         xserialmotor: requestBody.xserialmotor.toUpperCase(),
         xcobertura: requestBody.xcobertura.toUpperCase(),
-        xtipo: requestBody.xtipo.toUpperCase(),
         cplan: requestBody.cplan,
         cmetodologiapago: requestBody.cmetodologiapago ? requestBody.cmetodologiapago : undefined,
         femision: requestBody.femision ,
@@ -1765,8 +1783,18 @@ const operationCreateContractBroker = async(requestBody) => {
         pblindaje: requestBody.pblindaje ? requestBody.pblindaje : undefined,
         cproductor: requestBody.cproductor ? requestBody.cproductor : undefined,
         mgrua: requestBody.mgrua ? requestBody.mgrua : undefined,
+        ctomador: requestBody.ctomador ? requestBody.ctomador : undefined,
+        cusuario: requestBody.cusuario ? requestBody.cusuario : undefined,
+        ctarifa_exceso: requestBody.ctarifa_exceso,
+        xzona_postal: requestBody.xzona_postal ? requestBody.xzona_postal : undefined,
+        xuso: requestBody.xuso ? requestBody.xuso : undefined,
+        xtipo: requestBody.xtipo ? requestBody.xtipo : undefined,
+        nkilometraje: requestBody.nkilometraje ? requestBody.nkilometraje : undefined,
+        xclase: requestBody.xclase ? requestBody.xclase : undefined,
+
         //ccodigo_ubii: requestBody.ccodigo_ubii
     };
+    console.log(userData)
     let paymentList = {};
     if(requestBody.payment){
         paymentList = {
