@@ -8760,6 +8760,18 @@ module.exports = {
             return { error: err.message };
         }
     },
+    getPolicyHolderData: async(ctomador) => {
+        try{
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+            .input('ctomador', sql.Int, ctomador)
+            .query('select * from VWBUSCARTOMADOR where CTOMADOR = @ctomador');
+            return { result: result }
+        }catch(err){
+            console.log(err.message);
+            return { error: err.message };
+        }
+    },
     getImagesInspectionDataDataQuery: async(cinspeccioncontratoflota) => {
         try{
             let pool = await sql.connect(config);
