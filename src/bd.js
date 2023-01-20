@@ -4270,12 +4270,12 @@ module.exports = {
             let result = await pool.request()
                 .input('xmodelo', sql.NVarChar, modelData.xmodelo)
                 .input('cmarca', sql.Int, modelData.cmarca)
-                .input('casociado', sql.Int, modelData.casociado)
+                //.input('casociado', sql.Int, modelData.casociado)
                 .input('bactivo', sql.Bit, modelData.bactivo)
                 .input('cpais', sql.Numeric(4, 0), modelData.cpais)
                 .input('cusuariocreacion', sql.Int, modelData.cusuariocreacion)
                 .input('fcreacion', sql.DateTime, new Date())
-                .query('insert into MAMODELO (XMODELO, CMARCA, CASOCIADO, BACTIVO, CPAIS, CUSUARIOCREACION, FCREACION) values (@xmodelo, @cmarca, @casociado, @bactivo, @cpais, @cusuariocreacion, @fcreacion)');
+                .query('insert into MAMODELO (XMODELO, CMARCA,  BACTIVO, CPAIS, CUSUARIOCREACION, FCREACION) values (@xmodelo, @cmarca,  @bactivo, @cpais, @cusuariocreacion, @fcreacion)');
             if(result.rowsAffected > 0){
                 let query = await pool.request()
                     .input('xmodelo', sql.NVarChar, modelData.xmodelo)
@@ -4327,15 +4327,16 @@ module.exports = {
                 .input('cpais', sql.Numeric(4, 0), modelData.cpais)
                 .input('cmodelo', sql.Int, modelData.cmodelo)
                 .input('cmarca', sql.Int, modelData.cmarca)
-                .input('casociado', sql.Int, modelData.casociado)
+                // .input('casociado', sql.Int, modelData.casociado)
                 .input('xmodelo', sql.NVarChar, modelData.xmodelo)
                 .input('bactivo', sql.Bit, modelData.bactivo)
                 .input('cusuariomodificacion', sql.Int, modelData.cusuariomodificacion)
                 .input('fmodificacion', sql.DateTime, new Date())
-                .query('update MAMODELO set XMODELO = @xmodelo, CASOCIADO = @casociado, CMARCA = @cmarca, BACTIVO = @bactivo, CUSUARIOMODIFICACION = @cusuariomodificacion, FMODIFICACION = @fmodificacion where CMODELO = @cmodelo and CPAIS = @cpais');
+                .query('update MAMODELO set XMODELO = @xmodelo,  BACTIVO = @bactivo, CUSUARIOMODIFICACION = @cusuariomodificacion, FMODIFICACION = @fmodificacion where CMODELO = @cmodelo and CPAIS = @cpais AND CMARCA = @cmarca');
             //sql.close();
             return { result: result };
         }catch(err){
+            console.log(err.message)
             return { error: err.message };
         }
     },
