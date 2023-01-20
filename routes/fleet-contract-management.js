@@ -716,6 +716,9 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
                 accesories.push(accessory);
             }
         }
+        let getPolicyEffectiveDate = await bd.getPolicyEffectiveDateQuery(fleetContractData.ccontratoflota);
+        if(getPolicyEffectiveDate.error){ return { status: false, code: 500, message: getPolicyEffectiveDate.error }; }
+        if(getPolicyEffectiveDate.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Fleet Contract Receipts not found.' }; }
         return {
             status: true,
             ccarga: getFleetContractData.result.recordset[0].ccarga,
@@ -748,7 +751,7 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
             fhasta: getFleetContractData.result.recordset[0].FHASTA_POL,
             finiciorecibo: getFleetContractData.result.recordset[0].FDESDE_REC,
             fhastarecibo: getFleetContractData.result.recordset[0].FHASTA_REC,
-            femision: getFleetContractData.result.recordset[0].femision,
+            femision: getFleetContractData.result.recordset[0].FINICIO,
             cestatusgeneral: getFleetContractData.result.recordset[0].CESTATUSGENERAL,
             xestatusgeneral: getFleetContractData.result.recordset[0].XESTATUSGENERAL,
             ctrabajador: getFleetContractData.result.recordset[0].CTRABAJADOR,
@@ -818,7 +821,9 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
             inspections: inspections,
             services:services,
             realCoverages: realCoverages,
-            coverageAnnexes: coverageAnnexes
+            coverageAnnexes: coverageAnnexes,
+            fdesde_pol: getPolicyEffectiveDate.result.recordset[0].FDESDE_POL,
+            fhasta_pol: getPolicyEffectiveDate.result.recordset[0].FHASTA_POL
         }
     }else{ return { status: false, code: 404, message: 'Fleet Contract not found.' }; }
 }
