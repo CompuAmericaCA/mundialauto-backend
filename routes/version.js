@@ -171,7 +171,7 @@ const operationDetailVersion = async(authHeader, requestBody) => {
     let getVersionData = await bd.getVersionDataQuery(versionData).then((res) => res);
     if(getVersionData.error){ return { status: false, code: 500, message: getVersionData.error }; }
     if(getVersionData.result.rowsAffected > 0){
-        return { 
+        return{ 
             status: true,
             cmodelo: getVersionData.result.recordset[0].CVERSION,
             xversion: getVersionData.result.recordset[0].XVERSION,
