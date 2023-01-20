@@ -8725,6 +8725,18 @@ module.exports = {
             return { error: err.message };
         }
     },
+    getPolicyEffectiveDateQuery: async(ccontratoflota) => {
+        try{
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+            .input('ccontratoflota', sql.Int, ccontratoflota)
+            .query('select top 1 FDESDE_POL, FHASTA_POL from SURECIBO where CCONTRATOFLOTA = @ccontratoflota and BACTIVO = 1');
+            return { result: result };
+        }catch(err){
+            console.log(err.message);
+            return { error: err.message };
+        }
+    },
     getFleetContractDataQuery: async(fleetContractData) => {
         try{
             let pool = await sql.connect(config);
@@ -8773,6 +8785,18 @@ module.exports = {
             .query('select * from macorredores where ccorredor = @ccorredor');
             return { result: result }
         }catch(err){
+            return { error: err.message };
+        }
+    },
+    getPolicyHolderData: async(ctomador) => {
+        try{
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+            .input('ctomador', sql.Int, ctomador)
+            .query('select * from VWBUSCARTOMADOR where CTOMADOR = @ctomador');
+            return { result: result }
+        }catch(err){
+            console.log(err.message);
             return { error: err.message };
         }
     },
