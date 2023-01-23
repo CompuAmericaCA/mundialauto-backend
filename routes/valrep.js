@@ -1742,13 +1742,13 @@ const operationValrepReceipt = async(authHeader, requestBody) => {
         let yyyyHasta = dateFormatHasta.getFullYear();
         let fhasta_rec = ddHasta + '/' + mmHasta + '/' + yyyyHasta;
         let xstatus = "";
-        if(query.result.recordset[i].CESTATUSGENERAL = 3) {
+        if(query.result.recordset[i].CESTATUSGENERAL == 3) {
             xstatus = "ANULADO";
         }
-        if(query.result.recordset[i].CESTATUSGENERAL = 7){
+        if(query.result.recordset[i].CESTATUSGENERAL == 7){
             xstatus = "COBRADO";
         }
-        if(query.result.recordset[i].CESTATUSGENERAL = 13){
+        if(query.result.recordset[i].CESTATUSGENERAL == 13){
             xstatus = "PENDIENTE"
         }
         jsonArray.push({ ccarga: query.result.recordset[i].CCARGA, xrecibo: query.result.recordset[i].XRECIBO, crecibo: query.result.recordset[i].CRECIBO, nconsecutivo: query.result.recordset[i].NCONSECUTIVO, fdesde_rec: fdesde_rec, fhasta_rec: fhasta_rec, ccontratoflota: query.result.recordset[i].CCONTRATOFLOTA, mprima_anual: query.result.recordset[i].MPRIMA_ANUAL, msuma_anual: query.result.recordset[i].MSUMA_ANUAL, xstatus: xstatus, xplaca: query.result.recordset[i].XPLACA  });
