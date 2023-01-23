@@ -933,7 +933,8 @@ const operationReceiptDetail = async(authHeader, requestBody) => {
         nkilometraje: getReceiptData.result.recordset[0].NKILOMETRAJE,
         xtituloreporte: getReceiptData.result.recordset[0].XTITULO_REPORTE,
         xrepresentantelegal: getReceiptData.result.recordset[0].XREPRESENTANTELEGAL,
-        xdocidentidadrepresentantelegal: getReceiptData.result.recordset[0].XDOCIDENTIDADREPRESENTANTELEGAL
+        xdocidentidadrepresentantelegal: getReceiptData.result.recordset[0].XDOCIDENTIDADREPRESENTANTELEGAL,
+        cestatusgeneral: getReceiptData.result.recordset[0].CESTATUSGENERAL
     }
 }
 
