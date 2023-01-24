@@ -24,8 +24,8 @@ const operationSearchVersion = async(authHeader, requestBody) => {
     if(!helper.validateRequestObj(requestBody, ['cpais'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
     let searchData = {
         cpais: requestBody.cpais,
-        cmarca: requestBody.cmarca ? requestBody.cmarca : undefined,
-        cmodelo: requestBody.cmodelo ? requestBody.cmodelo : undefined,
+        cmarca: requestBody.cmarca  ? requestBody.cmarca : undefined,
+        cmodelo: requestBody.cmodelo  ? requestBody.cmodelo : undefined,
     } 
     let searchVersion = await bd.searchVersionnQuery(searchData).then((res) => res);
     if(searchVersion.error){ return { status: false, code: 500, message: searchVersion.error }; }
@@ -73,9 +73,9 @@ const operationSearchVersionn = async(authHeader, requestBody) => {
     if(!helper.validateRequestObj(requestBody, ['cpais'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
     let searchData = {
         cpais: requestBody.cpais,
-        cmarca: requestBody.cmarca ? requestBody.cmarca : undefined,
-        cmodelo: requestBody.cmodelo ? requestBody.cmodelo : undefined,
-        cversion: requestBody.cversion ? requestBody.cversion.toUpperCase() : undefined
+        cmarca: requestBody.cmarca  ? requestBody.cmarca : undefined,
+        cmodelo: requestBody.cmodelo  ? requestBody.cmodelo : undefined,
+        cversion: requestBody.cversion  ? requestBody.cversion.toUpperCase() : undefined
     }
     let searchVersion = await bd.searchVersionQuery(searchData).then((res) => res);
     if(searchVersion.error){ return { status: false, code: 500, message: searchVersion.error }; }
@@ -207,24 +207,25 @@ router.route('/update').post((req, res) => {
 
 const operationUpdateVersion = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
-    if(!helper.validateRequestObj(requestBody, ['cversion', 'xversion', 'cmodelo', 'cmarca', 'casociado', 'ctipotransmision', 'xcilindrajemotor', 'ctipovehiculo', 'ncapacidadcarga', 'npasajero', 'bactivo', 'cpais', 'cusuariomodificacion'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
+   // if(!helper.validateRequestObj(requestBody, ['cversion', 'xversion', 'cmodelo', 'cmarca', 'casociado', 'ctipotransmision', 'xcilindrajemotor', 'ctipovehiculo', 'ncapacidadcarga', 'npasajero', 'bactivo', 'cpais', 'cusuariomodificacion'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
     let versionData = {
-        cversion: requestBody.cversion,
-        xversion: requestBody.xversion.toUpperCase(),
-        ctipotransmision: requestBody.ctipotransmision,
-        xcilindrajemotor: requestBody.xcilindrajemotor.toUpperCase(),
-        ctipovehiculo: requestBody.ctipovehiculo,
-        ncapacidadcarga: requestBody.ncapacidadcarga,
-        npasajero: requestBody.npasajero,
-        cmodelo: requestBody.cmodelo,
-        bactivo: requestBody.bactivo,
-        cpais: requestBody.cpais,
-        cmarca: requestBody.cmarca,
-        casociado: requestBody.casociado,
+        cversion: requestBody.cversion  ? requestBody.cversion : undefined,
+        xversion: requestBody.xversion.toUpperCase() ? requestBody.xversion : undefined,
+        xtransmision: requestBody.xtransmision ? requestBody.xtransmision : undefined,
+      //  xcilindrajemotor: requestBody.xcilindrajemotor.toUpperCase() ? requestBody.xcilindrajemotor : undefined,
+      //  ctipovehiculo: requestBody.ctipovehiculo ? requestBody.ctipovehiculo : undefined,
+     //   ncapacidadcarga: requestBody.ncapacidadcarga ? requestBody.ncapacidadcarga : undefined,
+        npasajero: requestBody.npasajero ? requestBody.npasajero : undefined,
+        cmodelo: requestBody.cmodelo ? requestBody.cmodelo : undefined,
+        bactivo: requestBody.bactivo ? requestBody.bactivo : undefined,
+        cpais: requestBody.cpais ? requestBody.cpais : undefined,
+        cmarca: requestBody.cmarca ? requestBody.cmarca : undefined,
+     //   casociado: requestBody.casociado ? requestBody.casociado : undefined,
         cusuariomodificacion: requestBody.cusuariomodificacion
     };
     let verifyVersionName = await bd.verifyVersionNameToUpdateQuery(versionData).then((res) => res);
-    if(verifyVersionName.error){ return { status: false, code: 500, message: verifyVersionName.error }; }
+   
+    //if(verifyVersionName.error){ return { status: false, code: 500, message: verifyVersionName.error }; }
     if(verifyVersionName.result.rowsAffected > 0){ return { status: false, code: 200, condition: 'version-name-already-exist'}; }
     else{
         let updateVersion = await bd.updateVersionQuery(versionData).then((res) => res);

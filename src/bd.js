@@ -351,7 +351,7 @@ module.exports = {
             let result = await pool.request()
                 .input('cusuario', sql.Int, cusuario)
                 .input('bactivo', sql.Bit, true)
-                .query('select * from VWMODULOSXUSUARIO where CUSUARIO = @cusuario and BACTIVO = @bactivo');
+                .query('select * from VWMODULOSXUSUARIO where CUSUARIO = @cusuario and BACTIVO = @bactivo ORDER BY XRUTA , XMODULO');
             //sql.close();
             return { result: result }; 
         }catch(err){
@@ -4455,7 +4455,7 @@ module.exports = {
                 .input('cversion', sql.Int, versionData.cversion)
                 .input('cmodelo', sql.Int, versionData.cmodelo)
                 .input('cmarca', sql.Int, versionData.cmarca)
-                .query('select * from MAVERSION where XVERSION = @xversion and CVERSION != @cversion and CPAIS = @cpais and CMARCA = @cmarca and CMODELO = @cmodelo');
+                .query('select * from MAVERSION where XVERSION = @xversion and CVERSION ! = @cversion and CPAIS = @cpais and CMARCA = @cmarca and CMODELO = @cmodelo');
             //sql.close();
             return { result: result };
         }catch(err){
@@ -4471,7 +4471,7 @@ module.exports = {
                 .input('cmarca', sql.Int, versionData.cmarca)
                 .input('cmodelo', sql.Int, versionData.cmodelo)
                 .input('casociado', sql.Int, versionData.casociado)
-                .input('ctipotransmision', sql.Int, versionData.ctipotransmision)
+                .input('xtransmision', sql.NVarChar, versionData.xtransmision)
                 .input('ctipovehiculo', sql.Int, versionData.ctipovehiculo)
                 .input('ncapacidadcarga', sql.Numeric(11, 2), versionData.ncapacidadcarga)
                 .input('npasajero', sql.Int, versionData.npasajero)
@@ -4481,10 +4481,10 @@ module.exports = {
                 .input('cusuariocreacion', sql.Int, versionData.cusuariocreacion)
                 .input('cusuariomodificacion', sql.Int, versionData.cusuariomodificacion)
                 .input('fmodificacion', sql.DateTime, new Date())
-                .query('update MAVERSION set XVERSION = @xversion, CTIPOTRANSMISION = @ctipotransmision, CTIPOVEHICULO = @ctipovehiculo, NCAPACIDADCARGA = @ncapacidadcarga, NPASAJERO = @npasajero, XCILINDRAJEMOTOR = @xcilindrajemotor, XCARROCERIA = @xcarroceria, CASOCIADO = @casociado, CMARCA = @cmarca, CMODELO = @cmodelo, BACTIVO = @bactivo, CUSUARIOMODIFICACION = @cusuariomodificacion, FMODIFICACION = @fmodificacion where CVERSION = @cversion and CPAIS = @cpais');
-            //sql.close();
+                .query('update MAVERSION set XVERSION = @xversion, XTRANSMISION= @xtransmision, NPASAJERO = @npasajero,  BACTIVO = @bactivo, CUSUARIOMODIFICACION = @cusuariomodificacion, FMODIFICACION = @fmodificacion where CVERSION = @cversion and CPAIS = @cpais and CMARCA = @cmarca and CMODELO = @cmodelo');            //sql.close();
             return { result: result };
         }catch(err){
+            console.log(err.message)
             return { error: err.message };
         }
     },
