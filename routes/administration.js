@@ -539,4 +539,40 @@ const operationSearchBill = async(authHeader, requestBody) => {
     return { status: true, serviceOrder: serviceOrderList, settlement: settlementList}
 }
 
+router.route('/bill-detail').post((req, res) => {
+    if(!req.header('Authorization')){
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } });
+        return;
+    }else{
+        operationBillDetail(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationBillDetail' } });
+        });
+    }
+});
+
+const operationBillDetail = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let searchData = {
+        cfactura: requestBody.cfactura
+    }
+    let detailBill = await bd.detailBillQuery(searchData).then((res) => res);
+    if(detailBill.error){ return  { status: false, code: 500, message: detailBill.error }; }
+    if(detailBill.result.rowsAffected > 0){
+        return { status: true, 
+                xcliente: detailBill.result.recordset[0].XCLIENTE,
+                nfactura: detailBill.result.recordset[0].NFACTURA,
+                ncontrol: detailBill.result.recordset[0].NCONTROL,
+                ffactura: detailBill.result.recordset[0].FFACTURA,
+                fvencimiento: detailBill.result.recordset[0].FVENCIMIENTO,
+                frecepcion: detailBill.result.recordset[0].FRECEPCION
+          };
+    }else{ return { status: false, code: 404, message: 'Notification not found.' }; }
+}
+
 module.exports = router;

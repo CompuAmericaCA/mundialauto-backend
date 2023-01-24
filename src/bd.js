@@ -10506,6 +10506,7 @@ module.exports = {
                 let insert = await pool.request()
                     .input('cnotificacion', sql.Int, notificationData.cnotificacion)
                     .input('ccompania', sql.Int, notificationData.ccompania)
+                    .input('cpais', sql.Int, notificationData.cpais)
                     .input('cservicio', sql.Int, serviceOrderCreateList[i].cservicio)
                     .input('xobservacion', sql.NVarChar, serviceOrderCreateList[i].xobservacion)
                     .input('cservicioadicional', sql.Int, serviceOrderCreateList[i].cservicioadicional ? serviceOrderCreateList[i].cservicioadicional : undefined)
@@ -10527,13 +10528,14 @@ module.exports = {
                     .input('cestatusgeneral', sql.Int, 13)
                     .input('ccausaanulacion', sql.Int, serviceOrderCreateList[i].ccausaanulacion)
                     .input('fcreacion', sql.DateTime, new Date())
-                    .query('insert into EVORDENSERVICIO (CSERVICIO, FCREACION, CNOTIFICACION, XOBSERVACION, CSERVICIOADICIONAL, CCOTIZACION, XDANOS, XFECHA, FAJUSTE, XDESDE, XHACIA, MMONTO, MMONTOTOTAL, CMONEDA, CIMPUESTO, PIMPUESTO, MMONTOTOTALIVA, XMENSAJE, XRUTAARCHIVO, CPROVEEDOR, CCOMPANIA, CESTATUSGENERAL, CCAUSAANULACION, BACTIVO) values (@cservicio, @fcreacion, @cnotificacion, @xobservacion, @cservicioadicional, @ccotizacion, @xdanos, @xfecha, @fajuste, @xdesde, @xhacia, @mmonto, @mmontototal, @cmoneda, @cimpuesto, @pimpuesto, @mmontototaliva, @xmensaje, @xrutaarchivo, @cproveedor, @ccompania, @cestatusgeneral, @ccausaanulacion, 1)')
+                    .query('insert into EVORDENSERVICIO (CSERVICIO, FCREACION, CNOTIFICACION, XOBSERVACION, CSERVICIOADICIONAL, CCOTIZACION, XDANOS, XFECHA, FAJUSTE, XDESDE, XHACIA, MMONTO, MMONTOTOTAL, CMONEDA, CIMPUESTO, PIMPUESTO, MMONTOTOTALIVA, XMENSAJE, XRUTAARCHIVO, CPROVEEDOR, CCOMPANIA, CPAIS, CESTATUSGENERAL, CCAUSAANULACION, BACTIVO) values (@cservicio, @fcreacion, @cnotificacion, @xobservacion, @cservicioadicional, @ccotizacion, @xdanos, @xfecha, @fajuste, @xdesde, @xhacia, @mmonto, @mmontototal, @cmoneda, @cimpuesto, @pimpuesto, @mmontototaliva, @xmensaje, @xrutaarchivo, @cproveedor, @ccompania, @cpais, @cestatusgeneral, @ccausaanulacion, 1)')
                 rowsAffected = rowsAffected + insert.rowsAffected;
             }
             //sql.close();
             return { result: { rowsAffected: rowsAffected } };
         }
         catch(err){
+            console.log(err.message)
             return { error: err.message };
         }
     },
@@ -13268,6 +13270,19 @@ takersValrepQuery: async() => {
         let result = await pool.request()
             .query('select * from MATOMADORES where CESTATUSGENERAL = 2');
         //sql.close();
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+},
+detailBillQuery: async(searchData) => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+            .input('cfactura', sql.Int, searchData.cfactura)
+            .query('select * from VWBUSCARFACTURASREGISTRADAS WHERE CFACTURA = @cfactura');
+        //sql.close();
+        console.log(result)
         return { result: result };
     }catch(err){
         return { error: err.message };
