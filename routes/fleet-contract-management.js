@@ -1116,6 +1116,7 @@ router.route('/create/individualContract').post((req, res) => {
 });
 
 const operationCreateIndividualContract = async(requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
     let userData = {
         xnombre: requestBody.xnombre.toUpperCase(),
         xapellido: requestBody.xapellido.toUpperCase(),
@@ -1878,23 +1879,22 @@ router.route('/ubii/update').post((req, res) => {
 });
 
 const operationUpdateReceiptPayment = async(authHeader, requestBody) => {
-    if(authHeader == 'SKDJK23J4KJ2352304923059'){
-        let orden = requestBody.paymentData.orderId.split("_");
-        let paymentData = {
-            orderId: parseInt(orden[1]),
-            ctipopago: requestBody.paymentData.ctipopago,
-            xreferencia: requestBody.paymentData.xreferencia,
-            fcobro: requestBody.paymentData.fcobro,
-            mprima_pagada: requestBody.paymentData.mprima_pagada
-        }
-        console.log(paymentData);
-        let updateReceiptPayment = await bd.updateReceiptPaymentBrokerQuery(paymentData);
-        if(updateReceiptPayment.error){ return { status: false, code: 500, message: updateReceiptPayment.error }; }
-        if(updateReceiptPayment.result.rowsAffected > 0){ return { status: true }; }
-        else{ 
-            return { status: false, code: 404, message: 'Receipt Not Found.' }; }
-    
-    } else { return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let paymentData = {
+        ccontratoflota: requestBody.paymentData.ccontratoflota,
+        orderId: requestBody.paymentData.orderId,
+        ctipopago: requestBody.paymentData.ctipopago,
+        xreferencia: requestBody.paymentData.xreferencia,
+        fcobro: requestBody.paymentData.fcobro,
+        mprima_pagada: requestBody.paymentData.mprima_pagada
+    }
+    let updateReceiptPayment = await bd.updateReceiptPaymentBrokerQuery(paymentData);
+    if(updateReceiptPayment.error){ return { status: false, code: 500, message: updateReceiptPayment.error }; }
+    if(updateReceiptPayment.result.rowsAffected > 0){ return { status: true }; }
+    let updateFleetContractGeneralState = await bd.updateFleetContractGeneralStateQuery(paymentData.ccontratoflota);
+    if(updateFleetContractGeneralState.error){ return { status: false, code: 500, message: updateFleetContractGeneralState.error }; }
+    if(updateFleetContractGeneralState.result.rowsAffected > 0){ return { status: true }; }
+    return { status: true };
 }
 
 router.route('/cancellations').post((req, res) => {
