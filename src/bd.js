@@ -12274,7 +12274,7 @@ module.exports = {
             .input('xreferencia', sql.NVarChar, paymentData.xreferencia)
             .input('fcobro', sql.DateTime, paymentData.fcobro)
             .input('mprima_pagada', sql.Numeric(17,2), paymentData.mprima_pagada)
-            .input('cestatusgeneral', sql.Int, 12)
+            .input('cestatusgeneral', sql.Int, 7)
             .query('update SURECIBO set XREFERENCIA = @xreferencia, CTIPOPAGO = @ctipopago, FCOBRO = @fcobro, MPRIMA_PAGADA = @mprima_pagada, CESTATUSGENERAL = @cestatusgeneral where CRECIBO = @crecibo');
             rowsAffected = rowsAffected + update.rowsAffected;
             //sql.close();
