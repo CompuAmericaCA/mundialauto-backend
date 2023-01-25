@@ -92,7 +92,8 @@ const operationDetailCollection = async(authHeader, requestBody) => {
                 xestatusgeneral: detailCollection.result.recordset[0].XESTATUSGENERAL,
                 mprima: mprima,
                 mprima_pagada: detailCollection.result.recordset[0].MPRIMA_ANUAL,
-                ccodigo_ubii: detailCollection.result.recordset[0].CCODIGO_UBII
+                ccodigo_ubii: detailCollection.result.recordset[0].CCODIGO_UBII,
+                ccontratoflota: detailCollection.result.recordset[0].CCONTRATOFLOTA
                };
 }
 
@@ -115,16 +116,23 @@ router.route('/ubii/update').post((req, res) => {
 });
 
 const operationUpdateReceiptPayment = async(authHeader, requestBody) => {
-    if(authHeader == 'SKDJK23J4KJ2352304923059'){
-    
-        console.log(requestBody.paymentData);
-        let updateReceiptPayment = await bd.updateReceiptPaymentQuery(requestBody.paymentData);
-        if(updateReceiptPayment.error){ return { status: false, code: 500, message: updateReceiptPayment.error }; }
-        if(updateReceiptPayment.result.rowsAffected > 0){ return { status: true }; }
-        else{ 
-            return { status: false, code: 404, message: 'Receipt Not Found.' }; }
-    
-    } else { return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let paymentData = {
+        crecibo: requestBody.paymentData.crecibo,
+        ccontratoflota: requestBody.paymentData.ccontratoflota,
+        orderId: requestBody.paymentData.orderId,
+        ctipopago: requestBody.paymentData.ctipopago,
+        xreferencia: requestBody.paymentData.xreferencia,
+        fcobro: requestBody.paymentData.fcobro,
+        mprima_pagada: requestBody.paymentData.mprima_pagada
+    }
+    let updateReceiptPayment = await bd.updateReceiptPaymentQuery(paymentData);
+    if(updateReceiptPayment.error){ return { status: false, code: 500, message: updateReceiptPayment.error }; }
+    if(updateReceiptPayment.result.rowsAffected > 0){ return { status: true }; }
+    let updateFleetContractGeneralState = await bd.updateFleetContractGeneralStateQuery(paymentData.ccontratoflota);
+    if(updateFleetContractGeneralState.error){ return { status: false, code: 500, message: updateFleetContractGeneralState.error }; }
+    if(updateFleetContractGeneralState.result.rowsAffected > 0){ return { status: true }; }
+    return { status: true };
 }
 
 router.route('/update').post((req, res) => {
