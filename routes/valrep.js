@@ -2233,11 +2233,17 @@ const operationValrepVersion = async(authHeader, requestBody) => {
         cmarca: requestBody.cmarca ? requestBody.cmarca : undefined,
         cmodelo: requestBody.cmodelo ? requestBody.cmodelo : undefined,
     };
-    let query = await bd.versionValrepQuery(searchData).then((res) => res);
+    let query = await bd.searchVersionQuery(searchData).then((res) => res);
     if(query.error){ return { status: false, code: 500, message: query.error }; }
+    console.log(query.result.recordset)
     let jsonArray = [];
     for(let i = 0; i < query.result.recordset.length; i++){
-        jsonArray.push({ cversion: query.result.recordset[i].CVERSION, xversion: query.result.recordset[i].XVERSION + '-' + query.result.recordset[i].CANO, bactivo: query.result.recordset[i].BACTIVO, cano: query.result.recordset[i].CANO, control: i, npasajero: query.result.recordset[i].NPASAJERO  });
+        jsonArray.push({ cversion: query.result.recordset[i].CVERSION, 
+            xversion: query.result.recordset[i].XVERSION + '-' + query.result.recordset[i].CANO, 
+            bactivo: query.result.recordset[i].BACTIVO, cano: query.result.recordset[i].CANO, 
+            control: i, 
+            npasajero: query.result.recordset[i].NPASAJERO,
+            xtransmision: query.result.recordset[i].XTRANSMISION  });
     }
     return { status: true, list: jsonArray }
 }

@@ -7671,7 +7671,7 @@ module.exports = {
                 .input('cpais', sql.Numeric(4, 0), searchData.cpais)
                 .input('cmarca', sql.NVarChar, searchData.cmarca)
                 .input('cmodelo', sql.NVarChar, searchData.cmodelo)
-                .query('select DISTINCT CVERSION, XVERSION, CANO, NPASAJERO, BACTIVO from VWBUSCARMARCAMODELOVERSION where CPAIS = @cpais AND CMARCA = @cmarca AND CMODELO = @cmodelo');
+                .query('select DISTINCT CVERSION, XVERSION, CANO, NPASAJERO, BACTIVO , XTRANSMISION  from VWBUSCARMARCAMODELOVERSION where CPAIS = @cpais AND CMARCA = @cmarca AND CMODELO = @cmodelo');
             //sql.close();
             return { result: result };
         }catch(err){
