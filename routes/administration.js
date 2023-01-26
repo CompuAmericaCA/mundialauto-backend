@@ -127,6 +127,7 @@ const operationServiceOrderFromBillLoading = async(authHeader, requestBody) => {
         cproveedor: requestBody.cproveedor,
         ccliente: requestBody.ccliente
     }
+    console.log(searchData)
     let searchServiceOrderFromBillLoading = await bd.searchServiceOrderFromBillLoadingQuery(searchData).then((res) => res);
     if(searchServiceOrderFromBillLoading.error){ return  { status: false, code: 500, message: searchServiceOrderFromBillLoading.error }; }
     if(searchServiceOrderFromBillLoading.result.rowsAffected > 0){
@@ -521,7 +522,8 @@ const operationSearchBill = async(authHeader, requestBody) => {
                 corden: searchServiceOrderByBill.result.recordset[i].CORDEN,
                 xnombre: searchServiceOrderByBill.result.recordset[i].XNOMBRE,
                 mmontofactura: searchServiceOrderByBill.result.recordset[i].MMONTOFACTURA,
-                xtipopagador: searchServiceOrderByBill.result.recordset[i].XTIPOPAGADOR
+                xtipopagador: searchServiceOrderByBill.result.recordset[i].XTIPOPAGADOR,
+                xmoneda: searchServiceOrderByBill.result.recordset[i].XMONEDA
             });
         }
 
@@ -532,11 +534,51 @@ const operationSearchBill = async(authHeader, requestBody) => {
                 cfiniquito: searchSettlementByBill.result.recordset[i].CFINIQUITO,
                 xnombre: searchSettlementByBill.result.recordset[i].XNOMBRE,
                 mmontofactura: searchSettlementByBill.result.recordset[i].MMONTOFACTURA,
-                xtipopagador: searchSettlementByBill.result.recordset[i].XTIPOPAGADOR
+                xtipopagador: searchSettlementByBill.result.recordset[i].XTIPOPAGADOR,
+                xmoneda: searchSettlementByBill.result.recordset[i].XMONEDA
             });
         }
 
     return { status: true, serviceOrder: serviceOrderList, settlement: settlementList}
+}
+
+router.route('/bill-detail').post((req, res) => {
+    if(!req.header('Authorization')){
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } });
+        return;
+    }else{
+        operationBillDetail(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationBillDetail' } });
+        });
+    }
+});
+
+const operationBillDetail = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let searchData = {
+        cfactura: requestBody.cfactura
+    }
+    let detailBill = await bd.detailBillQuery(searchData).then((res) => res);
+    if(detailBill.error){ return  { status: false, code: 500, message: detailBill.error }; }
+    if(detailBill.result.rowsAffected > 0){
+        return { status: true, 
+                xcliente: detailBill.result.recordset[0].XCLIENTE,
+                nfactura: detailBill.result.recordset[0].NFACTURA,
+                ncontrol: detailBill.result.recordset[0].NCONTROL,
+                ffactura: detailBill.result.recordset[0].FFACTURA,
+                fvencimiento: detailBill.result.recordset[0].FVENCIMIENTO,
+                frecepcion: detailBill.result.recordset[0].FRECEPCION,
+                pretencion: detailBill.result.recordset[0].PRETENCION,
+                pislr: detailBill.result.recordset[0].PISLR,
+                pimpuesto: detailBill.result.recordset[0].PIMPUESTO,
+          };
+    }else{ return { status: false, code: 404, message: 'Notification not found.' }; }
 }
 
 module.exports = router;

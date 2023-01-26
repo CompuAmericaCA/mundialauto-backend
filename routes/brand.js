@@ -141,15 +141,15 @@ router.route('/update').post((req, res) => {
 
 const operationUpdateBrand = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
-    if(!helper.validateRequestObj(requestBody, ['cpais', 'cmarca', 'xmarca', 'casociado', 'bactivo', 'cusuariomodificacion'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
+    if(!helper.validateRequestObj(requestBody, ['cpais', 'cmarca', 'xmarca', 'bactivo', 'cusuariomodificacion'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
     let brandData = {
         cpais: requestBody.cpais,
         cmarca: requestBody.cmarca,
         xmarca: requestBody.xmarca.toUpperCase(),
-        casociado: requestBody.casociado,
         bactivo: requestBody.bactivo,
         cusuariomodificacion: requestBody.cusuariomodificacion 
     };
+
     let verifyBrandName = await bd.verifyBrandNameToUpdateQuery(brandData).then((res) => res);
     if(verifyBrandName.error){ return { status: false, code: 500, message: verifyBrandName.error }; }
     if(verifyBrandName.result.rowsAffected > 0){ return { status: false, code: 200, condition: 'brand-name-already-exist'}; }
