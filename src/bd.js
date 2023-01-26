@@ -12890,14 +12890,16 @@ getUserBrokerDataQuery: async(ccorredor, cpais, ccompania) => {
 },
 searchServiceOrderFromBillLoadingQuery: async(searchData) => {
     try{
+        let query = `select * from VWBUSCARORDENSERVICIOXFACTURA WHERE CCOMPANIA = @ccompania AND CPAIS = @cpais${ searchData.cproveedor ? " and CPROVEEDOR = @cproveedor" : '' }${ searchData.ccliente ? " and CCLIENTE = @ccliente" : '' }`;
         let pool = await sql.connect(config);
         let result = await pool.request()
             .input('cpais', sql.Int, searchData.cpais)
             .input('ccompania', sql.Int, searchData.ccompania)
-            .input('cproveedor', sql.Int, searchData.cproveedor)
-            .input('ccliente', sql.Int, searchData.ccliente)
-            .query('select * from VWBUSCARORDENSERVICIOXFACTURA WHERE CPAIS = @cpais AND CCOMPANIA = @ccompania AND CPROVEEDOR = @cproveedor AND CCLIENTE = @ccliente');
+            .input('cproveedor', sql.Int, searchData.cproveedor ? searchData.cproveedor: undefined)
+            .input('ccliente', sql.Int, searchData.ccliente ? searchData.ccliente: undefined)
+            .query(query);
         //sql.close()
+        console.log(result)
         return { result: result };
     }catch(err){
         return { error: err.message };
@@ -13107,7 +13109,8 @@ createBillLoadingSettlementQuery: async(settlementList, billLoadingData) => {
                 .input('cfactura', sql.Int, billLoadingData.cfactura)
                 .input('cproveedor', sql.Int, billLoadingData.cproveedor)
                 .input('xtipopagador', sql.NVarChar, billLoadingData.xtipopagador)
-                .input('cpagador', sql.Int, billLoadingData.cpagador)
+                .input('xpagador', sql.NVarChar, billLoadingData.xpagador)
+                .input('crecibidor', sql.Int, billLoadingData.crecibidor)
                 .input('ffactura', sql.DateTime, billLoadingData.ffactura)
                 .input('frecepcion', sql.DateTime, billLoadingData.frecepcion)
                 .input('fvencimiento', sql.DateTime, billLoadingData.fvencimiento)
@@ -13118,7 +13121,7 @@ createBillLoadingSettlementQuery: async(settlementList, billLoadingData) => {
                 .input('cmoneda', sql.Int, billLoadingData.cmoneda)
                 .input('xrutaarchivo', sql.NVarChar, billLoadingData.xrutaarchivo)
                 .input('fcreacion', sql.DateTime, new Date())
-                .query('INSERT INTO ADREGISTROFACTURA (CFACTURA, CFINIQUITO, CPROVEEDOR, CPAGADOR, XTIPOPAGADOR, XOBSERVACION, FFACTURA, FRECEPCION, FVENCIMIENTO, NFACTURA, NCONTROL, MMONTOFACTURA, CMONEDA, XRUTAARCHIVO, CPAIS, CCOMPANIA, CUSUARIOCREACION, FCREACION) VALUES (@cfactura, @cfiniquito, @cproveedor, @cpagador, @xtipopagador, @xobservacion, @ffactura, @frecepcion, @fvencimiento, @nfactura, @ncontrol, @mmontofactura, @cmoneda, @xrutaarchivo, @cpais, @ccompania, @cusuario, @fcreacion)')
+                .query('INSERT INTO ADREGISTROFACTURA (CFACTURA, CFINIQUITO, CPROVEEDOR, CRECIBIDOR, XPAGADOR, XTIPOPAGADOR, XOBSERVACION,  FFACTURA, FRECEPCION, FVENCIMIENTO, NFACTURA, NCONTROL, MMONTOFACTURA, CMONEDA, XRUTAARCHIVO, CPAIS, CCOMPANIA, CUSUARIOCREACION, FCREACION) VALUES (@cfactura, @cfiniquito, @cproveedor, @crecibidor, @xpagador, @xtipopagador, @xobservacion, @ffactura, @frecepcion, @fvencimiento, @nfactura, @ncontrol, @mmontofactura, @cmoneda, @xrutaarchivo, @cpais, @ccompania, @cusuario, @fcreacion)')
             rowsAffected = rowsAffected + insert.rowsAffected;
         }
         //sql.close();
