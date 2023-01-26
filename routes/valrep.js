@@ -1658,7 +1658,7 @@ const operationValrepCharge = async(authHeader, requestBody) => {
 
     for(let i = 0; i < query.result.recordset.length; i++){
         let dateFormat = new Date(query.result.recordset[i].FINGRESO);
-        let dd = dateFormat.getDate();
+        let dd = dateFormat.getDate() + 1;
         let mm = dateFormat.getMonth() + 1;
         let yyyy = dateFormat.getFullYear();
         let fingreso = dd + '/' + mm + '/' + yyyy;
@@ -1730,17 +1730,27 @@ const operationValrepReceipt = async(authHeader, requestBody) => {
     let jsonArray = [];
     for(let i = 0; i < query.result.recordset.length; i++){
         let dateFormatDesde = new Date(query.result.recordset[i].FDESDE_REC);
-        let ddDesde = dateFormatDesde.getDate();
+        let ddDesde = dateFormatDesde.getDate() + 1;
         let mmDesde = dateFormatDesde.getMonth() + 1;
         let yyyyDesde = dateFormatDesde.getFullYear();
         let fdesde_rec = ddDesde + '/' + mmDesde + '/' + yyyyDesde;
 
         let dateFormatHasta = new Date(query.result.recordset[i].FHASTA_REC);
-        let ddHasta = dateFormatHasta.getDate();
+        let ddHasta = dateFormatHasta.getDate() + 1;
         let mmHasta = dateFormatHasta.getMonth() + 1;
         let yyyyHasta = dateFormatHasta.getFullYear();
         let fhasta_rec = ddHasta + '/' + mmHasta + '/' + yyyyHasta;
-        jsonArray.push({ ccarga: query.result.recordset[i].CCARGA, crecibo: query.result.recordset[i].CRECIBO, nconsecutivo: query.result.recordset[i].NCONSECUTIVO, fdesde_rec: fdesde_rec, fhasta_rec: fhasta_rec });
+        let xstatus = "";
+        if(query.result.recordset[i].CESTATUSGENERAL == 3) {
+            xstatus = "ANULADO";
+        }
+        if(query.result.recordset[i].CESTATUSGENERAL == 7){
+            xstatus = "COBRADO";
+        }
+        if(query.result.recordset[i].CESTATUSGENERAL == 13){
+            xstatus = "PENDIENTE"
+        }
+        jsonArray.push({ ccarga: query.result.recordset[i].CCARGA, xrecibo: query.result.recordset[i].XRECIBO, crecibo: query.result.recordset[i].CRECIBO, nconsecutivo: query.result.recordset[i].NCONSECUTIVO, fdesde_rec: fdesde_rec, fhasta_rec: fhasta_rec, ccontratoflota: query.result.recordset[i].CCONTRATOFLOTA, mprima_anual: query.result.recordset[i].MPRIMA_ANUAL, msuma_anual: query.result.recordset[i].MSUMA_ANUAL, xstatus: xstatus, xplaca: query.result.recordset[i].XPLACA  });
     }
     return { status: true, list: jsonArray }
 }

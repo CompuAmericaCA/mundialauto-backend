@@ -8722,6 +8722,18 @@ module.exports = {
             return { error: err.message };
         }
     },
+    getPolicyEffectiveDateQuery: async(ccontratoflota) => {
+        try{
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+            .input('ccontratoflota', sql.Int, ccontratoflota)
+            .query('select top 1 FDESDE_POL, FHASTA_POL from SURECIBO where CCONTRATOFLOTA = @ccontratoflota and BACTIVO = 1');
+            return { result: result };
+        }catch(err){
+            console.log(err.message);
+            return { error: err.message };
+        }
+    },
     getFleetContractDataQuery: async(fleetContractData) => {
         try{
             let pool = await sql.connect(config);
@@ -8770,6 +8782,18 @@ module.exports = {
             .query('select * from macorredores where ccorredor = @ccorredor');
             return { result: result }
         }catch(err){
+            return { error: err.message };
+        }
+    },
+    getPolicyHolderData: async(ctomador) => {
+        try{
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+            .input('ctomador', sql.Int, ctomador)
+            .query('select * from VWBUSCARTOMADOR where CTOMADOR = @ctomador');
+            return { result: result }
+        }catch(err){
+            console.log(err.message);
             return { error: err.message };
         }
     },
@@ -12247,7 +12271,7 @@ module.exports = {
             .input('xreferencia', sql.NVarChar, paymentData.xreferencia)
             .input('fcobro', sql.DateTime, paymentData.fcobro)
             .input('mprima_pagada', sql.Numeric(17,2), paymentData.mprima_pagada)
-            .input('cestatusgeneral', sql.Int, 12)
+            .input('cestatusgeneral', sql.Int, 7)
             .query('update SURECIBO set XREFERENCIA = @xreferencia, CTIPOPAGO = @ctipopago, FCOBRO = @fcobro, MPRIMA_PAGADA = @mprima_pagada, CESTATUSGENERAL = @cestatusgeneral where CRECIBO = @crecibo');
             rowsAffected = rowsAffected + update.rowsAffected;
             //sql.close();
@@ -12263,16 +12287,33 @@ module.exports = {
             let rowsAffected = 0;
             let pool = await sql.connect(config);
             let update = await pool.request()
-            .input('orderId', sql.Int, paymentData.orderId)
+            .input('ccontratoflota', sql.Int, paymentData.ccontratoflota)
+            .input('orderId', sql.NVarChar, paymentData.orderId)
             .input('ctipopago', sql.Int, paymentData.ctipopago)
             .input('xreferencia', sql.NVarChar, paymentData.xreferencia)
             .input('fcobro', sql.DateTime, paymentData.fcobro)
             .input('mprima_pagada', sql.Numeric(17,2), paymentData.mprima_pagada)
-            .input('cestatusgeneral', sql.Int, 12)
-            .query('update SURECIBO set XREFERENCIA = @xreferencia, CTIPOPAGO = @ctipopago, FCOBRO = @fcobro, MPRIMA_PAGADA = @mprima_pagada, CESTATUSGENERAL = @cestatusgeneral where CCODIGO_UBII = @orderId');
+            .input('cestatusgeneral', sql.Int, 7)
+            .query('update SURECIBO set CCODIGO_UBII = @orderId, XREFERENCIA = @xreferencia, CTIPOPAGO = @ctipopago, FCOBRO = @fcobro, MPRIMA_PAGADA = @mprima_pagada, CESTATUSGENERAL = @cestatusgeneral where CRECIBO IN (SELECT TOP 1 CRECIBO FROM SURECIBO WHERE CCONTRATOFLOTA = @ccontratoflota AND CESTATUSGENERAL = 13)' );
             rowsAffected = rowsAffected + update.rowsAffected;
             //sql.close();
             return { result: { rowsAffected: rowsAffected } };
+        }
+        catch(err){
+            console.log(err.message);
+            return { error: err.message };
+        }
+    },
+    updateFleetContractGeneralStateQuery: async(ccontratoflota) => {
+        try{
+            let rowsAffected = 0;
+            let pool = await sql.connect(config);
+            let update = await pool.request()
+            .input('ccontratoflota', sql.Int, paymentData.ccontratoflota)
+            .input('cestatusgeneral', sql.Int, 7)
+            .query('update SUCONTRATOFLOTA set CESTATUSGENERAL = @cestatusgeneral where CCONTRATOFLOTA = @ccontratoflota')
+            rowsAffected = rowsAffected + update.rowsAffected;
+            return { result: { rowsAffected: rowsAffected}};
         }
         catch(err){
             console.log(err.message);

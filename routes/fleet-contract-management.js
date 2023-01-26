@@ -46,7 +46,7 @@ const operationSearchFleetContractManagement = async(authHeader, requestBody) =>
                 cversion: searchFleetContractManagement.result.recordset[i].CVERSION,
                 xversion: searchFleetContractManagement.result.recordset[i].XVERSION,
                 xplaca: searchFleetContractManagement.result.recordset[i].XPLACA,
-                crecibo: searchFleetContractManagement.result.recordset[i].crecibo,
+                xcliente: searchFleetContractManagement.result.recordset[i].XCLIENTE,
                 xestatusgeneral: searchFleetContractManagement.result.recordset[i].XESTATUSGENERAL,
                 xpoliza: searchFleetContractManagement.result.recordset[i].xpoliza,
             });
@@ -716,6 +716,9 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
                 accesories.push(accessory);
             }
         }
+        let getPolicyEffectiveDate = await bd.getPolicyEffectiveDateQuery(fleetContractData.ccontratoflota);
+        if(getPolicyEffectiveDate.error){ return { status: false, code: 500, message: getPolicyEffectiveDate.error }; }
+        if(getPolicyEffectiveDate.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Fleet Contract Receipts not found.' }; }
         return {
             status: true,
             ccarga: getFleetContractData.result.recordset[0].ccarga,
@@ -748,7 +751,7 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
             fhasta: getFleetContractData.result.recordset[0].FHASTA_POL,
             finiciorecibo: getFleetContractData.result.recordset[0].FDESDE_REC,
             fhastarecibo: getFleetContractData.result.recordset[0].FHASTA_REC,
-            femision: getFleetContractData.result.recordset[0].femision,
+            femision: getFleetContractData.result.recordset[0].FINICIO,
             cestatusgeneral: getFleetContractData.result.recordset[0].CESTATUSGENERAL,
             xestatusgeneral: getFleetContractData.result.recordset[0].XESTATUSGENERAL,
             ctrabajador: getFleetContractData.result.recordset[0].CTRABAJADOR,
@@ -818,7 +821,9 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
             inspections: inspections,
             services:services,
             realCoverages: realCoverages,
-            coverageAnnexes: coverageAnnexes
+            coverageAnnexes: coverageAnnexes,
+            fdesde_pol: getPolicyEffectiveDate.result.recordset[0].FDESDE_POL,
+            fhasta_pol: getPolicyEffectiveDate.result.recordset[0].FHASTA_POL
         }
     }else{ return { status: false, code: 404, message: 'Fleet Contract not found.' }; }
 }
@@ -845,73 +850,91 @@ const operationReceiptDetail = async(authHeader, requestBody) => {
     let receiptData = {
         crecibo: requestBody.crecibo
     };
+    let xnombretomador;
+    let xdocidentidadtomador;
+    let xdirecciontomador;
+    let xemailtomador;
+    let xestadotomador;
+    let xciudadtomador;
     let getReceiptData = await bd.getReceiptData(receiptData);
     if(getReceiptData.error){ return { status: false, code: 500, message: getReceiptData.error }; }
     if(getReceiptData.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Receipt Data not found.' }; }
+    if(getReceiptData.result.recordset[0].CTOMADOR && getReceiptData.result.recordset[0].CTOMADOR != 0) {
+        let getPolicyHolder = await bd.getPolicyHolderData(getReceiptData.result.recordset[0].CTOMADOR);
+        if(getPolicyHolder.error){ return { status: false, code: 500, message: getPolicyHolder.error }; }
+        if(getPolicyHolder.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Policy Holder Data not found.' }; }
+        xnombretomador = getPolicyHolder.result.recordset[0].XTOMADOR;
+        xdocidentidadtomador = getPolicyHolder.result.recordset[0].XRIF;
+        xdirecciontomador = getPolicyHolder.result.recordset[0].XDOMICILIO;
+        xtelefonotomador = getPolicyHolder.result.recordset[0].XTELEFONO;
+        xemailtomador = getPolicyHolder.result.recordset[0].XCORREO;
+        xestadotomador = getPolicyHolder.result.recordset[0].XESTADO;
+        xciudadtomador = getPolicyHolder.result.recordset[0].XCIUDAD;
+    } else{
+        xnombretomador = getReceiptData.result.recordset[0].XCLIENTE;
+        xdocidentidadtomador = getReceiptData.result.recordset[0].XDOCIDENTIDAD;
+        xdirecciontomador = getReceiptData.result.recordset[0].XDIRECCIONFISCAL;
+        xtelefonotomador = getReceiptData.result.recordset[0].XTELEFONO;
+        xemailtomador = getReceiptData.result.recordset[0].XEMAIL;
+        xestadotomador = getReceiptData.result.recordset[0].XESTADO;
+        xciudadtomador = getReceiptData.result.recordset[0].XCIUDAD;
+    }
     return {
         status: true,
-            ccarga: getReceiptData.result.recordset[0].CCARGA,
-            crecibo: getReceiptData.result.recordset[0].CRECIBO,
-            xrecibo: getReceiptData.result.recordset[0].XRECIBO,
-            xpoliza: getReceiptData.result.recordset[0].XPOLIZA,
-            femision: getReceiptData.result.recordset[0].FEMISION,
-            fdesde_pol: getReceiptData.result.recordset[0].FDESDE_POL,
-            fhasta_pol: getReceiptData.result.recordset[0].FHASTA_POL,
-            fdesde_rec: getReceiptData.result.recordset[0].FDESDE_REC,
-            fhasta_rec: getReceiptData.result.recordset[0].FHASTA_REC,
-            xsucursalemision: getReceiptData.result.recordset[0].xsucursalemision,
-            xsucursalsuscriptora: getReceiptData.result.recordset[0].xsucursalsuscriptora,
-            cmoneda: getReceiptData.result.recordset[0].CMONEDA,
-            xmoneda: getReceiptData.result.recordset[0].xmoneda,
-            tcobertura: getReceiptData.result.recordset[0].tcobertura,
-            c1: getReceiptData.result.recordset[0].c1,
-            tperdida: getReceiptData.result.recordset[0].tperdida,
-            c2: getReceiptData.result.recordset[0].c2,
-            trcv_1: getReceiptData.result.recordset[0].trcv_1,
-            c3_1: getReceiptData.result.recordset[0].c3_1,
-            trcv_2: getReceiptData.result.recordset[0].trcv_2,
-            c3_2: getReceiptData.result.recordset[0].c3_2,
-            trcv_3: getReceiptData.result.recordset[0].trcv_3,
-            c3_3: getReceiptData.result.recordset[0].c3_3,
-            t1: getReceiptData.result.recordset[0].t1,
-            x1: getReceiptData.result.recordset[0].x1,
-            d1: getReceiptData.result.recordset[0].d1,
-            x2: getReceiptData.result.recordset[0].x2,
-            d2: getReceiptData.result.recordset[0].d2,
-            x3: getReceiptData.result.recordset[0].x3,
-            d3: getReceiptData.result.recordset[0].d3,
-            x4: getReceiptData.result.recordset[0].x4,
-            d4: getReceiptData.result.recordset[0].d4,
-            t2: getReceiptData.result.recordset[0].t2,
-            x5: getReceiptData.result.recordset[0].x5,
-            d5: getReceiptData.result.recordset[0].d5,
-            x6: getReceiptData.result.recordset[0].x6,
-            d6: getReceiptData.result.recordset[0].d6,
-            x7: getReceiptData.result.recordset[0].x7,
-            d7: getReceiptData.result.recordset[0].d7,
-            t3: getReceiptData.result.recordset[0].t3,
-            x8: getReceiptData.result.recordset[0].x8,
-            d8: getReceiptData.result.recordset[0].d8,
-            t4: getReceiptData.result.recordset[0].t4,
-            x9: getReceiptData.result.recordset[0].x9,
-            d9: getReceiptData.result.recordset[0].d9,
-            mprimaanual: getReceiptData.result.recordset[0].MPRIMA_ANUAL,
-            mprimaprorrata: getReceiptData.result.recordset[0].MPRIMA_PRORRATA,
-            fanulado: getReceiptData.result.recordset[0].FANULADO,
-            fcobro: getReceiptData.result.recordset[0].FCOBRO,
-            iestado: getReceiptData.result.recordset[0].iestado,
-            xnombrecliente: getReceiptData.result.recordset[0].XCLIENTE,
-            xdocidentidadcliente: getReceiptData.result.recordset[0].XDOCIDENTIDAD,
-            xdireccionfiscalcliente: getReceiptData.result.recordset[0].XDIRECCIONFISCAL,
-            xtelefonocliente: getReceiptData.result.recordset[0].XTELEFONO,
-            xemailcliente: getReceiptData.result.recordset[0].XEMAIL,
-            xrepresentantecliente: getReceiptData.result.recordset[0].XREPRESENTANTE,
-            xestadocliente: getReceiptData.result.recordset[0].XESTADO,
-            xciudadcliente: getReceiptData.result.recordset[0].XCIUDAD,
-            xmetodologiapago: getReceiptData.result.recordset[0].XMETODOLOGIAPAGO,
-            ccorredor: getReceiptData.result.recordset[0].CCORREDOR,
-            xcorredor: getReceiptData.result.recordset[0].XCORREDOR,
-            xrif: getReceiptData.result.recordset[0].xrif
+        ccarga: getReceiptData.result.recordset[0].CCARGA,
+        crecibo: getReceiptData.result.recordset[0].CRECIBO,
+        xrecibo: getReceiptData.result.recordset[0].XRECIBO,
+        xpoliza: getReceiptData.result.recordset[0].xpoliza,
+        nconsecutivo: getReceiptData.result.recordset[0].NCONSECUTIVO,
+        femision: getReceiptData.result.recordset[0].FEMISION,
+        fsubscripcion: getReceiptData.result.recordset[0].FCREACION,
+        fdesde_pol: getReceiptData.result.recordset[0].FDESDE_POL,
+        fhasta_pol: getReceiptData.result.recordset[0].FHASTA_POL,
+        fdesde_rec: getReceiptData.result.recordset[0].FDESDE_REC,
+        fhasta_rec: getReceiptData.result.recordset[0].FHASTA_REC,
+        xsucursalemision: getReceiptData.result.recordset[0].XSUCURSALEMISION,
+        xsucursalsuscriptora: getReceiptData.result.recordset[0].XSUCURSALSUSCRIPTORA,
+        cmoneda: getReceiptData.result.recordset[0].CMONEDA,
+        xmoneda: getReceiptData.result.recordset[0].xmoneda,
+        mprimaanual: getReceiptData.result.recordset[0].MPRIMA_ANUAL,
+        mprimaprorrata: getReceiptData.result.recordset[0].MPRIMA_PRORRATA,
+        fanulado: getReceiptData.result.recordset[0].FANULADO,
+        fcobro: getReceiptData.result.recordset[0].FCOBRO,
+        iestado: getReceiptData.result.recordset[0].iestado,
+        xnombretomador: xnombretomador,
+        xdocidentidadtomador: xdocidentidadtomador,
+        xdireccionfiscaltomador: xdirecciontomador,
+        xtelefonotomador: xtelefonotomador,
+        xemailtomador: xemailtomador,
+        xestadotomador: xestadotomador,
+        xciudadtomador: xciudadtomador,
+        xnombrepropietario: getReceiptData.result.recordset[0].XNOMBRE + ' ' + getReceiptData.result.recordset[0].XAPELLIDO,
+        xdocidentidadpropietario: getReceiptData.result.recordset[0].XDOCIDENTIDADPROPIETARIO,
+        xdireccionpropietario: getReceiptData.result.recordset[0].XDIRECCION,
+        xtelefonopropietario: getReceiptData.result.recordset[0].XTELEFONOCASA,
+        xemailpropietario: getReceiptData.result.recordset[0].XEMAILPROPIETARIO,
+        xmetodologiapago: getReceiptData.result.recordset[0].XMETODOLOGIAPAGO,
+        xestadorpopietario: getReceiptData.result.recordset[0].XESTADOPROPIETARIO,
+        xciudadpropietario: getReceiptData.result.recordset[0].XCIUDADPROPIETARIO,
+        ccorredor: getReceiptData.result.recordset[0].CCORREDOR,
+        xcorredor: getReceiptData.result.recordset[0].XCORREDOR,
+        xplaca: getReceiptData.result.recordset[0].XPLACA,
+        fano: getReceiptData.result.recordset[0].FANO,
+        xserialcarroceria: getReceiptData.result.recordset[0].XSERIALCARROCERIA,
+        xserialmotor: getReceiptData.result.recordset[0].XSERIALMOTOR,
+        xuso: getReceiptData.result.recordset[0].XUSO,
+        xtipo: getReceiptData.result.recordset[0].XTIPO,
+        xcolor: getReceiptData.result.recordset[0].XCOLOR,
+        xmarca: getReceiptData.result.recordset[0].XMARCA,
+        xmodelo: getReceiptData.result.recordset[0].XMODELO,
+        xversion: getReceiptData.result.recordset[0].XVERSION,
+        xtransmision: getReceiptData.result.recordset[0].XTRANSMISION,
+        npasajeros: getReceiptData.result.recordset[0].NPASAJERO,
+        nkilometraje: getReceiptData.result.recordset[0].NKILOMETRAJE,
+        xtituloreporte: getReceiptData.result.recordset[0].XTITULO_REPORTE,
+        xrepresentantelegal: getReceiptData.result.recordset[0].XREPRESENTANTELEGAL,
+        xdocidentidadrepresentantelegal: getReceiptData.result.recordset[0].XDOCIDENTIDADREPRESENTANTELEGAL,
+        cestatusgeneral: getReceiptData.result.recordset[0].CESTATUSGENERAL
     }
 }
 
@@ -1093,6 +1116,7 @@ router.route('/create/individualContract').post((req, res) => {
 });
 
 const operationCreateIndividualContract = async(requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
     let userData = {
         xnombre: requestBody.xnombre.toUpperCase(),
         xapellido: requestBody.xapellido.toUpperCase(),
@@ -1855,23 +1879,22 @@ router.route('/ubii/update').post((req, res) => {
 });
 
 const operationUpdateReceiptPayment = async(authHeader, requestBody) => {
-    if(authHeader == 'SKDJK23J4KJ2352304923059'){
-        let orden = requestBody.paymentData.orderId.split("_");
-        let paymentData = {
-            orderId: parseInt(orden[1]),
-            ctipopago: requestBody.paymentData.ctipopago,
-            xreferencia: requestBody.paymentData.xreferencia,
-            fcobro: requestBody.paymentData.fcobro,
-            mprima_pagada: requestBody.paymentData.mprima_pagada
-        }
-        console.log(paymentData);
-        let updateReceiptPayment = await bd.updateReceiptPaymentBrokerQuery(paymentData);
-        if(updateReceiptPayment.error){ return { status: false, code: 500, message: updateReceiptPayment.error }; }
-        if(updateReceiptPayment.result.rowsAffected > 0){ return { status: true }; }
-        else{ 
-            return { status: false, code: 404, message: 'Receipt Not Found.' }; }
-    
-    } else { return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let paymentData = {
+        ccontratoflota: requestBody.paymentData.ccontratoflota,
+        orderId: requestBody.paymentData.orderId,
+        ctipopago: requestBody.paymentData.ctipopago,
+        xreferencia: requestBody.paymentData.xreferencia,
+        fcobro: requestBody.paymentData.fcobro,
+        mprima_pagada: requestBody.paymentData.mprima_pagada
+    }
+    let updateReceiptPayment = await bd.updateReceiptPaymentBrokerQuery(paymentData);
+    if(updateReceiptPayment.error){ return { status: false, code: 500, message: updateReceiptPayment.error }; }
+    if(updateReceiptPayment.result.rowsAffected > 0){ return { status: true }; }
+    let updateFleetContractGeneralState = await bd.updateFleetContractGeneralStateQuery(paymentData.ccontratoflota);
+    if(updateFleetContractGeneralState.error){ return { status: false, code: 500, message: updateFleetContractGeneralState.error }; }
+    if(updateFleetContractGeneralState.result.rowsAffected > 0){ return { status: true }; }
+    return { status: true };
 }
 
 router.route('/cancellations').post((req, res) => {
