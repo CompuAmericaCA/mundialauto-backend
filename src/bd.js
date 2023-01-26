@@ -10527,6 +10527,7 @@ module.exports = {
                 let insert = await pool.request()
                     .input('cnotificacion', sql.Int, notificationData.cnotificacion)
                     .input('ccompania', sql.Int, notificationData.ccompania)
+                    .input('cpais', sql.Int, notificationData.cpais)
                     .input('cservicio', sql.Int, serviceOrderCreateList[i].cservicio)
                     .input('xobservacion', sql.NVarChar, serviceOrderCreateList[i].xobservacion)
                     .input('cservicioadicional', sql.Int, serviceOrderCreateList[i].cservicioadicional ? serviceOrderCreateList[i].cservicioadicional : undefined)
@@ -10548,13 +10549,14 @@ module.exports = {
                     .input('cestatusgeneral', sql.Int, 13)
                     .input('ccausaanulacion', sql.Int, serviceOrderCreateList[i].ccausaanulacion)
                     .input('fcreacion', sql.DateTime, new Date())
-                    .query('insert into EVORDENSERVICIO (CSERVICIO, FCREACION, CNOTIFICACION, XOBSERVACION, CSERVICIOADICIONAL, CCOTIZACION, XDANOS, XFECHA, FAJUSTE, XDESDE, XHACIA, MMONTO, MMONTOTOTAL, CMONEDA, CIMPUESTO, PIMPUESTO, MMONTOTOTALIVA, XMENSAJE, XRUTAARCHIVO, CPROVEEDOR, CCOMPANIA, CESTATUSGENERAL, CCAUSAANULACION, BACTIVO) values (@cservicio, @fcreacion, @cnotificacion, @xobservacion, @cservicioadicional, @ccotizacion, @xdanos, @xfecha, @fajuste, @xdesde, @xhacia, @mmonto, @mmontototal, @cmoneda, @cimpuesto, @pimpuesto, @mmontototaliva, @xmensaje, @xrutaarchivo, @cproveedor, @ccompania, @cestatusgeneral, @ccausaanulacion, 1)')
+                    .query('insert into EVORDENSERVICIO (CSERVICIO, FCREACION, CNOTIFICACION, XOBSERVACION, CSERVICIOADICIONAL, CCOTIZACION, XDANOS, XFECHA, FAJUSTE, XDESDE, XHACIA, MMONTO, MMONTOTOTAL, CMONEDA, CIMPUESTO, PIMPUESTO, MMONTOTOTALIVA, XMENSAJE, XRUTAARCHIVO, CPROVEEDOR, CCOMPANIA, CPAIS, CESTATUSGENERAL, CCAUSAANULACION, BACTIVO) values (@cservicio, @fcreacion, @cnotificacion, @xobservacion, @cservicioadicional, @ccotizacion, @xdanos, @xfecha, @fajuste, @xdesde, @xhacia, @mmonto, @mmontototal, @cmoneda, @cimpuesto, @pimpuesto, @mmontototaliva, @xmensaje, @xrutaarchivo, @cproveedor, @ccompania, @cpais, @cestatusgeneral, @ccausaanulacion, 1)')
                 rowsAffected = rowsAffected + insert.rowsAffected;
             }
             //sql.close();
             return { result: { rowsAffected: rowsAffected } };
         }
         catch(err){
+            console.log(err.message)
             return { error: err.message };
         }
     },
@@ -12902,14 +12904,16 @@ getUserBrokerDataQuery: async(ccorredor, cpais, ccompania) => {
 },
 searchServiceOrderFromBillLoadingQuery: async(searchData) => {
     try{
+        let query = `select * from VWBUSCARORDENSERVICIOXFACTURA WHERE CCOMPANIA = @ccompania AND CPAIS = @cpais${ searchData.cproveedor ? " and CPROVEEDOR = @cproveedor" : '' }${ searchData.ccliente ? " and CCLIENTE = @ccliente" : '' }`;
         let pool = await sql.connect(config);
         let result = await pool.request()
             .input('cpais', sql.Int, searchData.cpais)
             .input('ccompania', sql.Int, searchData.ccompania)
-            .input('cproveedor', sql.Int, searchData.cproveedor)
-            .input('ccliente', sql.Int, searchData.ccliente)
-            .query('select * from VWBUSCARORDENSERVICIOXFACTURA WHERE CPAIS = @cpais AND CCOMPANIA = @ccompania AND CPROVEEDOR = @cproveedor AND CCLIENTE = @ccliente');
+            .input('cproveedor', sql.Int, searchData.cproveedor ? searchData.cproveedor: undefined)
+            .input('ccliente', sql.Int, searchData.ccliente ? searchData.ccliente: undefined)
+            .query(query);
         //sql.close()
+        console.log(result)
         return { result: result };
     }catch(err){
         return { error: err.message };
@@ -13119,7 +13123,8 @@ createBillLoadingSettlementQuery: async(settlementList, billLoadingData) => {
                 .input('cfactura', sql.Int, billLoadingData.cfactura)
                 .input('cproveedor', sql.Int, billLoadingData.cproveedor)
                 .input('xtipopagador', sql.NVarChar, billLoadingData.xtipopagador)
-                .input('cpagador', sql.Int, billLoadingData.cpagador)
+                .input('xpagador', sql.NVarChar, billLoadingData.xpagador)
+                .input('crecibidor', sql.Int, billLoadingData.crecibidor)
                 .input('ffactura', sql.DateTime, billLoadingData.ffactura)
                 .input('frecepcion', sql.DateTime, billLoadingData.frecepcion)
                 .input('fvencimiento', sql.DateTime, billLoadingData.fvencimiento)
@@ -13130,7 +13135,7 @@ createBillLoadingSettlementQuery: async(settlementList, billLoadingData) => {
                 .input('cmoneda', sql.Int, billLoadingData.cmoneda)
                 .input('xrutaarchivo', sql.NVarChar, billLoadingData.xrutaarchivo)
                 .input('fcreacion', sql.DateTime, new Date())
-                .query('INSERT INTO ADREGISTROFACTURA (CFACTURA, CFINIQUITO, CPROVEEDOR, CPAGADOR, XTIPOPAGADOR, XOBSERVACION, FFACTURA, FRECEPCION, FVENCIMIENTO, NFACTURA, NCONTROL, MMONTOFACTURA, CMONEDA, XRUTAARCHIVO, CPAIS, CCOMPANIA, CUSUARIOCREACION, FCREACION) VALUES (@cfactura, @cfiniquito, @cproveedor, @cpagador, @xtipopagador, @xobservacion, @ffactura, @frecepcion, @fvencimiento, @nfactura, @ncontrol, @mmontofactura, @cmoneda, @xrutaarchivo, @cpais, @ccompania, @cusuario, @fcreacion)')
+                .query('INSERT INTO ADREGISTROFACTURA (CFACTURA, CFINIQUITO, CPROVEEDOR, CRECIBIDOR, XPAGADOR, XTIPOPAGADOR, XOBSERVACION,  FFACTURA, FRECEPCION, FVENCIMIENTO, NFACTURA, NCONTROL, MMONTOFACTURA, CMONEDA, XRUTAARCHIVO, CPAIS, CCOMPANIA, CUSUARIOCREACION, FCREACION) VALUES (@cfactura, @cfiniquito, @cproveedor, @crecibidor, @xpagador, @xtipopagador, @xobservacion, @ffactura, @frecepcion, @fvencimiento, @nfactura, @ncontrol, @mmontofactura, @cmoneda, @xrutaarchivo, @cpais, @ccompania, @cusuario, @fcreacion)')
             rowsAffected = rowsAffected + insert.rowsAffected;
         }
         //sql.close();
@@ -13306,6 +13311,19 @@ takersValrepQuery: async() => {
         let result = await pool.request()
             .query('select * from MATOMADORES where CESTATUSGENERAL = 2');
         //sql.close();
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+},
+detailBillQuery: async(searchData) => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+            .input('cfactura', sql.Int, searchData.cfactura)
+            .query('select * from VWBUSCARFACTURASREGISTRADAS WHERE CFACTURA = @cfactura');
+        //sql.close();
+        console.log(result)
         return { result: result };
     }catch(err){
         return { error: err.message };
