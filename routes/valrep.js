@@ -1145,7 +1145,6 @@ const operationValrepServiceOrderProviders = async(authHeader, requestBody) => {
         cservicio: requestBody.cservicio,
         cestado: requestBody.cestado
     }
-    console.log(searchData)
     let query = await bd.getServiceOrderProviders(searchData).then((res) => res);
     //if(query.error){ return { status: false, code: 500, message: query.error }; }
     let jsonArray = [];
@@ -2235,7 +2234,6 @@ const operationValrepVersion = async(authHeader, requestBody) => {
     };
     let query = await bd.searchVersionQuery(searchData).then((res) => res);
     if(query.error){ return { status: false, code: 500, message: query.error }; }
-    console.log(query.result.recordset)
     let jsonArray = [];
     for(let i = 0; i < query.result.recordset.length; i++){
         jsonArray.push({ cversion: query.result.recordset[i].CVERSION, 
@@ -2290,7 +2288,6 @@ router.route('/accesory').post((req, res) => {
             }
             res.json({ data: result });
         }).catch((err) => {
-            console.log(err.message)
             res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationValrepAccesory' } });
         });
     }
@@ -2781,7 +2778,6 @@ router.route('/settlement/service-order').post((req, res) => {
             }
             res.json({ data: result });
         }).catch((err) => {
-            console.log(err.message)
             res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationValrepServiceOrderFromSettlement' } });
         });
     }

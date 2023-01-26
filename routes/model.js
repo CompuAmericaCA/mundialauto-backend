@@ -142,7 +142,7 @@ router.route('/update').post((req, res) => {
 
 const operationUpdateModel = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
-    //if(!helper.validateRequestObj(requestBody, ['cmodelo', 'xmodelo', 'cmarca', 'casociado', 'bactivo', 'cpais', 'cusuariomodificacion'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
+    if(!helper.validateRequestObj(requestBody, ['cmodelo', 'xmodelo', 'cmarca', 'bactivo', 'cpais', 'cusuariomodificacion'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
     let modelData = {
         cmodelo: requestBody.cmodelo ? requestBody.cmodelo : undefined,
         xmodelo: requestBody.xmodelo.toUpperCase() ? requestBody.xmodelo : undefined,
@@ -152,7 +152,7 @@ const operationUpdateModel = async(authHeader, requestBody) => {
         // casociado: requestBody.casociado,
         cusuariomodificacion: requestBody.cusuariomodificacion
     };
-
+    console.log(modelData)
     let verifyModelName = await bd.verifyModelNameToUpdateQuery(modelData).then((res) => res);
     if(verifyModelName.error){ return { status: false, code: 500, message: verifyModelName.error }; }
     if(verifyModelName.result.rowsAffected > 0){ return { status: false, code: 200, condition: 'model-name-already-exist'}; }

@@ -3740,14 +3740,14 @@ module.exports = {
                 .input('cpais', sql.Numeric(4, 0), brandData.cpais)
                 .input('cmarca', sql.Int, brandData.cmarca)
                 .input('xmarca', sql.NVarChar, brandData.xmarca)
-                .input('casociado', sql.Int, brandData.casociado)
                 .input('bactivo', sql.Bit, brandData.bactivo)
                 .input('cusuariomodificacion', sql.Int, brandData.cusuariomodificacion)
                 .input('fmodificacion', sql.DateTime, new Date())
-                .query('update MAMARCA set XMARCA = @xmarca, CASOCIADO = @casociado, BACTIVO = @bactivo, CUSUARIOMODIFICACION = @cusuariomodificacion, FMODIFICACION = @fmodificacion where CMARCA = @cmarca and CPAIS = @cpais');
+                .query('update MAMARCA set XMARCA = @xmarca, BACTIVO = @bactivo, CUSUARIOMODIFICACION = @cusuariomodificacion, FMODIFICACION = @fmodificacion where CMARCA = @cmarca and CPAIS = @cpais');
             //sql.close();
             return { result: result };
         }catch(err){
+            console.log(err.message)
             return { error: err.message };
         }
     },
@@ -4470,12 +4470,8 @@ module.exports = {
                 .input('xversion', sql.NVarChar, versionData.xversion)
                 .input('cmarca', sql.Int, versionData.cmarca)
                 .input('cmodelo', sql.Int, versionData.cmodelo)
-                .input('casociado', sql.Int, versionData.casociado)
                 .input('xtransmision', sql.NVarChar, versionData.xtransmision)
-                .input('ctipovehiculo', sql.Int, versionData.ctipovehiculo)
-                .input('ncapacidadcarga', sql.Numeric(11, 2), versionData.ncapacidadcarga)
                 .input('npasajero', sql.Int, versionData.npasajero)
-                .input('xcilindrajemotor', sql.NVarChar, versionData.xcilindrajemotor)
                 .input('bactivo', sql.Bit, versionData.bactivo)
                 .input('cpais', sql.Numeric(4, 0), versionData.cpais)
                 .input('cusuariocreacion', sql.Int, versionData.cusuariocreacion)
