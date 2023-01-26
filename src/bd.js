@@ -351,7 +351,7 @@ module.exports = {
             let result = await pool.request()
                 .input('cusuario', sql.Int, cusuario)
                 .input('bactivo', sql.Bit, true)
-                .query('select * from VWMODULOSXUSUARIO where CUSUARIO = @cusuario and BACTIVO = @bactivo');
+                .query('select * from VWMODULOSXUSUARIO where CUSUARIO = @cusuario and BACTIVO = @bactivo ORDER BY XRUTA , XMODULO');
             //sql.close();
             return { result: result }; 
         }catch(err){
@@ -3740,14 +3740,14 @@ module.exports = {
                 .input('cpais', sql.Numeric(4, 0), brandData.cpais)
                 .input('cmarca', sql.Int, brandData.cmarca)
                 .input('xmarca', sql.NVarChar, brandData.xmarca)
-                .input('casociado', sql.Int, brandData.casociado)
                 .input('bactivo', sql.Bit, brandData.bactivo)
                 .input('cusuariomodificacion', sql.Int, brandData.cusuariomodificacion)
                 .input('fmodificacion', sql.DateTime, new Date())
-                .query('update MAMARCA set XMARCA = @xmarca, CASOCIADO = @casociado, BACTIVO = @bactivo, CUSUARIOMODIFICACION = @cusuariomodificacion, FMODIFICACION = @fmodificacion where CMARCA = @cmarca and CPAIS = @cpais');
+                .query('update MAMARCA set XMARCA = @xmarca, BACTIVO = @bactivo, CUSUARIOMODIFICACION = @cusuariomodificacion, FMODIFICACION = @fmodificacion where CMARCA = @cmarca and CPAIS = @cpais');
             //sql.close();
             return { result: result };
         }catch(err){
+            console.log(err.message)
             return { error: err.message };
         }
     },
@@ -4270,12 +4270,12 @@ module.exports = {
             let result = await pool.request()
                 .input('xmodelo', sql.NVarChar, modelData.xmodelo)
                 .input('cmarca', sql.Int, modelData.cmarca)
-                .input('casociado', sql.Int, modelData.casociado)
+                //.input('casociado', sql.Int, modelData.casociado)
                 .input('bactivo', sql.Bit, modelData.bactivo)
                 .input('cpais', sql.Numeric(4, 0), modelData.cpais)
                 .input('cusuariocreacion', sql.Int, modelData.cusuariocreacion)
                 .input('fcreacion', sql.DateTime, new Date())
-                .query('insert into MAMODELO (XMODELO, CMARCA, CASOCIADO, BACTIVO, CPAIS, CUSUARIOCREACION, FCREACION) values (@xmodelo, @cmarca, @casociado, @bactivo, @cpais, @cusuariocreacion, @fcreacion)');
+                .query('insert into MAMODELO (XMODELO, CMARCA,  BACTIVO, CPAIS, CUSUARIOCREACION, FCREACION) values (@xmodelo, @cmarca,  @bactivo, @cpais, @cusuariocreacion, @fcreacion)');
             if(result.rowsAffected > 0){
                 let query = await pool.request()
                     .input('xmodelo', sql.NVarChar, modelData.xmodelo)
@@ -4327,15 +4327,16 @@ module.exports = {
                 .input('cpais', sql.Numeric(4, 0), modelData.cpais)
                 .input('cmodelo', sql.Int, modelData.cmodelo)
                 .input('cmarca', sql.Int, modelData.cmarca)
-                .input('casociado', sql.Int, modelData.casociado)
+                // .input('casociado', sql.Int, modelData.casociado)
                 .input('xmodelo', sql.NVarChar, modelData.xmodelo)
                 .input('bactivo', sql.Bit, modelData.bactivo)
                 .input('cusuariomodificacion', sql.Int, modelData.cusuariomodificacion)
                 .input('fmodificacion', sql.DateTime, new Date())
-                .query('update MAMODELO set XMODELO = @xmodelo, CASOCIADO = @casociado, CMARCA = @cmarca, BACTIVO = @bactivo, CUSUARIOMODIFICACION = @cusuariomodificacion, FMODIFICACION = @fmodificacion where CMODELO = @cmodelo and CPAIS = @cpais');
+                .query('update MAMODELO set XMODELO = @xmodelo,  BACTIVO = @bactivo, CUSUARIOMODIFICACION = @cusuariomodificacion, FMODIFICACION = @fmodificacion where CMODELO = @cmodelo and CPAIS = @cpais AND CMARCA = @cmarca');
             //sql.close();
             return { result: result };
         }catch(err){
+            console.log(err.message)
             return { error: err.message };
         }
     },
@@ -4454,7 +4455,7 @@ module.exports = {
                 .input('cversion', sql.Int, versionData.cversion)
                 .input('cmodelo', sql.Int, versionData.cmodelo)
                 .input('cmarca', sql.Int, versionData.cmarca)
-                .query('select * from MAVERSION where XVERSION = @xversion and CVERSION != @cversion and CPAIS = @cpais and CMARCA = @cmarca and CMODELO = @cmodelo');
+                .query('select * from MAVERSION where XVERSION = @xversion and CVERSION ! = @cversion and CPAIS = @cpais and CMARCA = @cmarca and CMODELO = @cmodelo');
             //sql.close();
             return { result: result };
         }catch(err){
@@ -4469,21 +4470,17 @@ module.exports = {
                 .input('xversion', sql.NVarChar, versionData.xversion)
                 .input('cmarca', sql.Int, versionData.cmarca)
                 .input('cmodelo', sql.Int, versionData.cmodelo)
-                .input('casociado', sql.Int, versionData.casociado)
-                .input('ctipotransmision', sql.Int, versionData.ctipotransmision)
-                .input('ctipovehiculo', sql.Int, versionData.ctipovehiculo)
-                .input('ncapacidadcarga', sql.Numeric(11, 2), versionData.ncapacidadcarga)
+                .input('xtransmision', sql.NVarChar, versionData.xtransmision)
                 .input('npasajero', sql.Int, versionData.npasajero)
-                .input('xcilindrajemotor', sql.NVarChar, versionData.xcilindrajemotor)
                 .input('bactivo', sql.Bit, versionData.bactivo)
                 .input('cpais', sql.Numeric(4, 0), versionData.cpais)
                 .input('cusuariocreacion', sql.Int, versionData.cusuariocreacion)
                 .input('cusuariomodificacion', sql.Int, versionData.cusuariomodificacion)
                 .input('fmodificacion', sql.DateTime, new Date())
-                .query('update MAVERSION set XVERSION = @xversion, CTIPOTRANSMISION = @ctipotransmision, CTIPOVEHICULO = @ctipovehiculo, NCAPACIDADCARGA = @ncapacidadcarga, NPASAJERO = @npasajero, XCILINDRAJEMOTOR = @xcilindrajemotor, XCARROCERIA = @xcarroceria, CASOCIADO = @casociado, CMARCA = @cmarca, CMODELO = @cmodelo, BACTIVO = @bactivo, CUSUARIOMODIFICACION = @cusuariomodificacion, FMODIFICACION = @fmodificacion where CVERSION = @cversion and CPAIS = @cpais');
-            //sql.close();
+                .query('update MAVERSION set XVERSION = @xversion, XTRANSMISION= @xtransmision, NPASAJERO = @npasajero,  BACTIVO = @bactivo, CUSUARIOMODIFICACION = @cusuariomodificacion, FMODIFICACION = @fmodificacion where CVERSION = @cversion and CPAIS = @cpais and CMARCA = @cmarca and CMODELO = @cmodelo');            //sql.close();
             return { result: result };
         }catch(err){
+            console.log(err.message)
             return { error: err.message };
         }
     },
@@ -7670,7 +7667,7 @@ module.exports = {
                 .input('cpais', sql.Numeric(4, 0), searchData.cpais)
                 .input('cmarca', sql.NVarChar, searchData.cmarca)
                 .input('cmodelo', sql.NVarChar, searchData.cmodelo)
-                .query('select DISTINCT CVERSION, XVERSION, CANO, NPASAJERO, BACTIVO from VWBUSCARMARCAMODELOVERSION where CPAIS = @cpais AND CMARCA = @cmarca AND CMODELO = @cmodelo');
+                .query('select DISTINCT CVERSION, XVERSION, CANO, NPASAJERO, BACTIVO , XTRANSMISION  from VWBUSCARMARCAMODELOVERSION where CPAIS = @cpais AND CMARCA = @cmarca AND CMODELO = @cmodelo');
             //sql.close();
             return { result: result };
         }catch(err){
