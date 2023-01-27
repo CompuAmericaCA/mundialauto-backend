@@ -1136,7 +1136,6 @@ const operationCreateIndividualContract = async(requestBody) => {
         cplan: requestBody.cplan,
         ccorredor: requestBody.ccorredor ? requestBody.ccorredor : undefined,
         mgrua: requestBody.mgrua ? requestBody.mgrua : undefined,
-
         xcedula:requestBody.xcedula,
         xcobertura: requestBody.xcobertura.toUpperCase(),
         ncapacidad_p: requestBody.ncapacidad_p,
@@ -1168,9 +1167,9 @@ const operationCreateIndividualContract = async(requestBody) => {
         cusuario: requestBody.cusuario ? requestBody.cusuario : undefined,
         xzona_postal: requestBody.xzona_postal ? requestBody.xzona_postal : undefined,
         xuso: requestBody.xuso ? requestBody.xuso : undefined,
-        xtipo: requestBody.xtipo ? requestBody.xtipo : undefined,
+        ctipovehiculo: requestBody.ctipovehiculo ? requestBody.ctipovehiculo : undefined,
         nkilometraje: requestBody.nkilometraje ? requestBody.nkilometraje : undefined,
-        xclase: requestBody.xclase ? requestBody.xclase : undefined,
+        cclase: requestBody.cclase ? requestBody.cclase : undefined,
     };
     let paymentList = {};
     if(requestBody.payment){
