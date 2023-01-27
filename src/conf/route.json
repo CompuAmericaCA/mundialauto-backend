@@ -443,5 +443,10 @@
         "name": "Parent Policy Route",
         "router": "../routes/parent-policy",
         "route": "/api/parent-policy"
+    },
+    {
+        "name": "Pending Payments Route",
+        "router": "../routes/pending-payments",
+        "route": "api/pending-payments"
     }
 ]   
