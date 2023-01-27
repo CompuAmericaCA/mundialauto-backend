@@ -12215,7 +12215,7 @@ module.exports = {
             let result = await pool.request()
                 .input('fdesde', sql.Date, searchData.fdesde)
                 .input('fhasta', sql.Date, searchData.fhasta)
-                .input('factual', sql.DateTime,)
+                .input('factual', sql.DateTime, new Date().toJSON())
                 .query('SELECT * FROM VWBUSCARPRIMASPENDIENTES WHERE CESTATUSGENERAL = 14 AND FDESDE_REC BETWEEN CONVERT(DATETIME, @fdesde) AND CONVERT(DATETIME, @fhasta)')
             return { result: result };
         }
