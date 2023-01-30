@@ -792,7 +792,7 @@ const operationDetailFleetContractManagement = async(authHeader, requestBody) =>
             xcolor: getFleetContractData.result.recordset[0].XCOLOR,
             xplaca: getFleetContractData.result.recordset[0].XPLACA,
             xuso: getFleetContractData.result.recordset[0].XUSO,
-            xtipovehiculo: getFleetContractData.result.recordset[0].XTIPO,
+            xtipovehiculo: getFleetContractData.result.recordset[0].XTIPOVEHICULO,
             fano: getFleetContractData.result.recordset[0].FANO,
             xserialcarroceria: getFleetContractData.result.recordset[0].XSERIALCARROCERIA,
             xserialmotor: getFleetContractData.result.recordset[0].XSERIALMOTOR,
@@ -1101,9 +1101,8 @@ const operationChargeContracts = async(authHeader, requestBody) => {
     }
 }
 
-
 router.route('/create/individualContract').post((req, res) => {
-    operationCreateIndividualContract(req.body).then((result) => {
+    operationCreateIndividualContract(req.header('Authorization'), req.body).then((result) => {
         if(!result.status){
             res.status(result.code).json({ data: result });
             return;
@@ -1115,8 +1114,9 @@ router.route('/create/individualContract').post((req, res) => {
     });
 });
 
-const operationCreateIndividualContract = async(requestBody) => {
+const operationCreateIndividualContract = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    
     let userData = {
         xnombre: requestBody.xnombre.toUpperCase(),
         xapellido: requestBody.xapellido.toUpperCase(),
@@ -1136,7 +1136,6 @@ const operationCreateIndividualContract = async(requestBody) => {
         cplan: requestBody.cplan,
         ccorredor: requestBody.ccorredor ? requestBody.ccorredor : undefined,
         mgrua: requestBody.mgrua ? requestBody.mgrua : undefined,
-
         xcedula:requestBody.xcedula,
         xcobertura: requestBody.xcobertura.toUpperCase(),
         ncapacidad_p: requestBody.ncapacidad_p,
@@ -1167,10 +1166,10 @@ const operationCreateIndividualContract = async(requestBody) => {
         ctomador: requestBody.ctomador ? requestBody.ctomador : undefined,
         cusuario: requestBody.cusuario ? requestBody.cusuario : undefined,
         xzona_postal: requestBody.xzona_postal ? requestBody.xzona_postal : undefined,
-        xuso: requestBody.xuso ? requestBody.xuso : undefined,
-        xtipo: requestBody.xtipo ? requestBody.xtipo : undefined,
+        cuso: requestBody.cuso ? requestBody.cuso : undefined,
+        ctipovehiculo: requestBody.ctipovehiculo ? requestBody.ctipovehiculo : undefined,
         nkilometraje: requestBody.nkilometraje ? requestBody.nkilometraje : undefined,
-        xclase: requestBody.xclase ? requestBody.xclase : undefined,
+        cclase: requestBody.cclase ? requestBody.cclase : undefined,
     };
     let paymentList = {};
     if(requestBody.payment){
