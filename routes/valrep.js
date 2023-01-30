@@ -865,7 +865,7 @@ router.route('/service').post((req, res) => {
 
 const operationValrepService = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
-    if(!helper.validateRequestObj(requestBody, ['cpais', 'ccompania', 'ctiposervicio'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
+    //if(!helper.validateRequestObj(requestBody, ['cpais', 'ccompania', 'ctiposervicio'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
     let searchData = {
         cpais: requestBody.cpais,
         ccompania: requestBody.ccompania,
@@ -3159,6 +3159,40 @@ const operationValrepTakers = async(authHeader, requestBody) => {
     let jsonArray = [];
     for(let i = 0; i < query.result.recordset.length; i++){
         jsonArray.push({ ctomador: query.result.recordset[i].CTOMADOR, xtomador: query.result.recordset[i].XTOMADOR });
+    }
+    return { status: true, list: jsonArray }
+}
+
+router.route('/search-service').post((req, res) => {
+    if(!req.header('Authorization')){ 
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
+        return;
+    }else{
+        operationValrepSearchService(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){ 
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationValrepSearchService' } });
+        });
+    }
+});
+
+const operationValrepSearchService = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    //if(!helper.validateRequestObj(requestBody, ['cpais', 'ccompania', 'ctiposervicio'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
+    let searchData = {
+        cpais: requestBody.cpais,
+        ccompania: requestBody.ccompania,
+        ctiposervicio: requestBody.ctiposervicio
+    };
+    let query = await bd.serviceValrepQuery(searchData).then((res) => res);
+    if(query.error){ return { status: false, code: 500, message: query.error }; }
+    let jsonArray = [];
+    for(let i = 0; i < query.result.recordset.length; i++){
+        jsonArray.push({ cservicio: query.result.recordset[i].CSERVICIO, xservicio: query.result.recordset[i].XSERVICIO, bactivo: query.result.recordset[i].BACTIVO });
     }
     return { status: true, list: jsonArray }
 }

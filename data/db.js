@@ -3297,10 +3297,8 @@ module.exports = {
                     let insert = await pool.request()
                         .input('cproveedor', sql.Int, result.recordset[0].CPROVEEDOR)
                         .input('cservicio', sql.Int, providerData.services[i].cservicio)
-                        .input('ctiposervicio', sql.Int, providerData.services[i].ctiposervicio)
-                        .input('cusuariocreacion', sql.Int, providerData.cusuariocreacion)
-                        .input('fcreacion', sql.DateTime, new Date())
-                        .query('insert into PRSERVICIO (CPROVEEDOR, CSERVICIO, CTIPOSERVICIO, CUSUARIOCREACION, FCREACION) values (@cproveedor, @cservicio, @ctiposervicio, @cusuariocreacion, @fcreacion)')
+                        .input('cestado', sql.Int, providerData.services[i].cestado)
+                        .query('insert into PRPROVEEDOR_SERVICIO (CPROVEEDOR, CSERVICIO, CESTADO) values (@cproveedor, @cservicio, @cestado)')
                 }
             }
             //sql.close();
@@ -3542,10 +3540,8 @@ module.exports = {
                 let insert = await pool.request()
                     .input('cproveedor', sql.Int, providerData.cproveedor)
                     .input('cservicio', sql.Int, services[i].cservicio)
-                    .input('ctiposervicio', sql.Int, services[i].ctiposervicio)
-                    .input('cusuariocreacion', sql.Int, providerData.cusuariomodificacion)
-                    .input('fcreacion', sql.DateTime, new Date())
-                    .query('insert into PRSERVICIO (CPROVEEDOR, CSERVICIO, CTIPOSERVICIO, CUSUARIOCREACION, FCREACION) values (@cproveedor, @cservicio, @ctiposervicio, @cusuariocreacion, @fcreacion)')
+                    .input('cestado', sql.Int, services[i].cestado)
+                    .query('insert into PRPROVEEDOR_SERVICIO (CPROVEEDOR, CSERVICIO, CESTADO) values (@cproveedor, @cservicio, @cestado)')
                 rowsAffected = rowsAffected + insert.rowsAffected;
             }
             //sql.close();
@@ -3563,10 +3559,8 @@ module.exports = {
                 let update = await pool.request()
                     .input('cproveedor', sql.Int, providerData.cproveedor)
                     .input('cservicio', sql.Int, services[i].cservicio)
-                    .input('ctiposervicio', sql.Int, services[i].ctiposervicio)
-                    .input('cusuariomodificacion', sql.Int, providerData.cusuariomodificacion)
-                    .input('fmodificacion', sql.DateTime, new Date())
-                    .query('update PRSERVICIO set CUSUARIOMODIFICACION = @cusuariomodificacion, FMODIFICACION = @fmodificacion where CSERVICIO = @cservicio and CTIPOSERVICIO = @ctiposervicio and CPROVEEDOR = @cproveedor');
+                    .input('cestado', sql.Int, services[i].cestado)
+                    .query('update PRPROVEEDOR_SERVICIO set CSERVICIO = @cservicio, CESTADO = @cestado where CPROVEEDOR = @cproveedor');
                 rowsAffected = rowsAffected + update.rowsAffected;
             }
             //sql.close();

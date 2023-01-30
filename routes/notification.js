@@ -286,7 +286,7 @@ const operationSearchProvider = async(authHeader, requestBody) => {
             for(let i = 0; i < getProvidersByServicesData.result.recordset.length; i++){
                 jsonList.push({
                     cproveedor: getProvidersByServicesData.result.recordset[i].CPROVEEDOR,
-                    xservicio: getProvidersByServicesData.result.recordset[i].XSERVICIO,
+                    xdocidentidad: getProvidersByServicesData.result.recordset[i].XDOCIDENTIDAD,
                     xnombre: getProvidersByServicesData.result.recordset[i].XNOMBRE,
                     xtelefonoproveedor: getProvidersByServicesData.result.recordset[i].XTELEFONO,
                 });

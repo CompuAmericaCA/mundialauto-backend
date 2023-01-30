@@ -5698,12 +5698,12 @@ module.exports = {
     },
     serviceValrepQuery: async(searchData) => {
         try{
+            let query = `select * from MASERVICIO where CPAIS = @cpais AND CCOMPANIA = @ccompania`
             let pool = await sql.connect(config);
             let result = await pool.request()
                 .input('cpais', sql.Int, searchData.cpais)
                 .input('ccompania', sql.Int, searchData.ccompania)
-                .input('ccarga', sql.Int, searchData.ccarga)
-                .query('select cservicio, XSERVICIO from VWBUSCARSERVICIOS where CPAIS = @cpais AND CCOMPANIA = @ccompania AND CCARGA = @ccarga');
+                .query(query);
             //sql.close();
             return { result: result };
         }catch(err){
@@ -10699,7 +10699,7 @@ module.exports = {
             let pool = await sql.connect(config);
             let result = await pool.request()
                 //.input('cproveedor', sql.Int, cproveedor)
-                .query('select * from VWBUSCARPROVEEDORXSERVICIO');
+                .query('select * from PRPROVEEDORES');
             //sql.close();
             return { result: result };
         }catch(err){
@@ -12725,12 +12725,13 @@ ValidateVersionDataQuery: async(searchData) => {
 },
 searchAdministrationPaymentRecordQuery: async(searchData) => {
     try{
-        let query = `select DISTINCT CFACTURA, XCLIENTE, XNOMBRE, MMONTOFACTURA, NCONTROL, NFACTURA, FFACTURA, FRECEPCION, FVENCIMIENTO from VWBUSCARFACTURASREGISTRADAS WHERE CORDEN > 0${ searchData.ffactura ? " and FFACTURA = @ffactura" : '' }${ searchData.frecepcion ? " and FRECEPCION = @frecepcion" : '' }${ searchData.fvencimiento ? " and FVENCIMIENTO = @fvencimiento" : '' }`;
+        let query = `select DISTINCT CFACTURA, XCLIENTE, XNOMBRE, MMONTOFACTURA, NCONTROL, NFACTURA, FFACTURA, FRECEPCION, FVENCIMIENTO from VWBUSCARFACTURASREGISTRADAS WHERE CORDEN > 0 AND CESTATUSGENERAL = @cestatusgeneral${ searchData.ffactura ? " and FFACTURA = @ffactura" : '' }${ searchData.frecepcion ? " and FRECEPCION = @frecepcion" : '' }${ searchData.fvencimiento ? " and FVENCIMIENTO = @fvencimiento" : '' }`;
         let pool = await sql.connect(config);
         let result = await pool.request()
             .input('ffactura', sql.DateTime, searchData.ffactura ? searchData.ffactura: undefined)
             .input('frecepcion', sql.DateTime, searchData.frecepcion ? searchData.frecepcion: undefined)
             .input('fvencimiento', sql.DateTime, searchData.fvencimiento ? searchData.fvencimiento: undefined)
+            .input('cestatusgeneral', sql.Int, 10)
             .query(query);
         //sql.close();
         return { result: result };
@@ -12752,12 +12753,13 @@ serviceOrderValrepQuery: async() => {
 },
 searchSettlementAdministrationPaymentRecordQuery: async(searchData) => {
     try{
-        let query = `select DISTINCT CFACTURA, XCLIENTE, XNOMBRE, MMONTOFACTURA, NCONTROL, NFACTURA, FFACTURA, FRECEPCION, FVENCIMIENTO from VWBUSCARFACTURASREGISTRADAS WHERE CFINIQUITO > 0${ searchData.ffactura ? " and FFACTURA = @ffactura" : '' }${ searchData.frecepcion ? " and FRECEPCION = @frecepcion" : '' }${ searchData.fvencimiento ? " and FVENCIMIENTO = @fvencimiento" : '' }`;
+        let query = `select DISTINCT CFACTURA, XCLIENTE, XNOMBRE, MMONTOFACTURA, NCONTROL, NFACTURA, FFACTURA, FRECEPCION, FVENCIMIENTO from VWBUSCARFACTURASREGISTRADAS WHERE CFINIQUITO > 0 AND CESTATUSGENERAL = @cestatusgeneral${ searchData.ffactura ? " and FFACTURA = @ffactura" : '' }${ searchData.frecepcion ? " and FRECEPCION = @frecepcion" : '' }${ searchData.fvencimiento ? " and FVENCIMIENTO = @fvencimiento" : '' }`;
         let pool = await sql.connect(config);
         let result = await pool.request()
             .input('ffactura', sql.DateTime, searchData.ffactura ? searchData.ffactura: undefined)
             .input('frecepcion', sql.DateTime, searchData.frecepcion ? searchData.frecepcion: undefined)
             .input('fvencimiento', sql.DateTime, searchData.fvencimiento ? searchData.fvencimiento: undefined)
+            .input('cestatusgeneral', sql.Int, 10)
             .query(query);
         //sql.close();
         return { result: result };
@@ -13099,8 +13101,9 @@ createBillLoadingServiceOrderQuery: async(serviceOrderList, billLoadingData) => 
                 .input('xobservacion', sql.NVarChar, billLoadingData.xobservacion)
                 .input('cmoneda', sql.Int, billLoadingData.cmoneda)
                 .input('xrutaarchivo', sql.NVarChar, billLoadingData.xrutaarchivo)
+                .input('cestatusgeneral', sql.Int, billLoadingData.cestatusgeneral)
                 .input('fcreacion', sql.DateTime, new Date())
-                .query('INSERT INTO ADREGISTROFACTURA (CFACTURA, CORDEN, CPROVEEDOR, CRECIBIDOR, XTIPOPAGADOR, XPAGADOR, XOBSERVACION, FFACTURA, FRECEPCION, FVENCIMIENTO, NFACTURA, NCONTROL, MMONTOFACTURA, CMONEDA, XRUTAARCHIVO, CPAIS, CCOMPANIA, CUSUARIOCREACION, FCREACION) VALUES (@cfactura, @corden, @cproveedor, @crecibidor, @xtipopagador, @xpagador, @xobservacion, @ffactura, @frecepcion, @fvencimiento, @nfactura, @ncontrol, @mmontofactura, @cmoneda, @xrutaarchivo, @cpais, @ccompania, @cusuario, @fcreacion)')
+                .query('INSERT INTO ADREGISTROFACTURA (CFACTURA, CORDEN, CPROVEEDOR, CRECIBIDOR, XTIPOPAGADOR, XPAGADOR, XOBSERVACION, FFACTURA, FRECEPCION, FVENCIMIENTO, NFACTURA, NCONTROL, MMONTOFACTURA, CMONEDA, XRUTAARCHIVO, CESTATUSGENERAL, CPAIS, CCOMPANIA, CUSUARIOCREACION, FCREACION) VALUES (@cfactura, @corden, @cproveedor, @crecibidor, @xtipopagador, @xpagador, @xobservacion, @ffactura, @frecepcion, @fvencimiento, @nfactura, @ncontrol, @mmontofactura, @cmoneda, @xrutaarchivo, @cestatusgeneral, @cpais, @ccompania, @cusuario, @fcreacion)')
             rowsAffected = rowsAffected + insert.rowsAffected;
         }
         //sql.close();
@@ -13134,8 +13137,9 @@ createBillLoadingSettlementQuery: async(settlementList, billLoadingData) => {
                 .input('xobservacion', sql.NVarChar, billLoadingData.xobservacion)
                 .input('cmoneda', sql.Int, billLoadingData.cmoneda)
                 .input('xrutaarchivo', sql.NVarChar, billLoadingData.xrutaarchivo)
+                .input('cestatusgeneral', sql.Int, billLoadingData.cestatusgeneral)
                 .input('fcreacion', sql.DateTime, new Date())
-                .query('INSERT INTO ADREGISTROFACTURA (CFACTURA, CFINIQUITO, CPROVEEDOR, CRECIBIDOR, XPAGADOR, XTIPOPAGADOR, XOBSERVACION,  FFACTURA, FRECEPCION, FVENCIMIENTO, NFACTURA, NCONTROL, MMONTOFACTURA, CMONEDA, XRUTAARCHIVO, CPAIS, CCOMPANIA, CUSUARIOCREACION, FCREACION) VALUES (@cfactura, @cfiniquito, @cproveedor, @crecibidor, @xpagador, @xtipopagador, @xobservacion, @ffactura, @frecepcion, @fvencimiento, @nfactura, @ncontrol, @mmontofactura, @cmoneda, @xrutaarchivo, @cpais, @ccompania, @cusuario, @fcreacion)')
+                .query('INSERT INTO ADREGISTROFACTURA (CFACTURA, CFINIQUITO, CPROVEEDOR, CRECIBIDOR, XPAGADOR, XTIPOPAGADOR, XOBSERVACION,  FFACTURA, FRECEPCION, FVENCIMIENTO, NFACTURA, NCONTROL, MMONTOFACTURA, CMONEDA, XRUTAARCHIVO, CESTATUSGENERAL, CPAIS, CCOMPANIA, CUSUARIOCREACION, FCREACION) VALUES (@cfactura, @cfiniquito, @cproveedor, @crecibidor, @xpagador, @xtipopagador, @xobservacion, @ffactura, @frecepcion, @fvencimiento, @nfactura, @ncontrol, @mmontofactura, @cmoneda, @xrutaarchivo, @cestatusgeneral, @cpais, @ccompania, @cusuario, @fcreacion)')
             rowsAffected = rowsAffected + insert.rowsAffected;
         }
         //sql.close();
@@ -13326,6 +13330,37 @@ detailBillQuery: async(searchData) => {
         console.log(result)
         return { result: result };
     }catch(err){
+        return { error: err.message };
+    }
+},
+createPaymentQuery: async(paymentList) => {
+    try{
+        let rowsAffected = 0;
+        let pool = await sql.connect(config);
+        
+        let insert = await pool.request()
+            .input('cfactura', sql.Int, paymentList.cfactura)
+            .input('xcliente', sql.NVarChar, paymentList.xcliente)
+            .input('nfactura', sql.Int, paymentList.nfactura)
+            .input('ffactura', sql.DateTime, paymentList.ffactura)
+            .input('msumafactura', sql.Numeric(18, 2), paymentList.msumafactura)
+            .input('mmontocotizacion', sql.Numeric(18, 2), paymentList.mmontocotizacion)
+            .input('mmontototaliva', sql.Numeric(18, 2), paymentList.mmontototaliva)
+            .input('mmontototalretencion', sql.Numeric(18, 2), paymentList.mmontototalretencion)
+            .input('mmontototalislr', sql.Numeric(18, 2), paymentList.mmontototalislr)
+            .input('mmontototalimpuestos', sql.Numeric(18, 2), paymentList.mmontototalimpuestos)
+            .input('mmontototalfactura', sql.Numeric(18, 2), paymentList.mmontototalfactura)
+            .input('cestatusgeneral', sql.Int, paymentList.cestatusgeneral)
+            .input('cusuariocreacion', sql.Int, paymentList.cusuario)
+            .input('fcreacion', sql.DateTime, new Date())
+            .query('insert into ADREGISTROPAGOS (CFACTURA, XCLIENTE, NFACTURA, FFACTURA, MSUMAFACTURA, MMONTOCOTIZACION, MMONTOTOTALIVA, MMONTOTOTALRETENCION, MMONTOTOTALISLR, MMONTOTOTALIMPUESTOS, MMONTOTOTALFACTURA, CESTATUSGENERAL, CUSUARIOCREACION, FCREACION) values (@cfactura, @xcliente, @nfactura, @ffactura, @msumafactura, @mmontocotizacion, @mmontototaliva, @mmontototalretencion, @mmontototalislr, @mmontototalimpuestos, @mmontototalfactura, @cestatusgeneral, @cusuariocreacion, @fcreacion)')
+        rowsAffected = rowsAffected + insert.rowsAffected;
+        
+        //sql.close();
+        return { result: { rowsAffected: rowsAffected } };
+    }
+    catch(err){
+        console.log(err.message)
         return { error: err.message };
     }
 },
