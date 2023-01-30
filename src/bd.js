@@ -3685,12 +3685,11 @@ module.exports = {
             let pool = await sql.connect(config);
             let result = await pool.request()
                 .input('xmarca', sql.NVarChar, brandData.xmarca)
-                .input('casociado', sql.Int, brandData.casociado)
                 .input('bactivo', sql.Bit, brandData.bactivo)
                 .input('cpais', sql.Numeric(4, 0), brandData.cpais)
                 .input('cusuariocreacion', sql.Int, brandData.cusuariocreacion)
                 .input('fcreacion', sql.DateTime, new Date())
-                .query('insert into MAMARCA (XMARCA, CASOCIADO, BACTIVO, CPAIS, CUSUARIOCREACION, FCREACION) values (@xmarca, @casociado, @bactivo, @cpais, @cusuariocreacion, @fcreacion)');
+                .query('insert into MAMARCA (XMARCA, BACTIVO, CPAIS, CUSUARIOCREACION, FCREACION) values (@xmarca, @bactivo, @cpais, @cusuariocreacion, @fcreacion)');
             if(result.rowsAffected > 0){
                 let query = await pool.request()
                     .input('xmarca', sql.NVarChar, brandData.xmarca)
