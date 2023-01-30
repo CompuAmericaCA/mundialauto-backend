@@ -66,14 +66,14 @@ router.route('/create').post((req, res) => {
 
 const operationCreateBrand = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
-    if(!helper.validateRequestObj(requestBody, ['cpais', 'xmarca', 'casociado', 'bactivo', 'cusuariocreacion'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
+    if(!helper.validateRequestObj(requestBody, ['cpais', 'xmarca', 'bactivo'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
     let brandData = {
         cpais: requestBody.cpais,
         xmarca: requestBody.xmarca.toUpperCase(),
-        casociado: requestBody.casociado,
         bactivo: requestBody.bactivo,
         cusuariocreacion: requestBody.cusuariocreacion
     };
+    console.log(brandData)
     let verifyBrandName = await bd.verifyBrandNameToCreateQuery(brandData).then((res) => res);
     if(verifyBrandName.error){ return { status: false, code: 500, message: verifyBrandName.error }; }
     if(verifyBrandName.result.rowsAffected > 0){ return { status: false, code: 200, condition: 'brand-name-already-exist' }; }
