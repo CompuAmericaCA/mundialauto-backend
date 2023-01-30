@@ -35,3 +35,5 @@ const operationSearchPendingPayments = async(authHeader, requestBody) => {
         }
     }
 }
+
+module.exports = router;
