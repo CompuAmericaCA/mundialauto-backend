@@ -65,13 +65,12 @@ router.route('/create').post((req, res) => {
 
 const operationCreateModel = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
-  //  if(!helper.validateRequestObj(requestBody, ['xmodelo', 'cmarca', 'casociado', 'bactivo', 'cpais', 'cusuariocreacion'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
+    if(!helper.validateRequestObj(requestBody, ['xmodelo', 'cmarca', 'bactivo', 'cpais'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
     let modelData = {
         xmodelo: requestBody.xmodelo.toUpperCase(),
         bactivo: requestBody.bactivo,
         cpais: requestBody.cpais,
         cmarca: requestBody.cmarca,
-        casociado: requestBody.casociado,
         cusuariocreacion: requestBody.cusuariocreacion
     };
     let verifyModelName = await bd.verifyModelNameToCreateQuery(modelData).then((res) => res);

@@ -3685,12 +3685,11 @@ module.exports = {
             let pool = await sql.connect(config);
             let result = await pool.request()
                 .input('xmarca', sql.NVarChar, brandData.xmarca)
-                .input('casociado', sql.Int, brandData.casociado)
                 .input('bactivo', sql.Bit, brandData.bactivo)
                 .input('cpais', sql.Numeric(4, 0), brandData.cpais)
                 .input('cusuariocreacion', sql.Int, brandData.cusuariocreacion)
                 .input('fcreacion', sql.DateTime, new Date())
-                .query('insert into MAMARCA (XMARCA, CASOCIADO, BACTIVO, CPAIS, CUSUARIOCREACION, FCREACION) values (@xmarca, @casociado, @bactivo, @cpais, @cusuariocreacion, @fcreacion)');
+                .query('insert into MAMARCA (XMARCA, BACTIVO, CPAIS, CUSUARIOCREACION, FCREACION) values (@xmarca, @bactivo, @cpais, @cusuariocreacion, @fcreacion)');
             if(result.rowsAffected > 0){
                 let query = await pool.request()
                     .input('xmarca', sql.NVarChar, brandData.xmarca)
@@ -4402,20 +4401,17 @@ module.exports = {
         try{
             let pool = await sql.connect(config);
             let result = await pool.request()
-                .input('xversion', sql.NVarChar, versionData.xversion)
                 .input('cmarca', sql.Int, versionData.cmarca)
                 .input('cmodelo', sql.Int, versionData.cmodelo)
-                .input('casociado', sql.Int, versionData.casociado)
-                .input('ctipotransmision', sql.Int, versionData.ctipotransmision)
-                .input('ctipovehiculo', sql.Int, versionData.ctipovehiculo)
-                .input('ncapacidadcarga', sql.Numeric(11, 2), versionData.ncapacidadcarga)
+                .input('xversion', sql.NVarChar, versionData.xversion)
                 .input('npasajero', sql.Int, versionData.npasajero)
-                .input('xcilindrajemotor', sql.NVarChar, versionData.xcilindrajemotor)
+                .input('xtransmision', sql.NVarChar, versionData.xtransmision)
                 .input('bactivo', sql.Bit, versionData.bactivo)
                 .input('cpais', sql.Numeric(4, 0), versionData.cpais)
+                .input('cano', sql.Numeric(4, 0), versionData.cano)
                 .input('cusuariocreacion', sql.Int, versionData.cusuariocreacion)
                 .input('fcreacion', sql.DateTime, new Date())
-                .query('insert into MAVERSION (XVERSION, CMARCA, CMODELO, CASOCIADO, CTIPOTRANSMISION, CTIPOVEHICULO, NCAPACIDADCARGA, NPASAJERO, XCILINDRAJEMOTOR, BACTIVO, CPAIS, CUSUARIOCREACION, FCREACION) values (@xversion, @cmarca, @cmodelo, @casociado, @ctipotransmision, @ctipovehiculo, @ncapacidadcarga, @npasajero, @xcilindrajemotor, @bactivo, @cpais, @cusuariocreacion, @fcreacion)');
+                .query('insert into MAVERSION ( CMARCA, CMODELO, XVERSION,NPASAJERO, XTRANSMISION, BACTIVO, CPAIS, CANO, CUSUARIOCREACION, FCREACION) values ( @cmarca, @cmodelo,@xversion, @npasajero, @xtransmision, @bactivo, @cpais, @cano,@cusuariocreacion, @fcreacion)');
             if(result.rowsAffected > 0){
                 let query = await pool.request()
                     .input('xversion', sql.NVarChar, versionData.xversion)
@@ -4502,6 +4498,30 @@ module.exports = {
             let result = await pool.request()
                 .input('cpais', sql.Numeric(4, 0), searchData.cpais)
                 .query('select CTIPOVEHICULO, XTIPOVEHICULO, BACTIVO from MATIPOVEHICULO where CPAIS = @cpais');
+            //sql.close();
+            return { result: result };
+        }catch(err){
+            return { error: err.message };
+        }
+    },
+    vehicleDataValrepQuery: async(searchData) => {
+        try{
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .input('cpais', sql.Numeric(4, 0), searchData.cpais)
+                .query('select * from MATIPOVEHICULO where CPAIS = @cpais and BACTIVO = 1');
+            //sql.close();
+            return { result: result };
+        }catch(err){
+            return { error: err.message };
+        }
+    },
+    ClaseDataValrepQuery: async(searchData) => {
+        try{
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .input('cpais', sql.Numeric(4, 0), searchData.cpais)
+                .query('select * from MACLASES where BACTIVO = 1');
             //sql.close();
             return { result: result };
         }catch(err){
@@ -8516,8 +8536,6 @@ module.exports = {
     },
 
     createIndividualContractQuery: async(userData, paymentList) => {
-
-        console.log(userData.cpais)
         try{
             let rowsAffected = 0;
             let pool = await sql.connect(config);
@@ -8582,14 +8600,13 @@ module.exports = {
                 .input('ctomador', sql.Int, userData.ctomador ? userData.ctomador: 0)
                 .input('cusuariocreacion', sql.Int, userData.cusuario ? userData.cusuario: 0)
                 .input('xzona_postal', sql.NVarChar, userData.xzona_postal)
-                .input('xuso', sql.NVarChar, userData.xuso)
-                .input('xtipo', sql.NVarChar, userData.xtipo)
-                .input('nkilometraje', sql.Int, userData.nkilometraje)
-                .input('xclase', sql.NVarChar, userData.xclase)
+                .input('cuso', sql.NVarChar, userData.cuso)
+                .input('ctipovehiculo', sql.Int, userData.ctipovehiculo)
+                .input('nkilometraje', sql.Numeric(18, 2), userData.nkilometraje)
+                .input('cclase', sql.Int, userData.cclase)
                 .input('fcreacion', sql.DateTime, new Date())
-
-                .query('insert into TMEMISION_INDIVIDUAL(XNOMBRE, XAPELLIDO, CANO, XCOLOR, CMARCA, CMODELO, CVERSION, XRIF_CLIENTE, EMAIL, XTELEFONO_PROP, XDIRECCIONFISCAL, XSERIALMOTOR, XSERIALCARROCERIA, XPLACA, XTELEFONO_EMP, CPLAN, CCORREDOR, XCEDULA, XCOBERTURA, NCAPACIDAD_P, CTARIFA_EXCESO, FINICIO, CMETODOLOGIAPAGO, MSUMA_ASEG, PCASCO, MPRIMA_CASCO, MCATASTROFICO, PDESCUENTO, IFRACCIONAMIENTO, NCUOTAS, MPRIMA_BLINDAJE, MSUMA_BLINDAJE, MPRIMA_BRUTA, PCATASTROFICO, PMOTIN, MMOTIN, PBLINDAJE, CESTADO, CCIUDAD, CPAIS, ICEDULA, FEMISION, IVIGENCIA, CTIPOPAGO, XREFERENCIA, FCOBRO, CBANCO, CBANCO_DESTINO, MPRIMA_PAGADA, MPRIMA_BS, XNOTA, MTASA_CAMBIO, FTASA_CAMBIO,CCODIGO_UBII, MGRUA, CESTATUSGENERAL, CTOMADOR, XZONA_POSTAL, XUSO, XTIPO, FCREACION, CUSUARIOCREACION, NKILOMETRAJE, XCLASE) values (@xnombre, @xapellido, @cano, @xcolor, @cmarca, @cmodelo, @cversion, @xrif_cliente, @email, @xtelefono_prop, @xdireccionfiscal, @xserialmotor, @xserialcarroceria, @xplaca, @xtelefono_emp, @cplan, @ccorredor, @xcedula, @xcobertura, @ncapacidad_p, @ctarifa_exceso, @finicio, @cmetodologiapago, @msuma_aseg, @pcasco, @mprima_casco, @mcatastrofico, @pdescuento, @ifraccionamiento, @ncuotas, @mprima_blindaje, @msuma_blindaje, @mprima_bruta,@pcatastrofico ,@pmotin, @mmotin, @pblindaje, @cestado, @cciudad, @cpais, @icedula, @femision, @ivigencia, @ctipopago, @xreferencia, @fcobro, @cbanco, @cbanco_destino, @mprima_pagada, @mprima_bs, @xnota, @mtasa_cambio, @ftasa_cambio,@ccodigo_ubii, @mgrua, @cestatusgeneral, @ctomador, @xzona_postal, @xuso, @xtipo, @fcreacion, @cusuariocreacion, @nkilometraje, @xclase)')            //sql.close();
-            return { result: { rowsAffected: rowsAffected, status: true } };
+                .query('insert into TMEMISION_INDIVIDUAL(XNOMBRE, XAPELLIDO, CANO, XCOLOR, CMARCA, CMODELO, CVERSION, XRIF_CLIENTE, EMAIL, XTELEFONO_PROP, XDIRECCIONFISCAL, XSERIALMOTOR, XSERIALCARROCERIA, XPLACA, XTELEFONO_EMP, CPLAN, CCORREDOR, XCEDULA, XCOBERTURA, NCAPACIDAD_P, CTARIFA_EXCESO, FINICIO, CMETODOLOGIAPAGO, MSUMA_ASEG, PCASCO, MPRIMA_CASCO, MCATASTROFICO, PDESCUENTO, IFRACCIONAMIENTO, NCUOTAS, MPRIMA_BLINDAJE, MSUMA_BLINDAJE, MPRIMA_BRUTA, PCATASTROFICO, PMOTIN, MMOTIN, PBLINDAJE, CESTADO, CCIUDAD, CPAIS, ICEDULA, FEMISION, IVIGENCIA, CTIPOPAGO, XREFERENCIA, FCOBRO, CBANCO, CBANCO_DESTINO, MPRIMA_PAGADA, MPRIMA_BS, XNOTA, MTASA_CAMBIO, FTASA_CAMBIO,CCODIGO_UBII, MGRUA, CESTATUSGENERAL, CTOMADOR, XZONA_POSTAL,CUSO ,CTIPOVEHICULO, FCREACION, CUSUARIOCREACION, NKILOMETRAJE, CCLASE) values (@xnombre, @xapellido, @cano, @xcolor, @cmarca, @cmodelo, @cversion, @xrif_cliente, @email, @xtelefono_prop, @xdireccionfiscal, @xserialmotor, @xserialcarroceria, @xplaca, @xtelefono_emp, @cplan, @ccorredor, @xcedula, @xcobertura, @ncapacidad_p, @ctarifa_exceso, @finicio, @cmetodologiapago, @msuma_aseg, @pcasco, @mprima_casco, @mcatastrofico, @pdescuento, @ifraccionamiento, @ncuotas, @mprima_blindaje, @msuma_blindaje, @mprima_bruta,@pcatastrofico ,@pmotin, @mmotin, @pblindaje, @cestado, @cciudad, @cpais, @icedula, @femision, @ivigencia, @ctipopago, @xreferencia, @fcobro, @cbanco, @cbanco_destino, @mprima_pagada, @mprima_bs, @xnota, @mtasa_cambio, @ftasa_cambio,@ccodigo_ubii, @mgrua, @cestatusgeneral, @ctomador, @xzona_postal, @cuso, @ctipovehiculo, @fcreacion, @cusuariocreacion, @nkilometraje, @cclase)')                
+                 return { result: { rowsAffected: rowsAffected, status: true } };
         }
         catch(err){
             console.log(err.message)
