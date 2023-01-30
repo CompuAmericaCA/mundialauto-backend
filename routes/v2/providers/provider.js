@@ -55,15 +55,15 @@ const operationSearchProvider = async(authHeader, requestBody) => {
 }
 
 router.route('/production/create').post((req, res) => {
-    if(!req.header('Authorization')){
-        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } });
-        return;
-    }
-    let validateSchema = helper.validateSchema('production', 'provider', req.body, 'createProvidersProductionProviderSchema');
-    if(validateSchema.error){ 
-        res.status(400).json({ data: { status: false, code: 400, message: validateSchema.error.details[0].message } });
-        return;
-    }
+    // if(!req.header('Authorization')){
+    //     res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } });
+    //     return;
+    // }
+    // let validateSchema = helper.validateSchema('production', 'provider', req.body, 'createProvidersProductionProviderSchema');
+    // if(validateSchema.error){ 
+    //     res.status(400).json({ data: { status: false, code: 400, message: validateSchema.error.details[0].message } });
+    //     return;
+    // }
     validator.operationVerifyProductionModulePermission(req.body.permissionData, 'BCREAR').then((response) => {
         if(response.error){ 
             res.status(401).json({ status: false, code: 401, condition: 'user-dont-have-permissions', expired: false });
@@ -221,7 +221,6 @@ const operationDetailProvider = async(authHeader, requestBody) => {
                 xnumerocuenta: getProviderBanksData.result.recordset[i].XNUMEROCUENTA,
                 bprincipal: getProviderBanksData.result.recordset[i].BPRINCIPAL,
             }
-            console.log(bank)
             banks.push(bank);
         }
     }
@@ -420,6 +419,7 @@ const operationUpdateProvider = async(authHeader, requestBody) => {
         } 
     }
     if(requestBody.services){
+        console.log(requestBody.services.create)
         if(requestBody.services.delete && requestBody.services.delete.length > 0){
             let deleteServicesByProviderUpdate = await db.deleteServicesByProviderUpdateQuery(requestBody.services.delete, providerData).then((res) => res);
             if(deleteServicesByProviderUpdate.error){ return { status: false, code: 500, message: deleteServicesByProviderUpdate.error }; }

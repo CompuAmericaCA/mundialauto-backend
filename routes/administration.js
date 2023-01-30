@@ -411,7 +411,7 @@ const operationCreateBillLoading = async(authHeader, requestBody) => {
         cproveedor: requestBody.cproveedor,
         xtipopagador: requestBody.xtipopagador,
         xpagador: requestBody.xpagador,
-        crecibidor: requestBody.crecibidor,
+        crecibidor: requestBody.crecibidor ? requestBody.crecibidor: undefined,
         ffactura: requestBody.ffactura,
         frecepcion: requestBody.frecepcion,
         fvencimiento: requestBody.fvencimiento,
@@ -421,6 +421,7 @@ const operationCreateBillLoading = async(authHeader, requestBody) => {
         xobservacion: requestBody.xobservacion.toUpperCase(),
         cfactura: requestBody.cfactura,
         xrutaarchivo: requestBody.xrutaarchivo,
+        cestatusgeneral: requestBody.cestatusgeneral,
         cmoneda: requestBody.cmoneda
     }
     if(requestBody.serviceorder){
@@ -523,7 +524,9 @@ const operationSearchBill = async(authHeader, requestBody) => {
                 xnombre: searchServiceOrderByBill.result.recordset[i].XNOMBRE,
                 mmontofactura: searchServiceOrderByBill.result.recordset[i].MMONTOFACTURA,
                 xtipopagador: searchServiceOrderByBill.result.recordset[i].XTIPOPAGADOR,
-                xmoneda: searchServiceOrderByBill.result.recordset[i].XMONEDA
+                xmoneda: searchServiceOrderByBill.result.recordset[i].xmoneda,
+                mmontocotizacion: searchServiceOrderByBill.result.recordset[i].MMONTOCOTIZACION,
+                mmontocotizacioniva: searchServiceOrderByBill.result.recordset[i].MMONTOCOTIZACIONIVA,
             });
         }
 
@@ -535,7 +538,7 @@ const operationSearchBill = async(authHeader, requestBody) => {
                 xnombre: searchSettlementByBill.result.recordset[i].XNOMBRE,
                 mmontofactura: searchSettlementByBill.result.recordset[i].MMONTOFACTURA,
                 xtipopagador: searchSettlementByBill.result.recordset[i].XTIPOPAGADOR,
-                xmoneda: searchSettlementByBill.result.recordset[i].XMONEDA
+                xmoneda: searchSettlementByBill.result.recordset[i].xmoneda
             });
         }
 
@@ -568,9 +571,11 @@ const operationBillDetail = async(authHeader, requestBody) => {
     if(detailBill.error){ return  { status: false, code: 500, message: detailBill.error }; }
     if(detailBill.result.rowsAffected > 0){
         return { status: true, 
+                cfactura: detailBill.result.recordset[0].CFACTURA,
                 xcliente: detailBill.result.recordset[0].XCLIENTE,
                 nfactura: detailBill.result.recordset[0].NFACTURA,
                 ncontrol: detailBill.result.recordset[0].NCONTROL,
+                mmontofactura: detailBill.result.recordset[0].MMONTOFACTURA,
                 ffactura: detailBill.result.recordset[0].FFACTURA,
                 fvencimiento: detailBill.result.recordset[0].FVENCIMIENTO,
                 frecepcion: detailBill.result.recordset[0].FRECEPCION,
@@ -579,6 +584,48 @@ const operationBillDetail = async(authHeader, requestBody) => {
                 pimpuesto: detailBill.result.recordset[0].PIMPUESTO,
           };
     }else{ return { status: false, code: 404, message: 'Notification not found.' }; }
+}
+
+router.route('/create-payment').post((req, res) => {
+    if(!req.header('Authorization')){
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } });
+        return;
+    }else{
+        operationCreatePayment(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            console.log(err.message)
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationCreatePayment' } });
+        });
+    }
+});
+
+const operationCreatePayment = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let paymentList = {
+        cfactura: requestBody.cfactura,
+        xcliente: requestBody.xcliente,
+        nfactura: requestBody.nfactura,
+        ffactura: requestBody.ffactura,
+        msumafactura: parseInt(requestBody.msumafactura) ? requestBody.msumafactura: undefined,
+        mmontocotizacion: parseInt(requestBody.mmontocotizacion) ? requestBody.mmontocotizacion: undefined,
+        mmontototaliva: parseInt(requestBody.mmontototaliva) ? requestBody.mmontototaliva: undefined,
+        mmontototalretencion: parseInt(requestBody.mmontototalretencion) ? requestBody.mmontototalretencion: undefined,
+        mmontototalislr: parseInt(requestBody.mmontototalislr) ? requestBody.mmontototalislr: undefined,
+        mmontototalimpuestos: parseInt(requestBody.mmontototalimpuestos) ? requestBody.mmontototalimpuestos: undefined,
+        mmontototalfactura: parseInt(requestBody.mmontototalfactura) ? requestBody.mmontototalfactura: undefined,
+        cusuario: requestBody.cusuario,
+        cestatusgeneral: requestBody.cestatusgeneral
+    }
+    let createPayment = await bd.createPaymentQuery(paymentList).then((res) => res);
+    if(createPayment.error){ return { status: false, code: 500, message: createPayment.error }; }
+    if(createPayment.result.rowsAffected > 0){ return { status: true }; }
+    else{ return { status: false, code: 404, message: 'Service Order not found.' }; }
+    
 }
 
 module.exports = router;
