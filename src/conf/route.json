@@ -447,6 +447,6 @@
     {
         "name": "Pending Payments Route",
         "router": "../routes/pending-payments",
-        "route": "api/pending-payments"
+        "route": "/api/pending-payments"
     }
 ]   
