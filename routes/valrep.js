@@ -1145,7 +1145,6 @@ const operationValrepServiceOrderProviders = async(authHeader, requestBody) => {
         cservicio: requestBody.cservicio,
         cestado: requestBody.cestado
     }
-    console.log(searchData)
     let query = await bd.getServiceOrderProviders(searchData).then((res) => res);
     //if(query.error){ return { status: false, code: 500, message: query.error }; }
     let jsonArray = [];
@@ -2243,11 +2242,16 @@ const operationValrepVersion = async(authHeader, requestBody) => {
         cmarca: requestBody.cmarca ? requestBody.cmarca : undefined,
         cmodelo: requestBody.cmodelo ? requestBody.cmodelo : undefined,
     };
-    let query = await bd.versionValrepQuery(searchData).then((res) => res);
+    let query = await bd.searchVersionQuery(searchData).then((res) => res);
     if(query.error){ return { status: false, code: 500, message: query.error }; }
     let jsonArray = [];
     for(let i = 0; i < query.result.recordset.length; i++){
-        jsonArray.push({ cversion: query.result.recordset[i].CVERSION, xversion: query.result.recordset[i].XVERSION + '-' + query.result.recordset[i].CANO, bactivo: query.result.recordset[i].BACTIVO, cano: query.result.recordset[i].CANO, control: i, npasajero: query.result.recordset[i].NPASAJERO  });
+        jsonArray.push({ cversion: query.result.recordset[i].CVERSION, 
+            xversion: query.result.recordset[i].XVERSION + '-' + query.result.recordset[i].CANO, 
+            bactivo: query.result.recordset[i].BACTIVO, cano: query.result.recordset[i].CANO, 
+            control: i, 
+            npasajero: query.result.recordset[i].NPASAJERO,
+            xtransmision: query.result.recordset[i].XTRANSMISION  });
     }
     return { status: true, list: jsonArray }
 }
@@ -2294,7 +2298,6 @@ router.route('/accesory').post((req, res) => {
             }
             res.json({ data: result });
         }).catch((err) => {
-            console.log(err.message)
             res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationValrepAccesory' } });
         });
     }
@@ -2785,7 +2788,6 @@ router.route('/settlement/service-order').post((req, res) => {
             }
             res.json({ data: result });
         }).catch((err) => {
-            console.log(err.message)
             res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationValrepServiceOrderFromSettlement' } });
         });
     }
