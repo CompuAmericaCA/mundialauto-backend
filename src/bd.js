@@ -1,5 +1,6 @@
 const { request } = require('express');
 const sql = require('mssql');
+const { search } = require('../routes/administration-collection');
 const config = {
     user: process.env.USER_BD,
     password: process.env.PASSWORD_BD,
@@ -12221,6 +12222,21 @@ module.exports = {
             //sql.close();
             return { result: result };
         }catch(err){
+            return { error: err.message };
+        }
+    },
+    searchPendingPaymentsQuery: async(searchData) => {
+        try{
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .input('fdesde', sql.Date, searchData.fdesde)
+                .input('fhasta', sql.Date, searchData.fhasta)
+                .input('factual', sql.DateTime, new Date().toJSON())
+                .query('SELECT * FROM VWBUSCARPRIMASPENDIENTES WHERE CESTATUSGENERAL = 13 AND FDESDE_REC BETWEEN CONVERT(DATETIME, @fdesde) AND CONVERT(DATETIME, @fhasta)')
+            return { result: result };
+        }
+        catch(err) {
+            console.log(err.message);
             return { error: err.message };
         }
     },
