@@ -16,6 +16,7 @@ router.route('/search').post((req, res) => {
             }
             res.json({ data: result });
         }).catch((err) => {
+            console.log(err.message);
             res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationPendingPayments' } });
         });
     }
@@ -29,10 +30,28 @@ const operationSearchPendingPayments = async(authHeader, requestBody) => {
     }
     let searchPendingPayments = await bd.searchPendingPaymentsQuery(searchData).then((res) => res);
     if(searchPendingPayments.error){ return  { status: false, code: 500, message: searchPendingPayments.error }; }
+    receipts = [];
     if(searchPendingPayments.result.recordset.length > 0){
-        for(let i = 0; i < query.result.recordset.length; i++){
-            
+        for(let i = 0; i < searchPendingPayments.result.recordset.length; i++){
+            receipt = {
+                xpoliza: searchPendingPayments.result.recordset[i].xpoliza,
+                ccontratoflota: searchPendingPayments.result.recordset[i].CCONTRATOFLOTA,
+                xnombre: searchPendingPayments.result.recordset[i].XNOMBRE + ' ' + searchPendingPayments.result.recordset[i].XAPELLIDO,
+                xsucursalemision: searchPendingPayments.result.recordset[i].XSUCURSALEMISION,
+                ccorredor: searchPendingPayments.result.recordset[i].CCORREDOR,
+                xcorredor: searchPendingPayments.result.recordset[i].XCORREDOR,
+                nrecibo: searchPendingPayments.result.recordset[i].XRECIBO + '-' + searchPendingPayments.result.recordset[i].NCONSECUTIVO,
+                xmoneda: searchPendingPayments.result.recordset[i].xmoneda,
+                femision: searchPendingPayments.result.recordset[i].FEMISION,
+                fdesde_rec: searchPendingPayments.result.recordset[i].FDESDE_REC,
+                fhasta_rec: searchPendingPayments.result.recordset[i].FHASTA_REC
+            }
+            receipts.push(receipt);
         }
+    }
+    return {
+        status: true,
+        receipts: receipts
     }
 }
 
