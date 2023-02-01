@@ -22,7 +22,6 @@ module.exports = {
                 .input('bactivo', sql.Bit, true)
                 .query('select * from VWAUTENTICACIONUSUARIO where XEMAIL = @xemail and BACTIVO = @bactivo');
             //sql.close();
-            console.log(result.recordset[0]);
             return { result: result };
         }
         catch(err){
