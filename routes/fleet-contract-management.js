@@ -1345,7 +1345,7 @@ router.route('/tarifa-casco').post((req, res) => {
 const operationTarifaCasco = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
     let searchData = {
-        xtipo: requestBody.xtipo,
+        xtipo: requestBody.xclase,
         xmarca: requestBody.xmarca,
         xmodelo: requestBody.xmodelo,
         cano: parseInt(requestBody.cano),

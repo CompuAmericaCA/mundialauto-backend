@@ -467,6 +467,7 @@ const operationValrepClaseData = async(authHeader, requestBody) => {
         jsonArray.push({ 
             cclase: query.result.recordset[i].CCLASE,
             xclase: query.result.recordset[i].XCLASE,
+            control: i, 
             bactivo: query.result.recordset[i].BACTIVO });
     }
     return { status: true, list: jsonArray }
