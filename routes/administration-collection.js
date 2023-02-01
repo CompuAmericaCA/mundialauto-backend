@@ -14,7 +14,6 @@ router.route('/search').post((req, res) => {
             }
             res.json({ data: result });
         }).catch((err) => {
-            console.log(err.message)
             res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationSearchCollection' } });
         });
     }
@@ -27,6 +26,7 @@ const operationSearchCollection = async(authHeader, requestBody) => {
         xplaca: requestBody.xplaca ? requestBody.xplaca.toUpperCase() : undefined,
         ccorredor: requestBody.ccorredor ? requestBody.ccorredor: undefined
     }
+    console.log(searchData)
     let searchCollection = await bd.searchCollectionQuery(searchData).then((res) => res);
     if(searchCollection.error){ return { status: false, code: 500, message: searchCollection.error }; }
     if(searchCollection.result.rowsAffected > 0){
