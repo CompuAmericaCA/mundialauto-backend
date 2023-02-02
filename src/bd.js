@@ -12228,7 +12228,7 @@ module.exports = {
             let pool = await sql.connect(config);
             let result = await pool.request()
                 .input('fhasta', sql.Date, searchData.fhasta)
-                .query('SELECT * FROM VWBUSCARPRIMASPENDIENTES WHERE CESTATUSGENERAL = 13 AND FHASTA_REC <= CONVERT(DATETIME, @fhasta)')
+                .query('SELECT * FROM VWBUSCARPRIMASPENDIENTES WHERE CESTATUSGENERAL = 13 AND FDESDE_REC <= CONVERT(DATETIME, @fhasta)')
             return { result: result };
         }
         catch(err) {
