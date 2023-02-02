@@ -12237,6 +12237,7 @@ module.exports = {
         }
     },
     searchCollectionQuery: async(searchData) => {
+        console.log('hola')
         try{
             let query = `SELECT * FROM VWBUSCARRECIBOSPENDIENTES WHERE CESTATUSGENERAL = @cestatusgeneral AND CCOMPANIA = @ccompania${ searchData.xplaca ? " and XPLACA = @xplaca" : '' } ${ searchData.ccorredor ? " and CCORREDOR = @ccorredor" : '' }`;
             let pool = await sql.connect(config);
@@ -12248,6 +12249,7 @@ module.exports = {
                 //.input('xclausulas', sql.NVarChar, searchData.xclausulas ? searchData.xclausulas: undefined)
                 .query(query);
             //sql.close();
+            console.log(result)
             return { result: result };
         }catch(err){
             return { error: err.message };
