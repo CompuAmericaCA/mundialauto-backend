@@ -25,7 +25,6 @@ router.route('/search').post((req, res) => {
 const operationSearchPendingPayments = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
     let searchData = {
-        fdesde: requestBody.fdesde,
         fhasta: requestBody.fhasta
     }
     let searchPendingPayments = await bd.searchPendingPaymentsQuery(searchData).then((res) => res);

@@ -1728,11 +1728,9 @@ const operationValrepCharge = async(authHeader, requestBody) => {
     let jsonArray = [];
 
     for(let i = 0; i < query.result.recordset.length; i++){
-        let dateFormat = new Date(query.result.recordset[i].FINGRESO);
-        let dd = dateFormat.getDate() + 1;
-        let mm = dateFormat.getMonth() + 1;
-        let yyyy = dateFormat.getFullYear();
-        let fingreso = dd + '/' + mm + '/' + yyyy;
+
+        dateFormat = query.result.recordset[i].FINGRESO.toISOString().substr(0,10).split("-");
+        let fingreso = dateFormat[2] + '/' + dateFormat[1] + '/' + dateFormat[0];
         jsonArray.push({ xcliente: query.result.recordset[i].XCLIENTE, ccliente: query.result.recordset[0].CCLIENTE, xpoliza: query.result.recordset[i].XPOLIZA, ccarga: query.result.recordset[i].CCARGA, fingreso: fingreso, xplaca: query.result.recordset[i].XPLACA });
     }
     return { status: true, list: jsonArray }
@@ -1800,17 +1798,13 @@ const operationValrepReceipt = async(authHeader, requestBody) => {
     if(query.error){ return { status: false, code: 500, message: query.error }; }
     let jsonArray = [];
     for(let i = 0; i < query.result.recordset.length; i++){
-        let dateFormatDesde = new Date(query.result.recordset[i].FDESDE_REC);
-        let ddDesde = dateFormatDesde.getDate() + 1;
-        let mmDesde = dateFormatDesde.getMonth() + 1;
-        let yyyyDesde = dateFormatDesde.getFullYear();
-        let fdesde_rec = ddDesde + '/' + mmDesde + '/' + yyyyDesde;
 
-        let dateFormatHasta = new Date(query.result.recordset[i].FHASTA_REC);
-        let ddHasta = dateFormatHasta.getDate() + 1;
-        let mmHasta = dateFormatHasta.getMonth() + 1;
-        let yyyyHasta = dateFormatHasta.getFullYear();
-        let fhasta_rec = ddHasta + '/' + mmHasta + '/' + yyyyHasta;
+        let dateFormatDesde = query.result.recordset[i].FDESDE_REC.toJSON().slice(0,10).split('-');
+        let fdesde_rec = dateFormatDesde[2] + '/' + dateFormatDesde[1] + '/' + dateFormatDesde[0];
+
+        let dateFormatHasta = query.result.recordset[i].FHASTA_REC.toJSON().slice(0,10).split('-');
+        let fhasta_rec = dateFormatHasta[2] + '/' + dateFormatHasta[1] + '/' + dateFormatHasta[0];
+        
         let xstatus = "";
         if(query.result.recordset[i].CESTATUSGENERAL == 3) {
             xstatus = "ANULADO";
