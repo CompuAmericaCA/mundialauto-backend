@@ -156,23 +156,21 @@ router.route('/update').post((req, res) => {
 const operationUpdateCollection = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
     let collectionDataList = {};
-
-        collectionDataList = {
-            crecibo: requestBody.crecibo,
-            ctipopago: requestBody.pago.ctipopago,
-            xreferencia: requestBody.pago.xreferencia,
-            fcobro: requestBody.pago.fcobro,
-            cbanco: requestBody.pago.cbanco,
-            mprima_pagada: requestBody.pago.mprima_pagada,
-            ccompania: requestBody.ccompania,
-            cpais: requestBody.cpais,
-            cestatusgeneral: 7,
-            xnota: requestBody.pago.xnota,
-            cbanco_destino: requestBody.pago.cbanco_destino,
-            mtasa_cambio: requestBody.pago.mtasa_cambio,
-            ftasa_cambio: requestBody.pago.ftasa_cambio,
-        }
-        console.log(collectionDataList)
+    collectionDataList = {
+        crecibo: requestBody.crecibo,
+        ctipopago: requestBody.pago.ctipopago,
+        xreferencia: requestBody.pago.xreferencia,
+        fcobro: requestBody.pago.fcobro,
+        cbanco: requestBody.pago.cbanco,
+        mprima_pagada: requestBody.pago.mprima_pagada,
+        ccompania: requestBody.ccompania,
+        cpais: requestBody.cpais,
+        cestatusgeneral: 7,
+        xnota: requestBody.pago.xnota,
+        cbanco_destino: requestBody.pago.cbanco_destino,
+        mtasa_cambio: requestBody.pago.mtasa_cambio,
+        ftasa_cambio: requestBody.pago.ftasa_cambio,
+    }
     let updateCollection = await bd.updateCollectionQuery(collectionDataList).then((res) => res);
     if(updateCollection.error){ return { status: false, code: 500, message: updateCollection.error }; }
     if(updateCollection.result.rowsAffected > 0){ return { status: true, crecibo: collectionDataList.crecibo }; }
