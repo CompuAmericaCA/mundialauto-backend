@@ -12223,6 +12223,19 @@ module.exports = {
             return { error: err.message };
         }
     },
+    searchSubscriptionsQuery: async(searchData) => {
+        try{
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .input('fhasta', sql.Date, searchData.fhasta)
+                .query('SELECT * FROM VWBUSCARPOLIZASSUSCRITAS WHERE CESTATUSGENERAL != 3 AND FINICIO <= CONVERT(DATETIME, @fhasta)')
+            return { result: result };
+        }
+        catch(err) {
+            console.log(err.message);
+            return { error: err.message };
+        }
+    },
     searchPendingPaymentsQuery: async(searchData) => {
         try{
             let pool = await sql.connect(config);
