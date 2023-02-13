@@ -12236,6 +12236,19 @@ module.exports = {
             return { error: err.message };
         }
     },
+    getContractCoverages: async(ccontratoflota) => {
+        try{
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .input('ccontratoflota', sql.Int, ccontratoflota)
+                .input('ititulo', sql.NVarChar, 'C')
+                .query('select * from VWBUSCARCOBERTURASXCONTRATOFLOTA where ccontratoflota = @ccontratoflota and ititulo = @ititulo');
+            //sql.close();
+            return { result: result };
+        }catch(err){
+            return { error: err.message };
+        }
+    },
     searchPendingPaymentsQuery: async(searchData) => {
         try{
             let pool = await sql.connect(config);
