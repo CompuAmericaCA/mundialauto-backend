@@ -68,11 +68,9 @@ const operationSearchSubscriptionReport = async(authHeader, requestBody) => {
                         break;
                     case 5:
                         mdefensapenal = getContractCoverages.result.recordset[i].mprima;
-                        mtotalprimarcv = mtotalprimarcv + mdefensapenal;
                         break;
                     case 7:
                         mexcesodelimite = getContractCoverages.result.recordset[i].mprima;
-                        mtotalprimarcv = mtotalprimarcv + mexcesodelimite;
                         break;
                     case 9:
                         mmuerte = getContractCoverages.result.recordset[i].mprima;
@@ -118,7 +116,7 @@ const operationSearchSubscriptionReport = async(authHeader, requestBody) => {
                         break;
                 }
             }
-            mtotalrcv = mdefensapenal + mexcesodelimite + mapov;
+            mtotalprimarcv = mdefensapenal + mexcesodelimite + mapov;
             mprimatotal = mprimacasco + mriesgocatastrofico + mmotin + mtotalprimarcv + mserviciogrua;
             subscriptions.push({
                 ccontratoflota:  searchSubscriptions.result.recordset[i].CCONTRATOFLOTA,
@@ -149,7 +147,6 @@ const operationSearchSubscriptionReport = async(authHeader, requestBody) => {
                 mprimatotal: mprimatotal
             });
         }
-        console.log(subscriptions);
     }
     return {
         status: true,
