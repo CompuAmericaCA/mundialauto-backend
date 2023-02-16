@@ -448,5 +448,10 @@
         "name": "Pending Payments Route",
         "router": "../routes/pending-payments",
         "route": "/api/pending-payments"
+    },
+    {
+        "name": "Subscription Report Route",
+        "router": "../routes/subscription-report",
+        "route": "/api/subscription-report"
     }
 ]   
