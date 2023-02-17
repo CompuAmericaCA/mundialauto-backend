@@ -12227,8 +12227,9 @@ module.exports = {
         try{
             let pool = await sql.connect(config);
             let result = await pool.request()
+                .input('fdesde', sql.Date, searchData.fdesde)
                 .input('fhasta', sql.Date, searchData.fhasta)
-                .query('SELECT * FROM VWBUSCARPOLIZASSUSCRITAS WHERE CESTATUSGENERAL != 3 AND FINICIO <= CONVERT(DATETIME, @fhasta)')
+                .query('SELECT * FROM VWBUSCARPOLIZASSUSCRITAS WHERE CESTATUSGENERAL != 3 AND FINICIO BETWEEN CONVERT(DATETIME, @fdesde) and CONVERT(DATETIME, @fhasta)')
             return { result: result };
         }
         catch(err) {
