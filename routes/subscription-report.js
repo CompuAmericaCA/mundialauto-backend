@@ -119,7 +119,9 @@ const operationSearchSubscriptionReport = async(authHeader, requestBody) => {
             mtotalprimarcv = mdefensapenal + mexcesodelimite + mapov;
             mprimatotal = mprimacasco + mriesgocatastrofico + mmotin + mtotalprimarcv + mserviciogrua;
             subscriptions.push({
-                ccontratoflota:  searchSubscriptions.result.recordset[i].CCONTRATOFLOTA,
+                xpoliza:  searchSubscriptions.result.recordset[i].xpoliza,
+                xestatus: searchSubscriptions.result.recordset[i].XESTATUSGENERAL,
+                xnombreusuario: searchSubscriptions.result.recordset[i].XNOMBREUSUARIO + ' ' + searchSubscriptions.result.recordset[i].XAPELLIDOUSUARIO,
                 xnombrepropietario: searchSubscriptions.result.recordset[i].XNOMBRE + ' ' + searchSubscriptions.result.recordset[i].XAPELLIDO,
                 xmarca: searchSubscriptions.result.recordset[i].XMARCA,
                 xmodelo: searchSubscriptions.result.recordset[i].XMODELO,
