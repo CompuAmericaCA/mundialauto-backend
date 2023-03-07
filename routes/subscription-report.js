@@ -55,69 +55,78 @@ const operationSearchSubscriptionReport = async(authHeader, requestBody) => {
             let mmotin = 0;
             let mtotalprimarcv = 0;
             let mserviciogrua = 0;
+            let minternacional = 0;
             let mprimatotal = 0;
-            for (let i = 0; i < getContractCoverages.result.recordset.length; i++) { 
-                switch (getContractCoverages.result.recordset[i].CCOBERTURA) {
+            for (let j = 0; j < getContractCoverages.result.recordset.length; j++) { 
+                switch (getContractCoverages.result.recordset[j].CCOBERTURA) {
                     case 2:
-                        mdanosacosas = getContractCoverages.result.recordset[i].mprima;
+                        mdanosacosas = getContractCoverages.result.recordset[j].mprima;
                         mbasicarcv = mbasicarcv + mdanosacosas;
                         break;
                     case 3:
-                        mdanosapersonas = getContractCoverages.result.recordset[i].mprima;
+                        mdanosapersonas = getContractCoverages.result.recordset[j].mprima;
                         mbasicarcv = mbasicarcv + mdanosapersonas;
                         break;
                     case 5:
-                        mdefensapenal = getContractCoverages.result.recordset[i].mprima;
+                        mdefensapenal = getContractCoverages.result.recordset[j].mprima;
                         break;
                     case 7:
-                        mexcesodelimite = getContractCoverages.result.recordset[i].mprima;
+                        mexcesodelimite = getContractCoverages.result.recordset[j].mprima;
                         break;
                     case 9:
-                        mmuerte = getContractCoverages.result.recordset[i].mprima;
+                        mmuerte = getContractCoverages.result.recordset[j].mprima;
                         mapov = mapov + mmuerte;
                         break;
                     case 10:
-                        minvalidez = getContractCoverages.result.recordset[i].mprima;
+                        minvalidez = getContractCoverages.result.recordset[j].mprima;
                         mapov = mapov + minvalidez;
                         break;
                     case 11:
-                        mgastosmedicos = getContractCoverages.result.recordset[i].mprima;
+                        mgastosmedicos = getContractCoverages.result.recordset[j].mprima;
                         mapov = mapov + mgastosmedicos;
                         break;
                     case 12:
-                        mgastosfunerarios = getContractCoverages.result.recordset[i].mprima;
+                        mgastosfunerarios = getContractCoverages.result.recordset[j].mprima;
                         mapov = mapov + mgastosfunerarios;
                         break;
                     case 14:
-                        mcoberturaamplia = getContractCoverages.result.recordset[i].mprima;
+                        mcoberturaamplia = getContractCoverages.result.recordset[j].mprima;
                         mprimacasco = mprimacasco + mcoberturaamplia;
                         break;
                     case 16:
-                        mperdidatotal = getContractCoverages.result.recordset[i].mprima;
+                        mperdidatotal = getContractCoverages.result.recordset[j].mprima;
                         mprimacasco = mprimacasco + mperdidatotal;
                         break;
                     case 17:
-                        mriesgocatastrofico = getContractCoverages.result.recordset[i].mprima;
+                        mriesgocatastrofico = getContractCoverages.result.recordset[j].mprima;
                         break;
                     case 18:
-                        mblindaje = getContractCoverages.result.recordset[i].mprima;
+                        mblindaje = getContractCoverages.result.recordset[j].mprima;
                         mprimacasco = mprimacasco + mblindaje;
                         break;
                     case 19:
-                        maccesorios = getContractCoverages.result.recordset[i].mprima;
-                        mvaloraseguradoaccesorios = getContractCoverages.result.recordset[i].msuma_aseg;
+                        maccesorios = getContractCoverages.result.recordset[j].mprima;
+                        mvaloraseguradoaccesorios = getContractCoverages.result.recordset[j].msuma_aseg;
                         mprimacasco = mprimacasco + maccesorios;
                         break;
                     case 20:
-                        mmotin = getContractCoverages.result.recordset[i].mprima;
+                        mmotin = getContractCoverages.result.recordset[j].mprima;
+                        break;
+                    case 21:
+                        minternacional = getContractCoverages.result.recordset[j].mprima;
                         break;
                     case 22:
-                        mserviciogrua = getContractCoverages.result.recordset[i].mprima;
+                        mserviciogrua = getContractCoverages.result.recordset[j].mprima;
                         break;
                 }
             }
             mtotalprimarcv = mdefensapenal + mexcesodelimite + mapov;
-            mprimatotal = mprimacasco + mriesgocatastrofico + mmotin + mtotalprimarcv + mserviciogrua;
+            if (minternacional != 0) {
+                mprimatotal = minternacional;
+            }
+            else {
+                mprimatotal = mprimacasco + mriesgocatastrofico + mmotin + mtotalprimarcv + mserviciogrua;
+            }
             subscriptions.push({
                 xpoliza:  searchSubscriptions.result.recordset[i].xpoliza,
                 xestatus: searchSubscriptions.result.recordset[i].XESTATUSGENERAL,
@@ -148,6 +157,10 @@ const operationSearchSubscriptionReport = async(authHeader, requestBody) => {
                 mserviciogrua: mserviciogrua,
                 mprimatotal: mprimatotal
             });
+            if (searchSubscriptions.result.recordset[i].CCONTRATOFLOTA == 60) {
+                console.log(subscriptions[43]);
+            }
+            
         }
     }
     return {
