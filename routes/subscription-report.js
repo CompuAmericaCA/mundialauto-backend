@@ -156,11 +156,7 @@ const operationSearchSubscriptionReport = async(authHeader, requestBody) => {
                 mtotalprimarcv: mtotalprimarcv,
                 mserviciogrua: mserviciogrua,
                 mprimatotal: mprimatotal
-            });
-            if (searchSubscriptions.result.recordset[i].CCONTRATOFLOTA == 60) {
-                console.log(subscriptions[43]);
-            }
-            
+            }); 
         }
     }
     return {
