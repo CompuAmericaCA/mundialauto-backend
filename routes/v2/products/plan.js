@@ -716,11 +716,11 @@ router.route('/production/update').post((req, res) => {
         res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } });
         return;
     }
-    let validateSchema = helper.validateSchema('production', 'plan', req.body, 'updateProductsProductionPlanSchema');
-    if(validateSchema.error){ 
-        res.status(400).json({ data: { status: false, code: 400, message: validateSchema.error.details[0].message } });
-        return;
-    }
+    // let validateSchema = helper.validateSchema('production', 'plan', req.body, 'updateProductsProductionPlanSchema');
+    // if(validateSchema.error){ 
+    //     res.status(400).json({ data: { status: false, code: 400, message: validateSchema.error.details[0].message } });
+    //     return;
+    // }
     validator.operationVerifyProductionModulePermission(req.body.permissionData, 'BEDITAR').then((response) => {
         if(response.error){ 
             res.status(401).json({ status: false, code: 401, condition: 'user-dont-have-permissions', expired: false });
@@ -745,6 +745,7 @@ const operationUpdatePlan = async(authHeader, requestBody) => {
     let planData = {
         cplan: requestBody.cplan,
         xplan: requestBody.xplan.toUpperCase(),
+        mcosto: requestBody.mcosto,
         bactivo: requestBody.bactivo,       
         parys: requestBody.parys,
         paseguradora: requestBody.paseguradora,
