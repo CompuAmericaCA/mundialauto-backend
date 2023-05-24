@@ -153,7 +153,7 @@ const operationDetailBroker = async(authHeader, requestBody) => {
                     xbanco: getBrokerBanksData.result.recordset[i].XBANCO,
                     ctipocuentabancaria: getBrokerBanksData.result.recordset[i].CTIPOCUENTABANCARIA,
                     xtipocuentabancaria: getBrokerBanksData.result.recordset[i].XTIPOCUENTABANCARIA,
-                    xnumerocuenta: helper.decrypt(getBrokerBanksData.result.recordset[i].XNUMEROCUENTA)
+                    xnumerocuenta: getBrokerBanksData.result.recordset[i].XNUMEROCUENTA
                 }
                 banks.push(bank);
             }
@@ -161,15 +161,14 @@ const operationDetailBroker = async(authHeader, requestBody) => {
         return {
             status: true,
             ccorredor: getBrokerData.result.recordset[0].CCORREDOR,
-            ncorredor: helper.decrypt(getBrokerData.result.recordset[0].NCORREDOR),
-            xnombre: helper.decrypt(getBrokerData.result.recordset[0].XNOMBRE),
-            xapellido: helper.decrypt(getBrokerData.result.recordset[0].XAPELLIDO),
+            ncorredor: getBrokerData.result.recordset[0].NCORREDOR,
+            xnombre: getBrokerData.result.recordset[0].XCORREDOR,
             cactividadempresa: getBrokerData.result.recordset[0].CACTIVIDADEMPRESA,
             ctipodocidentidad: getBrokerData.result.recordset[0].CTIPODOCIDENTIDAD,
-            xdocidentidad: helper.decrypt(getBrokerData.result.recordset[0].XDOCIDENTIDAD),
-            xtelefono: helper.decrypt(getBrokerData.result.recordset[0].XTELEFONO),
-            xemail: helper.decrypt(getBrokerData.result.recordset[0].XEMAIL),
-            xdireccion: helper.decrypt(getBrokerData.result.recordset[0].XDIRECCION),
+            xdocidentidad: getBrokerData.result.recordset[0].XDOCIDENTIDAD,
+            xtelefono: getBrokerData.result.recordset[0].XTELEFONO,
+            xemail: getBrokerData.result.recordset[0].XEMAIL,
+            xdireccion: getBrokerData.result.recordset[0].XDIRECCION,
             cestado: getBrokerData.result.recordset[0].CESTADO,
             cciudad: getBrokerData.result.recordset[0].CCIUDAD,
             bactivo: getBrokerData.result.recordset[0].BACTIVO,
@@ -190,6 +189,7 @@ router.route('/update').post((req, res) => {
             }
             res.json({ data: result });
         }).catch((err) => {
+            console.log(err.message)
             res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationUpdateBroker' } });
         });
     }
@@ -197,20 +197,18 @@ router.route('/update').post((req, res) => {
 
 const operationUpdateBroker = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
-    if(!helper.validateRequestObj(requestBody, ['cpais', 'ccompania', 'ccorredor', 'ncorredor', 'xnombre', 'xapellido', 'cactividadempresa', 'ctipodocidentidad', 'xdocidentidad', 'xtelefono', 'xemail', 'xdireccion', 'cestado', 'cciudad', 'bactivo', 'cusuariomodificacion'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
     let brokerData = {
         cpais: requestBody.cpais,
         ccompania: requestBody.ccompania,
         ccorredor: requestBody.ccorredor,
-        ncorredor: helper.encrypt(requestBody.ncorredor),
-        xnombre: helper.encrypt(requestBody.xnombre.toUpperCase()),
-        xapellido: helper.encrypt(requestBody.xapellido.toUpperCase()),
+        ncorredor: requestBody.ncorredor,
+        xnombre: requestBody.xnombre,
         cactividadempresa: requestBody.cactividadempresa,
         ctipodocidentidad: requestBody.ctipodocidentidad,
-        xdocidentidad: helper.encrypt(requestBody.xdocidentidad),
-        xtelefono: helper.encrypt(requestBody.xtelefono),
-        xemail: helper.encrypt(requestBody.xemail.toUpperCase()),
-        xdireccion: helper.encrypt(requestBody.xdireccion.toUpperCase()),
+        xdocidentidad: requestBody.xdocidentidad,
+        xtelefono: requestBody.xtelefono,
+        xemail: requestBody.xemail,
+        xdireccion: requestBody.xdireccion,
         cestado: requestBody.cestado,
         cciudad: requestBody.cciudad,
         bactivo: requestBody.bactivo,
