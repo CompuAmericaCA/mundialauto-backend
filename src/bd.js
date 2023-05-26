@@ -1546,12 +1546,13 @@ module.exports = {
             return { error: err.message };
         }
     },
-    searchServiceTypeQuery: async() => {
+    searchServiceTypeQuery: async(searchData) => {
         try{
-            let query = `select CTIPOSERVICIO, XTIPOSERVICIO from MATIPOSERVICIO where BACTIVO = 1`;
+            let query = `select CTIPOSERVICIO, XTIPOSERVICIO from MATIPOSERVICIO where BACTIVO = 1${ searchData.xtiposervicio ? " and XTIPOSERVICIO = @xtiposervicio" : '' }`;
             let pool = await sql.connect(config);
             let result = await pool.request()
-            //sql.close();
+                .input('xtiposervicio', sql.NVarChar, searchData.xtiposervicio ? searchData.xtiposervicio : undefined)
+                .query(query);
             return { result: result };
         }catch(err){
             return { error: err.message };
