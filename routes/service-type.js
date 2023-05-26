@@ -27,7 +27,7 @@ const operationSearchServiceType = async(authHeader, requestBody) => {
         cpais: requestBody.cpais,
         xtiposervicio: requestBody.xtiposervicio ? requestBody.xtiposervicio : undefined
     };
-    let searchServiceType = await bd.searchServiceTypeQuery().then((res) => res);
+    let searchServiceType = await bd.searchServiceTypeQuery(searchData).then((res) => res);
     if(searchServiceType.error){ return  { status: false, code: 500, message: searchServiceType.error }; }
     if(searchServiceType.result.rowsAffected > 0){
         let jsonList = [];
