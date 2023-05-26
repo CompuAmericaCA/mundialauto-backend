@@ -22,13 +22,12 @@ router.route('/search').post((req, res) => {
 
 const operationSearchServiceType = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
-   /* if(!helper.validateRequestObj(requestBody, ['cpais', 'ccompania'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
     let searchData = {
         ccompania: requestBody.ccompania,
         cpais: requestBody.cpais,
-        xtiposervicio: requestBody.xtiposervicio ? requestBody.xtiposervicio.toUpperCase() : undefined
-    };*/
-    let searchServiceType = await bd.searchServiceTypeQuery().then((res) => res);
+        xtiposervicio: requestBody.xtiposervicio ? requestBody.xtiposervicio : undefined
+    };
+    let searchServiceType = await bd.searchServiceTypeQuery(searchData).then((res) => res);
     if(searchServiceType.error){ return  { status: false, code: 500, message: searchServiceType.error }; }
     if(searchServiceType.result.rowsAffected > 0){
         let jsonList = [];
