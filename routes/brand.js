@@ -66,7 +66,7 @@ router.route('/create').post((req, res) => {
 
 const operationCreateBrand = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
-    if(!helper.validateRequestObj(requestBody, ['cpais', 'xmarca', 'bactivo'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
+    // if(!helper.validateRequestObj(requestBody, ['cpais', 'xmarca', 'bactivo'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
     let brandData = {
         cpais: requestBody.cpais,
         xmarca: requestBody.xmarca.toUpperCase(),
@@ -141,7 +141,7 @@ router.route('/update').post((req, res) => {
 
 const operationUpdateBrand = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
-    if(!helper.validateRequestObj(requestBody, ['cpais', 'cmarca', 'xmarca', 'bactivo', 'cusuariomodificacion'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
+    // if(!helper.validateRequestObj(requestBody, ['cpais', 'cmarca', 'xmarca', 'bactivo', 'cusuariomodificacion'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
     let brandData = {
         cpais: requestBody.cpais,
         cmarca: requestBody.cmarca,

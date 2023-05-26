@@ -65,10 +65,10 @@ router.route('/create').post((req, res) => {
 
 const operationCreateModel = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
-    if(!helper.validateRequestObj(requestBody, ['xmodelo', 'cmarca', 'bactivo', 'cpais'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
+    if(!helper.validateRequestObj(requestBody, ['xmodelo', 'cmarca', 'cpais'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
     let modelData = {
         xmodelo: requestBody.xmodelo.toUpperCase(),
-        bactivo: requestBody.bactivo,
+        bactivo: 1,
         cpais: requestBody.cpais,
         cmarca: requestBody.cmarca,
         cusuariocreacion: requestBody.cusuariocreacion
@@ -141,7 +141,7 @@ router.route('/update').post((req, res) => {
 
 const operationUpdateModel = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
-    if(!helper.validateRequestObj(requestBody, ['cmodelo', 'xmodelo', 'cmarca', 'bactivo', 'cpais', 'cusuariomodificacion'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
+    // if(!helper.validateRequestObj(requestBody, ['cmodelo', 'xmodelo', 'cmarca', 'bactivo', 'cpais', 'cusuariomodificacion'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
     let modelData = {
         cmodelo: requestBody.cmodelo ? requestBody.cmodelo : undefined,
         xmodelo: requestBody.xmodelo.toUpperCase() ? requestBody.xmodelo : undefined,

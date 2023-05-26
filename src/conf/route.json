@@ -448,5 +448,10 @@
         "name": "Pending Payments Route",
         "router": "../routes/pending-payments",
         "route": "/api/pending-payments"
+    },
+    {
+        "name": "Rates Route",
+        "router": "../routes/rates",
+        "route": "/api/rates"
     }
 ]   

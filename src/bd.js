@@ -5179,6 +5179,17 @@ module.exports = {
             return { error: err.message };
         }
     },
+    SearchRates: async(searchData) => {
+        try{
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .query('select * from PRTARIFA_EXCESO');
+            //sql.close();
+            return { result: result };
+        }catch(err){
+            return { error: err.message };
+        }
+    },
     searchBrokerQuery: async(searchData) => {
         try{
             let query = `select * from VWBUSCARCORREDORDATA where CPAIS = @cpais and CCOMPANIA = @ccompania${ searchData.xnombre ? " and XNOMBRE like '%" + searchData.xnombre + "%'" : '' }${ searchData.cactividadempresa ? " and CACTIVIDADEMPRESA = @cactividadempresa" : '' }${ searchData.ctipodocidentidad ? " and CTIPODOCIDENTIDAD = @ctipodocidentidad" : '' }${ searchData.xdocidentidad ? " and XDOCIDENTIDAD like '%" + searchData.xdocidentidad + "%'" : '' }${ searchData.xapellido ? " and XAPELLIDO like '%" + searchData.xapellido + "%'" : '' }${ searchData.ncorredor ? " and NCORREDOR = @ncorredor" : '' }`;

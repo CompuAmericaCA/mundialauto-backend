@@ -118,13 +118,13 @@ router.route('/create').post((req, res) => {
 
 const operationCreateVersion = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
-    if(!helper.validateRequestObj(requestBody, ['xversion', 'cmodelo', 'cmarca', 'bactivo', 'cpais'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
+    if(!helper.validateRequestObj(requestBody, ['xversion', 'cmodelo', 'cmarca', 'cpais'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
     let versionData = {
         cmarca: requestBody.cmarca,
         cmodelo: requestBody.cmodelo,
         xversion: requestBody.xversion.toUpperCase(),
         npasajero: requestBody.npasajero,
-        bactivo: requestBody.bactivo,
+        bactivo: 1,
         xtransmision: requestBody.xtransmision.toUpperCase(),
         cpais: requestBody.cpais,
         cano: requestBody.cano,
