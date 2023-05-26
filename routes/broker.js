@@ -26,12 +26,12 @@ const operationSearchBroker = async(authHeader, requestBody) => {
     let searchData = {
         cpais: requestBody.cpais,
         ccompania: requestBody.ccompania,
-        ncorredor: requestBody.ncorredor ? helper.encrypt(requestBody.ncorredor) : undefined,
+        ncorredor: requestBody.ncorredor ? requestBody.ncorredor : undefined,
         cactividadempresa: requestBody.cactividadempresa ? requestBody.cactividadempresa : undefined,
         ctipodocidentidad: requestBody.ctipodocidentidad ? requestBody.ctipodocidentidad : undefined,
-        xdocidentidad: requestBody.xdocidentidad ? helper.encrypt(requestBody.xdocidentidad) : undefined,
-        xnombre: requestBody.xnombre ? helper.encrypt(requestBody.xnombre.toUpperCase()) : undefined,
-        xapellido: requestBody.xapellido ? helper.encrypt(requestBody.xapellido.toUpperCase()) : undefined
+        xdocidentidad: requestBody.xdocidentidad ? requestBody.xdocidentidad : undefined,
+        xnombre: requestBody.xnombre ? requestBody.xnombre.toUpperCase() : undefined,
+        xapellido: requestBody.xapellido ? requestBody.xapellido.toUpperCase() : undefined
     };
     let searchBroker = await bd.searchBrokerQuery(searchData).then((res) => res);
     if(searchBroker.error){ return  { status: false, code: 500, message: searchBroker.error }; }
@@ -65,6 +65,7 @@ router.route('/create').post((req, res) => {
             }
             res.json({ data: result });
         }).catch((err) => {
+            console.log(err.message)
             res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationCreateBroker' } });
         });
     }
@@ -72,45 +73,49 @@ router.route('/create').post((req, res) => {
 
 const operationCreateBroker = async (authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
-    if(!helper.validateRequestObj(requestBody, ['cpais', 'ccompania', 'ncorredor', 'xnombre', 'xapellido', 'cactividadempresa', 'ctipodocidentidad', 'xdocidentidad', 'xtelefono', 'xemail', 'xdireccion', 'cestado', 'cciudad', 'bactivo', 'cusuariocreacion'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
     let banks = [];
     if(requestBody.banks){
         banks = requestBody.banks;
         for(let i = 0; i < banks.length; i++){
-            if(!helper.validateRequestObj(banks[i], ['cbanco', 'ctipocuentabancaria', 'xnumerocuenta'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
-            banks[i].xnumerocuenta = helper.encrypt(banks[i].xnumerocuenta);
+            banks[i].xnumerocuenta = banks[i].xnumerocuenta;
         }
     }
     let brokerData = {
         cpais: requestBody.cpais,
         ccompania: requestBody.ccompania,
-        ncorredor: helper.encrypt(requestBody.ncorredor),
+        ncorredor: requestBody.ncorredor,
         banks: banks ? banks : undefined,
-        xnombre: helper.encrypt(requestBody.xnombre.toUpperCase()),
-        xapellido: helper.encrypt(requestBody.xapellido.toUpperCase()),
+        xcorredor: requestBody.xnombre,
         cactividadempresa: requestBody.cactividadempresa,
         ctipodocidentidad: requestBody.ctipodocidentidad,
-        xdocidentidad: helper.encrypt(requestBody.xdocidentidad),
-        xtelefono: helper.encrypt(requestBody.xtelefono),
-        xemail: helper.encrypt(requestBody.xemail.toUpperCase()),
-        xdireccion: helper.encrypt(requestBody.xdireccion.toUpperCase()),
+        xdocidentidad: requestBody.xdocidentidad,
+        xtelefono: requestBody.xtelefono,
+        xemail: requestBody.xemail,
+        xdireccion: requestBody.xdireccion,
         cestado: requestBody.cestado,
         cciudad: requestBody.cciudad,
         bactivo: requestBody.bactivo,
         cusuariocreacion: requestBody.cusuariocreacion
     }
-    let verifyBrokerNumber = await bd.verifyBrokerNumberToCreateQuery(brokerData).then((res) => res);
-    if(verifyBrokerNumber.error){ return { status: false, code: 500, message: verifyBrokerNumber.error }; }
-    if(verifyBrokerNumber.result.rowsAffected > 0){ return { status: false, code: 200, condition: 'broker-number-already-exist' }; }
-    else{
-        let verifyBrokerIdentification = await bd.verifyBrokerIdentificationToCreateQuery(brokerData).then((res) => res);
-        if(verifyBrokerIdentification.error){ return { status: false, code: 500, message: verifyBrokerIdentification.error }; }
-        if(verifyBrokerIdentification.result.rowsAffected > 0){ return { status: false, code: 200, condition: 'identification-document-already-exist' }; }
+    let ccorredor = 0;
+    let codeBroker = await bd.codeBrokerQuery().then((res) => res);
+    if(codeBroker.error){ return { status: false, code: 500, message: codeBroker.error }; }
+    if(codeBroker.result.rowsAffected > 0){
+        ccorredor = codeBroker.result.recordset[0].CCORREDOR + 1;
+    
+        let verifyBrokerNumber = await bd.verifyBrokerNumberToCreateQuery(brokerData).then((res) => res);
+        if(verifyBrokerNumber.error){ return { status: false, code: 500, message: verifyBrokerNumber.error }; }
+        if(verifyBrokerNumber.result.rowsAffected > 0){ return { status: false, code: 200, condition: 'broker-number-already-exist' }; }
         else{
-            let createBroker = await bd.createBrokerQuery(brokerData).then((res) => res);
-            if(createBroker.error){ return { status: false, code: 500, message: createBroker.error }; }
-            if(createBroker.result.rowsAffected > 0){ return { status: true, ccorredor: createBroker.result.recordset[0].CCORREDOR }; }
-            else{ return { status: false, code: 500, message: 'Server Internal Error.', hint: 'createBroker' }; }
+            let verifyBrokerIdentification = await bd.verifyBrokerIdentificationToCreateQuery(brokerData).then((res) => res);
+            if(verifyBrokerIdentification.error){ return { status: false, code: 500, message: verifyBrokerIdentification.error }; }
+            if(verifyBrokerIdentification.result.rowsAffected > 0){ return { status: false, code: 200, condition: 'identification-document-already-exist' }; }
+            else{
+                let createBroker = await bd.createBrokerQuery(brokerData, ccorredor).then((res) => res);
+                if(createBroker.error){ return { status: false, code: 500, message: createBroker.error }; }
+                console.log(createBroker.result.rowsAffected)
+                if(createBroker.result.rowsAffected > 0 || createBroker.result.rowsAffected == 0 ){ return { status: true, ccorredor: ccorredor }; }
+            }
         }
     }
 }
@@ -229,7 +234,7 @@ const operationUpdateBroker = async(authHeader, requestBody) => {
                     if(requestBody.banks.create && requestBody.banks.create.length > 0){
                         for(let i = 0; i < requestBody.banks.create.length; i++){
                             if(!helper.validateRequestObj(requestBody.banks.create[i], ['cbanco','ctipocuentabancaria','xnumerocuenta'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
-                            requestBody.banks.create[i].xnumerocuenta = helper.encrypt(requestBody.banks.create[i].xnumerocuenta);
+                            requestBody.banks.create[i].xnumerocuenta = requestBody.banks.create[i].xnumerocuenta;
                         }
                         let createBanksByBrokerUpdate = await bd.createBanksByBrokerUpdateQuery(requestBody.banks.create, brokerData).then((res) => res);
                         if(createBanksByBrokerUpdate.error){ return { status: false, code: 500, message: createBanksByBrokerUpdate.error }; }
@@ -238,7 +243,7 @@ const operationUpdateBroker = async(authHeader, requestBody) => {
                     if(requestBody.banks.update && requestBody.banks.update.length > 0){
                         for(let i = 0; i < requestBody.banks.update.length; i++){
                             if(!helper.validateRequestObj(requestBody.banks.update[i], ['cbanco','ctipocuentabancaria','xnumerocuenta'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
-                            requestBody.banks.update[i].xnumerocuenta = helper.encrypt(requestBody.banks.update[i].xnumerocuenta);
+                            requestBody.banks.update[i].xnumerocuenta = requestBody.banks.update[i].xnumerocuenta;
                         }
                         let updateBanksByBrokerUpdate = await bd.updateBanksByBrokerUpdateQuery(requestBody.banks.update, brokerData).then((res) => res);
                         if(updateBanksByBrokerUpdate.error){ return { status: false, code: 500, message: updateBanksByBrokerUpdate.error }; }
