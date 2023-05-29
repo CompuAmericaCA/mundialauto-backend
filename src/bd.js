@@ -12460,7 +12460,7 @@ module.exports = {
     },
     searchPlanRcvQuery: async(cplan_rc) => {
         try{
-            let query = `select * from PRPLAN_RC_DETALLE where BACTIVO = @bactivo${cplan_rc ? " and CPLAN_RC = @cplan_rc" : '' }`;
+            let query = `select * from PRPLAN_RC where BACTIVO = @bactivo${cplan_rc ? " and CPLAN_RC = @cplan_rc" : '' }`;
             let pool = await sql.connect(config);
             let result = await pool.request()
                 .input('bactivo', sql.Bit, 1)
@@ -12477,8 +12477,19 @@ module.exports = {
             let pool = await sql.connect(config);
             let result = await pool.request()
                 .input('cplan_rc', sql.Int, searchData.cplan_rc)
-                .input('ctarifa', sql.Int, searchData.ctarifa)
-                .query('select * from VWBUSCARPLANESRCV where CPLAN_RC = @cplan_rc AND CTARIFA = @ctarifa');
+                .query('select * from PRPLAN_RC where CPLAN_RC = @cplan_rc');
+            //sql.close();
+            return { result: result };
+        }catch(err){
+            return { error: err.message };
+        }
+    },
+    detailPlanRcvDetailQuery: async(searchData) => {
+        try{
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .input('cplan_rc', sql.Int, searchData.cplan_rc)
+                .query('select * from PRPLAN_RC_DETALLE where CPLAN_RC = @cplan_rc');
             //sql.close();
             return { result: result };
         }catch(err){
@@ -13434,6 +13445,41 @@ createPaymentQuery: async(paymentList) => {
     }
     catch(err){
         console.log(err.message)
+        return { error: err.message };
+    }
+},
+createPlanRcvQuery: async(dataPlanRcv, cplan_rc) => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+            .input('cplan_rc', sql.Int, cplan_rc)
+            .input('xplan_rc', sql.NVarChar, dataPlanRcv.xplan_rc)
+            .input('msuma_dc', sql.Numeric(22, 2), dataPlanRcv.msuma_dc)
+            .input('msuma_personas', sql.Numeric(22, 2), dataPlanRcv.msuma_personas)
+            .input('msuma_exceso', sql.Numeric(22, 2), dataPlanRcv.msuma_exceso)
+            .input('msuma_dp', sql.Numeric(22, 2), dataPlanRcv.msuma_dp)
+            .input('msuma_muerte', sql.Numeric(22, 2), dataPlanRcv.msuma_muerte)
+            .input('msuma_invalidez', sql.Numeric(22, 2), dataPlanRcv.msuma_invalidez)
+            .input('msuma_gm', sql.Numeric(22, 2), dataPlanRcv.msuma_gm)
+            .input('msuma_gf', sql.Numeric(22, 2), dataPlanRcv.msuma_gf)
+            .input('cusuariocreacion', sql.Int, dataPlanRcv.cusuario)
+            .input('fcreacion', sql.DateTime, new Date())
+            .query('insert into PRPLAN_RC (CPLAN_RC, XPLAN_RC, MSUMA_DC, MSUMA_PERSONAS, MSUMA_EXCESO, MSUMA_DP, MSUMA_MUERTE, MSUMA_INVALIDEZ, MSUMA_GM, MSUMA_GF, BACTIVO, FCREACION, CUSUARIOCREACION) values (@cplan_rc, @xplan_rc, @msuma_dc, @msuma_personas, @msuma_exceso, @msuma_dp, @msuma_muerte, @msuma_invalidez, @msuma_gm, @msuma_gf, 1, @fcreacion, @cusuariocreacion)');
+
+            return { result: result };
+        }catch(err){
+            console.log(err.message)
+        return { error: err.message };
+    }
+},
+codePlanRcvQuery: async() => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+            .query('select MAX(CPLAN_RC) AS CPLAN_RC from PRPLAN_RC');
+        //sql.close();
+        return { result: result };
+    }catch(err){
         return { error: err.message };
     }
 },
