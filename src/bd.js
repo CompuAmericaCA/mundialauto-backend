@@ -8570,6 +8570,7 @@ module.exports = {
                 .input('xplaca', sql.NVarChar, userData.xplaca)
                 .input('xtelefono_emp', sql.NVarChar, userData.xtelefono_emp)
                 .input('cplan', sql.Numeric(11, 0), userData.cplan)
+                .input('cplan_rc', sql.Int, userData.cplan_rc)
                 .input('ccorredor', sql.Numeric(11, 0), userData.ccorredor)
                 .input('xcedula', sql.NVarChar, userData.xcedula)
                 .input('cproductor', sql.Numeric(11, 0), userData.cproductor)
@@ -8619,7 +8620,7 @@ module.exports = {
                 .input('nkilometraje', sql.Numeric(18, 2), userData.nkilometraje)
                 .input('cclase', sql.Int, userData.cclase)
                 .input('fcreacion', sql.DateTime, new Date())
-                .query('insert into TMEMISION_INDIVIDUAL(XNOMBRE, XAPELLIDO, CANO, XCOLOR, CMARCA, CMODELO, CVERSION, XRIF_CLIENTE, EMAIL, XTELEFONO_PROP, XDIRECCIONFISCAL, XSERIALMOTOR, XSERIALCARROCERIA, XPLACA, XTELEFONO_EMP, CPLAN, CCORREDOR, XCEDULA, XCOBERTURA, NCAPACIDAD_P, CTARIFA_EXCESO, FINICIO, CMETODOLOGIAPAGO, MSUMA_ASEG, PCASCO, MPRIMA_CASCO, MCATASTROFICO, PDESCUENTO, IFRACCIONAMIENTO, NCUOTAS, MPRIMA_BLINDAJE, MSUMA_BLINDAJE, MPRIMA_BRUTA, PCATASTROFICO, PMOTIN, MMOTIN, PBLINDAJE, CESTADO, CCIUDAD, CPAIS, ICEDULA, FEMISION, IVIGENCIA, CTIPOPAGO, XREFERENCIA, FCOBRO, CBANCO, CBANCO_DESTINO, MPRIMA_PAGADA, MPRIMA_BS, XNOTA, MTASA_CAMBIO, FTASA_CAMBIO,CCODIGO_UBII, MGRUA, CESTATUSGENERAL, CTOMADOR, XZONA_POSTAL,CUSO ,CTIPOVEHICULO, FCREACION, CUSUARIOCREACION, NKILOMETRAJE, CCLASE) values (@xnombre, @xapellido, @cano, @xcolor, @cmarca, @cmodelo, @cversion, @xrif_cliente, @email, @xtelefono_prop, @xdireccionfiscal, @xserialmotor, @xserialcarroceria, @xplaca, @xtelefono_emp, @cplan, @ccorredor, @xcedula, @xcobertura, @ncapacidad_p, @ctarifa_exceso, @finicio, @cmetodologiapago, @msuma_aseg, @pcasco, @mprima_casco, @mcatastrofico, @pdescuento, @ifraccionamiento, @ncuotas, @mprima_blindaje, @msuma_blindaje, @mprima_bruta,@pcatastrofico ,@pmotin, @mmotin, @pblindaje, @cestado, @cciudad, @cpais, @icedula, @femision, @ivigencia, @ctipopago, @xreferencia, @fcobro, @cbanco, @cbanco_destino, @mprima_pagada, @mprima_bs, @xnota, @mtasa_cambio, @ftasa_cambio,@ccodigo_ubii, @mgrua, @cestatusgeneral, @ctomador, @xzona_postal, @cuso, @ctipovehiculo, @fcreacion, @cusuariocreacion, @nkilometraje, @cclase)')                
+                .query('insert into TMEMISION_INDIVIDUAL(XNOMBRE, XAPELLIDO, CANO, XCOLOR, CMARCA, CMODELO, CVERSION, XRIF_CLIENTE, EMAIL, XTELEFONO_PROP, XDIRECCIONFISCAL, XSERIALMOTOR, XSERIALCARROCERIA, XPLACA, XTELEFONO_EMP, CPLAN, CCORREDOR, XCEDULA, XCOBERTURA, NCAPACIDAD_P, CTARIFA_EXCESO, FINICIO, CMETODOLOGIAPAGO, MSUMA_ASEG, PCASCO, MPRIMA_CASCO, MCATASTROFICO, PDESCUENTO, IFRACCIONAMIENTO, NCUOTAS, MPRIMA_BLINDAJE, MSUMA_BLINDAJE, MPRIMA_BRUTA, PCATASTROFICO, PMOTIN, MMOTIN, PBLINDAJE, CESTADO, CCIUDAD, CPAIS, ICEDULA, FEMISION, IVIGENCIA, CTIPOPAGO, XREFERENCIA, FCOBRO, CBANCO, CBANCO_DESTINO, MPRIMA_PAGADA, MPRIMA_BS, XNOTA, MTASA_CAMBIO, FTASA_CAMBIO,CCODIGO_UBII, MGRUA, CESTATUSGENERAL, CTOMADOR, XZONA_POSTAL,CUSO ,CTIPOVEHICULO, FCREACION, CUSUARIOCREACION, NKILOMETRAJE, CCLASE, CPLAN_RC) values (@xnombre, @xapellido, @cano, @xcolor, @cmarca, @cmodelo, @cversion, @xrif_cliente, @email, @xtelefono_prop, @xdireccionfiscal, @xserialmotor, @xserialcarroceria, @xplaca, @xtelefono_emp, @cplan, @ccorredor, @xcedula, @xcobertura, @ncapacidad_p, @ctarifa_exceso, @finicio, @cmetodologiapago, @msuma_aseg, @pcasco, @mprima_casco, @mcatastrofico, @pdescuento, @ifraccionamiento, @ncuotas, @mprima_blindaje, @msuma_blindaje, @mprima_bruta,@pcatastrofico ,@pmotin, @mmotin, @pblindaje, @cestado, @cciudad, @cpais, @icedula, @femision, @ivigencia, @ctipopago, @xreferencia, @fcobro, @cbanco, @cbanco_destino, @mprima_pagada, @mprima_bs, @xnota, @mtasa_cambio, @ftasa_cambio,@ccodigo_ubii, @mgrua, @cestatusgeneral, @ctomador, @xzona_postal, @cuso, @ctipovehiculo, @fcreacion, @cusuariocreacion, @nkilometraje, @cclase, @cplan_rc)')                
                  return { result: { rowsAffected: rowsAffected, status: true } };
         }
         catch(err){
@@ -12460,7 +12461,7 @@ module.exports = {
     },
     searchPlanRcvQuery: async(cplan_rc) => {
         try{
-            let query = `select * from PRPLAN_RC_DETALLE where BACTIVO = @bactivo${cplan_rc ? " and CPLAN_RC = @cplan_rc" : '' }`;
+            let query = `select * from PRPLAN_RC where BACTIVO = @bactivo${cplan_rc ? " and CPLAN_RC = @cplan_rc" : '' }`;
             let pool = await sql.connect(config);
             let result = await pool.request()
                 .input('bactivo', sql.Bit, 1)
@@ -12477,8 +12478,19 @@ module.exports = {
             let pool = await sql.connect(config);
             let result = await pool.request()
                 .input('cplan_rc', sql.Int, searchData.cplan_rc)
-                .input('ctarifa', sql.Int, searchData.ctarifa)
-                .query('select * from VWBUSCARPLANESRCV where CPLAN_RC = @cplan_rc AND CTARIFA = @ctarifa');
+                .query('select * from PRPLAN_RC where CPLAN_RC = @cplan_rc');
+            //sql.close();
+            return { result: result };
+        }catch(err){
+            return { error: err.message };
+        }
+    },
+    detailPlanRcvDetailQuery: async(searchData) => {
+        try{
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .input('cplan_rc', sql.Int, searchData.cplan_rc)
+                .query('select * from PRPLAN_RC_DETALLE where CPLAN_RC = @cplan_rc');
             //sql.close();
             return { result: result };
         }catch(err){
@@ -13434,6 +13446,41 @@ createPaymentQuery: async(paymentList) => {
     }
     catch(err){
         console.log(err.message)
+        return { error: err.message };
+    }
+},
+createPlanRcvQuery: async(dataPlanRcv, cplan_rc) => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+            .input('cplan_rc', sql.Int, cplan_rc)
+            .input('xplan_rc', sql.NVarChar, dataPlanRcv.xplan_rc)
+            .input('msuma_dc', sql.Numeric(22, 2), dataPlanRcv.msuma_dc)
+            .input('msuma_personas', sql.Numeric(22, 2), dataPlanRcv.msuma_personas)
+            .input('msuma_exceso', sql.Numeric(22, 2), dataPlanRcv.msuma_exceso)
+            .input('msuma_dp', sql.Numeric(22, 2), dataPlanRcv.msuma_dp)
+            .input('msuma_muerte', sql.Numeric(22, 2), dataPlanRcv.msuma_muerte)
+            .input('msuma_invalidez', sql.Numeric(22, 2), dataPlanRcv.msuma_invalidez)
+            .input('msuma_gm', sql.Numeric(22, 2), dataPlanRcv.msuma_gm)
+            .input('msuma_gf', sql.Numeric(22, 2), dataPlanRcv.msuma_gf)
+            .input('cusuariocreacion', sql.Int, dataPlanRcv.cusuario)
+            .input('fcreacion', sql.DateTime, new Date())
+            .query('insert into PRPLAN_RC (CPLAN_RC, XPLAN_RC, MSUMA_DC, MSUMA_PERSONAS, MSUMA_EXCESO, MSUMA_DP, MSUMA_MUERTE, MSUMA_INVALIDEZ, MSUMA_GM, MSUMA_GF, BACTIVO, FCREACION, CUSUARIOCREACION) values (@cplan_rc, @xplan_rc, @msuma_dc, @msuma_personas, @msuma_exceso, @msuma_dp, @msuma_muerte, @msuma_invalidez, @msuma_gm, @msuma_gf, 1, @fcreacion, @cusuariocreacion)');
+
+            return { result: result };
+        }catch(err){
+            console.log(err.message)
+        return { error: err.message };
+    }
+},
+codePlanRcvQuery: async() => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+            .query('select MAX(CPLAN_RC) AS CPLAN_RC from PRPLAN_RC');
+        //sql.close();
+        return { result: result };
+    }catch(err){
         return { error: err.message };
     }
 },

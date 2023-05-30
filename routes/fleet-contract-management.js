@@ -1134,6 +1134,7 @@ const operationCreateIndividualContract = async(authHeader, requestBody) => {
         xplaca: requestBody.xplaca.toUpperCase(),
         xtelefono_emp: requestBody.xtelefono_emp,
         cplan: requestBody.cplan,
+        cplan_rc: requestBody.cplan_rc,
         ccorredor: requestBody.ccorredor ? requestBody.ccorredor : undefined,
         mgrua: requestBody.mgrua ? requestBody.mgrua : undefined,
         xcedula:requestBody.xcedula,
