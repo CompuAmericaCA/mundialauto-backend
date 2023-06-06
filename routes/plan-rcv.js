@@ -76,9 +76,16 @@ const operationDetailPlanRcv = async(authHeader, requestBody) => {
                     xclase: detailPlanRcvDetail.result.recordset[i].XCLASE,
                     xtipo: detailPlanRcvDetail.result.recordset[i].XTIPO,
                     xgrupo: detailPlanRcvDetail.result.recordset[i].XGRUPO,
+                    mgrua: detailPlanRcvDetail.result.recordset[i].MGRUA,
+                    mut_cosas_rc: detailPlanRcvDetail.result.recordset[i].MUT_COSAS_RC,
                     msuma_cosas_rc: detailPlanRcvDetail.result.recordset[i].MSUMA_COSAS_RC,
+                    mut_personas_rc: detailPlanRcvDetail.result.recordset[i].MUT_PERSONAS_RC,
                     msuma_personas_rc: detailPlanRcvDetail.result.recordset[i].MSUMA_PERSONAS_RC,
+                    mut_prima_rc: detailPlanRcvDetail.result.recordset[i].MUT_PRIMA_RC,
                     mprima_rc: detailPlanRcvDetail.result.recordset[i].MPRIMA_RC,
+                    mexceso_limite: detailPlanRcvDetail.result.recordset[i].MEXCESO_LIMITE,
+                    mgastos_cat: detailPlanRcvDetail.result.recordset[i].MGASTOS_CAT,
+                    mrecuperacion: detailPlanRcvDetail.result.recordset[i].MRECUPERACION,
                     msuma_defensa_per: detailPlanRcvDetail.result.recordset[i].MSUMA_DEFENSA_PER,
                     mprima_defensa_per: detailPlanRcvDetail.result.recordset[i].MPRIMA_DEFENSA_PER,
                     msuma_limite_ind: detailPlanRcvDetail.result.recordset[i].MSUMA_LIMITE_IND,
@@ -136,28 +143,91 @@ const operationUpdatePlanRcv = async(authHeader, requestBody) => {
         cusuario: requestBody.cusuario,
         cplan_rc: requestBody.cplan_rc,
         xplan_rc: requestBody.xplan_rc,
-        ctarifa: requestBody.ctarifa,
-        xclase: requestBody.xclase,
-        xtipo: requestBody.xtipo,
-        xgrupo: requestBody.xgrupo,
-        msuma_cosas_rc: requestBody.msuma_cosas_rc,
-        msuma_personas_rc: requestBody.msuma_personas_rc,
-        mprima_rc: requestBody.mprima_rc,
-        msuma_defensa_per: requestBody.msuma_defensa_per,
-        mprima_defensa_per: requestBody.mprima_defensa_per,
-        msuma_limite_ind: requestBody.msuma_limite_ind,
-        mprima_limite_ind: requestBody.mprima_limite_ind,
-        msuma_apov_mu: requestBody.msuma_apov_mu,
-        mapov_mu: requestBody.mapov_mu,
-        msuma_apov_in: requestBody.msuma_apov_in,
-        mapov_in: requestBody.mapov_in,
-        msuma_apov_ga: requestBody.msuma_apov_ga,
-        mapov_ga: requestBody.mapov_ga,
-        msuma_apov_fu: requestBody.msuma_apov_fu,
-        mapov_fu: requestBody.mapov_fu
+        msuma_dc: requestBody.msuma_dc,
+        msuma_personas: requestBody.msuma_personas,
+        msuma_exceso: requestBody.msuma_exceso,
+        msuma_dp: requestBody.msuma_dp,
+        msuma_muerte: requestBody.msuma_muerte,
+        msuma_invalidez: requestBody.msuma_invalidez,
+        msuma_gm: requestBody.msuma_gm,
+        msuma_gf: requestBody.msuma_gf,
     }
     let updatePlanRcvDetail = await bd.updatePlanRcvQuery(dataPlanRcv).then((res) => res);
     if(updatePlanRcvDetail.error){ return { status: false, code: 500, message: updatePlanRcvDetail.error }; }
+    let createRatesList = [];
+    let updateRatesList = [];
+    if(requestBody.rates){
+       if(requestBody.rates.create){
+          for(let i = 0; i < requestBody.rates.create.length; i++){
+            createRatesList.push({
+              ctarifa: requestBody.rates.create[i].ctarifa,
+              xclase: requestBody.rates.create[i].xclase,
+              xtipo: requestBody.rates.create[i].xtipo,
+              xgrupo: requestBody.rates.create[i].xgrupo,
+              mgrua: requestBody.rates.create[i].mgrua,
+              mut_cosas_rc: requestBody.rates.create[i].mut_cosas_rc,
+              msuma_cosas_rc: requestBody.rates.create[i].msuma_cosas_rc,
+              mut_personas_rc: requestBody.rates.create[i].mut_personas_rc,
+              msuma_personas_rc: requestBody.rates.create[i].msuma_personas_rc,
+              mut_prima_rc: requestBody.rates.create[i].mut_prima_rc,
+              mprima_rc: requestBody.rates.create[i].mprima_rc,
+              mexceso_limite: requestBody.rates.create[i].mprima_rc,
+              mgastos_cat: requestBody.rates.create[i].mgastos_cat,
+              mrecuperacion: requestBody.rates.create[i].mrecuperacion,
+              msuma_defensa_per: requestBody.rates.create[i].msuma_defensa_per,
+              mprima_defensa_per: requestBody.rates.create[i].mprima_defensa_per,
+              msuma_limite_ind: requestBody.rates.create[i].msuma_limite_ind,
+              mprima_limite_ind: requestBody.rates.create[i].mprima_limite_ind,
+              msuma_apov_mu: requestBody.rates.create[i].msuma_apov_mu,
+              mapov_mu: requestBody.rates.create[i].mapov_mu,
+              msuma_apov_in: requestBody.rates.create[i].msuma_apov_in,
+              mapov_in: requestBody.rates.create[i].mapov_in,
+              msuma_apov_ga: requestBody.rates.create[i].msuma_apov_ga,
+              mapov_ga: requestBody.rates.create[i].mapov_ga,
+              msuma_apov_fu: requestBody.rates.create[i].msuma_apov_fu,
+              mapov_fu: requestBody.rates.create[i].mapov_fu
+            })
+          }
+          let createRatesPlanRcv = await bd.createRatesPlanRcvQuery(dataPlanRcv, createRatesList).then((res) => res);
+          if(createRatesPlanRcv.error){ return { status: false, code: 500, message: createRatesPlanRcv.error }; }
+       }
+
+       if(requestBody.rates.update){
+        for(let i = 0; i < requestBody.rates.update.length; i++){
+            updateRatesList.push({
+              ctarifa: requestBody.rates.update[i].ctarifa,
+              xclase: requestBody.rates.update[i].xclase,
+              xtipo: requestBody.rates.update[i].xtipo,
+              xgrupo: requestBody.rates.update[i].xgrupo,
+              mgrua: requestBody.rates.update[i].mgrua,
+              mut_cosas_rc: requestBody.rates.update[i].mut_cosas_rc,
+              msuma_cosas_rc: requestBody.rates.update[i].msuma_cosas_rc,
+              mut_personas_rc: requestBody.rates.update[i].mut_personas_rc,
+              msuma_personas_rc: requestBody.rates.update[i].msuma_personas_rc,
+              mut_prima_rc: requestBody.rates.update[i].mut_prima_rc,
+              mprima_rc: requestBody.rates.update[i].mprima_rc,
+              mexceso_limite: requestBody.rates.update[i].mprima_rc,
+              mgastos_cat: requestBody.rates.update[i].mgastos_cat,
+              mrecuperacion: requestBody.rates.update[i].mrecuperacion,
+              msuma_defensa_per: requestBody.rates.update[i].msuma_defensa_per,
+              mprima_defensa_per: requestBody.rates.update[i].mprima_defensa_per,
+              msuma_limite_ind: requestBody.rates.update[i].msuma_limite_ind,
+              mprima_limite_ind: requestBody.rates.update[i].mprima_limite_ind,
+              msuma_apov_mu: requestBody.rates.update[i].msuma_apov_mu,
+              mapov_mu: requestBody.rates.update[i].mapov_mu,
+              msuma_apov_in: requestBody.rates.update[i].msuma_apov_in,
+              mapov_in: requestBody.rates.update[i].mapov_in,
+              msuma_apov_ga: requestBody.rates.update[i].msuma_apov_ga,
+              mapov_ga: requestBody.rates.update[i].mapov_ga,
+              msuma_apov_fu: requestBody.rates.update[i].msuma_apov_fu,
+              mapov_fu: requestBody.rates.update[i].mapov_fu
+            })
+          }
+          console.log(updateRatesList)
+          let updateRatesPlanRcv = await bd.updateRatesPlanRcvQuery(dataPlanRcv, updateRatesList).then((res) => res);
+          if(updateRatesPlanRcv.error){ return { status: false, code: 500, message: updateRatesPlanRcv.error }; }
+       }
+    }
     if(updatePlanRcvDetail.result.rowsAffected > 0){ return { status: true, cplan_rc: dataPlanRcv.cplan_rc }; }
     else{ return { status: false, code: 404, message: 'Service Order not found.' }; }
 }

@@ -13484,5 +13484,96 @@ codePlanRcvQuery: async() => {
         return { error: err.message };
     }
 },
+createRatesPlanRcvQuery: async(dataPlanRcv, createRatesList) => {
+    try{
+        let rowsAffected = 0;
+        let pool = await sql.connect(config);
+        for(let i = 0; i < createRatesList.length; i++){
+            let insert = await pool.request()
+                .input('cplan_rc', sql.Int, dataPlanRcv.cplan_rc)
+                .input('ctarifa', sql.Int, createRatesList[i].ctarifa)
+                .input('xclase', sql.NVarChar, createRatesList[i].xclase)
+                .input('xtipo', sql.NVarChar, createRatesList[i].xtipo)
+                .input('xgrupo', sql.NVarChar, createRatesList[i].xgrupo)
+                .input('mgrua', sql.Numeric(18, 2), createRatesList[i].mgrua)
+                .input('mut_cosas_rc', sql.Numeric(18, 2), createRatesList[i].mut_cosas_rc)
+                .input('msuma_cosas_rc', sql.Numeric(18, 2), createRatesList[i].msuma_cosas_rc)
+                .input('mut_personas_rc', sql.Numeric(18, 2), createRatesList[i].mut_personas_rc)
+                .input('msuma_personas_rc', sql.Numeric(18, 2), createRatesList[i].msuma_personas_rc)
+                .input('mut_prima_rc', sql.Numeric(18, 2), createRatesList[i].mut_prima_rc)
+                .input('mprima_rc', sql.Numeric(18, 2), createRatesList[i].mprima_rc)
+                .input('mexceso_limite', sql.Numeric(18, 2), createRatesList[i].mexceso_limite)
+                .input('mgastos_cat', sql.Numeric(18, 2), createRatesList[i].mgastos_cat)
+                .input('mrecuperacion', sql.Numeric(18, 2), createRatesList[i].mrecuperacion)
+                .input('msuma_defensa_per', sql.Numeric(18, 2), createRatesList[i].msuma_defensa_per)
+                .input('mprima_defensa_per', sql.Numeric(18, 2), createRatesList[i].mprima_defensa_per)
+                .input('msuma_limite_ind', sql.Numeric(18, 2), createRatesList[i].msuma_limite_ind)
+                .input('mprima_limite_ind', sql.Numeric(18, 2), createRatesList[i].mprima_limite_ind)
+                .input('msuma_apov_mu', sql.Numeric(18, 2), createRatesList[i].msuma_apov_mu)
+                .input('mapov_mu', sql.Numeric(18, 2), createRatesList[i].mapov_mu)
+                .input('msuma_apov_in', sql.Numeric(18, 2), createRatesList[i].msuma_apov_in)
+                .input('mapov_in', sql.Numeric(18, 2), createRatesList[i].mapov_in)
+                .input('msuma_apov_ga', sql.Numeric(18, 2), createRatesList[i].msuma_apov_ga)
+                .input('mapov_ga', sql.Numeric(18, 2), createRatesList[i].mapov_ga)
+                .input('msuma_apov_fu', sql.Numeric(18, 2), createRatesList[i].msuma_apov_fu)
+                .input('mapov_fu', sql.Numeric(18, 2), createRatesList[i].mapov_fu)
+                .input('cusuariocreacion', sql.Int, dataPlanRcv.cusuario)
+                .input('fcreacion', sql.DateTime, new Date())
+                .query('INSERT INTO PRPLAN_RC_DETALLE (CPLAN_RC, CTARIFA, XCLASE, XTIPO, XGRUPO, MGRUA, MUT_COSAS_RC, MSUMA_COSAS_RC, MUT_PERSONAS_RC, MSUMA_PERSONAS_RC, MUT_PRIMA_RC, MPRIMA_RC, MEXCESO_LIMITE, MGASTOS_CAT, MRECUPERACION, MSUMA_DEFENSA_PER, MPRIMA_DEFENSA_PER, MSUMA_LIMITE_IND, MPRIMA_LIMITE_IND, MSUMA_APOV_MU, MAPOV_MU, MSUMA_APOV_IN, MAPOV_IN, MSUMA_APOV_GA, MAPOV_GA, MSUMA_APOV_FU, MAPOV_FU, BACTIVO, CUSUARIOCREACION, FCREACION) values (@cplan_rc, @ctarifa, @xclase, @xtipo, @xgrupo, @mgrua, @mut_cosas_rc, @msuma_cosas_rc, @mut_personas_rc, @msuma_personas_rc, @mut_prima_rc, @mprima_rc, @mexceso_limite, @mgastos_cat, @mrecuperacion, @msuma_defensa_per, @mprima_defensa_per, @msuma_limite_ind, @mprima_limite_ind, @msuma_apov_mu, @mapov_mu, @msuma_apov_in, @mapov_in, @msuma_apov_ga, @mapov_ga, @msuma_apov_fu, @mapov_fu, 1, @cusuariocreacion, @fcreacion)')
+            rowsAffected = rowsAffected + insert.rowsAffected;
+        }
+        //sql.close();
+        return { result: { rowsAffected: rowsAffected } };
+    }
+    catch(err){
+        console.log(err.message)
+        return { error: err.message };
+    }
+},
+updateRatesPlanRcvQuery: async(dataPlanRcv, updateRatesList) => {
+    try{
+        let rowsAffected = 0;
+        let pool = await sql.connect(config);
+        for(let i = 0; i < updateRatesList.length; i++){
+            let update = await pool.request()
+            .input('cplan_rc', sql.Int, dataPlanRcv.cplan_rc)
+            .input('ctarifa', sql.Int, updateRatesList[i].ctarifa)
+            .input('xclase', sql.NVarChar, updateRatesList[i].xclase)
+            .input('xtipo', sql.NVarChar, updateRatesList[i].xtipo)
+            .input('xgrupo', sql.NVarChar, updateRatesList[i].xgrupo)
+            .input('mgrua', sql.Numeric(18, 2), updateRatesList[i].mgrua)
+            .input('mut_cosas_rc', sql.Numeric(18, 2), updateRatesList[i].mut_cosas_rc)
+            .input('msuma_cosas_rc', sql.Numeric(18, 2), updateRatesList[i].msuma_cosas_rc)
+            .input('mut_personas_rc', sql.Numeric(18, 2), updateRatesList[i].mut_personas_rc)
+            .input('msuma_personas_rc', sql.Numeric(18, 2), updateRatesList[i].msuma_personas_rc)
+            .input('mut_prima_rc', sql.Numeric(18, 2), updateRatesList[i].mut_prima_rc)
+            .input('mprima_rc', sql.Numeric(18, 2), updateRatesList[i].mprima_rc)
+            .input('mexceso_limite', sql.Numeric(18, 2), updateRatesList[i].mexceso_limite)
+            .input('mgastos_cat', sql.Numeric(18, 2), updateRatesList[i].mgastos_cat)
+            .input('mrecuperacion', sql.Numeric(18, 2), updateRatesList[i].mrecuperacion)
+            .input('msuma_defensa_per', sql.Numeric(18, 2), updateRatesList[i].msuma_defensa_per)
+            .input('mprima_defensa_per', sql.Numeric(18, 2), updateRatesList[i].mprima_defensa_per)
+            .input('msuma_limite_ind', sql.Numeric(18, 2), updateRatesList[i].msuma_limite_ind)
+            .input('mprima_limite_ind', sql.Numeric(18, 2), updateRatesList[i].mprima_limite_ind)
+            .input('msuma_apov_mu', sql.Numeric(18, 2), updateRatesList[i].msuma_apov_mu)
+            .input('mapov_mu', sql.Numeric(18, 2), updateRatesList[i].mapov_mu)
+            .input('msuma_apov_in', sql.Numeric(18, 2), updateRatesList[i].msuma_apov_in)
+            .input('mapov_in', sql.Numeric(18, 2), updateRatesList[i].mapov_in)
+            .input('msuma_apov_ga', sql.Numeric(18, 2), updateRatesList[i].msuma_apov_ga)
+            .input('mapov_ga', sql.Numeric(18, 2), updateRatesList[i].mapov_ga)
+            .input('msuma_apov_fu', sql.Numeric(18, 2), updateRatesList[i].msuma_apov_fu)
+            .input('mapov_fu', sql.Numeric(18, 2), updateRatesList[i].mapov_fu)
+            .input('cusuariomodificacion', sql.Int, dataPlanRcv.cusuario)
+            .input('fmodificacion', sql.DateTime, new Date())
+            .query('UPDATE PRPLAN_RC_DETALLE SET XCLASE = @xclase, XTIPO = @xtipo, XGRUPO = @xgrupo, MGRUA = @mgrua, MUT_COSAS_RC = @mut_cosas_rc, MSUMA_COSAS_RC = @msuma_cosas_rc, MUT_PERSONAS_RC = @mut_personas_rc, MSUMA_PERSONAS_RC = @msuma_personas_rc, MUT_PRIMA_RC = @mut_prima_rc, MPRIMA_RC = @mprima_rc, MEXCESO_LIMITE = @mexceso_limite, MGASTOS_CAT = @mgastos_cat, MRECUPERACION = @mrecuperacion, MSUMA_DEFENSA_PER = @msuma_defensa_per, MPRIMA_DEFENSA_PER = @mprima_defensa_per, MSUMA_LIMITE_IND = @msuma_limite_ind, MPRIMA_LIMITE_IND = @mprima_limite_ind, MSUMA_APOV_MU = @msuma_apov_mu, MAPOV_MU = @mapov_mu, MSUMA_APOV_IN = @msuma_apov_in, MAPOV_IN = @mapov_in, MSUMA_APOV_GA = @msuma_apov_ga, MAPOV_GA = @mapov_ga, MSUMA_APOV_FU = @msuma_apov_fu, MAPOV_FU = @mapov_fu, CUSUARIOMODIFICACION = @cusuariomodificacion, FMODIFICACION = @fmodificacion WHERE CPLAN_RC = @cplan_rc AND CTARIFA = @ctarifa');
+            rowsAffected = rowsAffected + update.rowsAffected;
+        }
+            return { result: { rowsAffected: rowsAffected } };
+
+        }catch(err){
+
+        return { error: err.message };
+    }
+},
 }
 
