@@ -989,6 +989,32 @@ const operationUpdateNotification = async(authHeader, requestBody) => {
             if(deleteReplacementsByNotificationUpdate.result.rowsAffected < 0){ return { status: false, code: 500, message: 'Server Internal Error.', hint: 'deleteReplacementsByNotificationUpdate' }; }
         }
     }
+    if(requestBody.materialDamages){
+        if(requestBody.materialDamages.create && requestBody.materialDamages.create.length > 0){
+            // for(let i = 0; i < requestBody.materialDamages.create.length; i++){
+            //     if(!helper.validateRequestObj(requestBody.materialDamages.create[i], ['crepuesto', 'ctiporepuesto', 'ncantidad', 'cniveldano'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
+            // }
+            let createMaterialDamagesByNotificationUpdate = await bd.createMaterialDamagesByNotificationUpdateQuery(requestBody.materialDamages.create, notificationData).then((res) => res);
+            if(createMaterialDamagesByNotificationUpdate.error){ return { status: false, code: 500, message: createMaterialDamagesByNotificationUpdate.error }; }
+            if(createMaterialDamagesByNotificationUpdate.result.rowsAffected < 0){ return { status: false, code: 500, message: 'Server Internal Error.', hint: 'createMaterialDamagesByNotificationUpdate' }; }
+        } 
+        if(requestBody.materialDamages.update && requestBody.materialDamages.update.length > 0){
+            // for(let i = 0; i < requestBody.materialDamages.update.length; i++){
+            //     if(!helper.validateRequestObj(requestBody.materialDamages.update[i], ['crepuesto', 'ctiporepuesto', 'ncantidad', 'cniveldano'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
+            // }
+            let updateMaterialDamagesByNotificationUpdate = await bd.updateMaterialDamagesByNotificationUpdateQuery(requestBody.materialDamages.update, notificationData).then((res) => res);
+            if(updateMaterialDamagesByNotificationUpdate.error){ return { status: false, code: 500, message: updateMaterialDamagesByNotificationUpdate.error }; }
+            if(updateMaterialDamagesByNotificationUpdate.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Replacement not found.' }; }
+        }
+        if(requestBody.materialDamages.delete && requestBody.materialDamages.delete.length){
+            // for(let i = 0; i < requestBody.materialDamages.delete.length; i++){
+            //     if(!helper.validateRequestObj(requestBody.materialDamages.delete[i], ['crepuesto'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
+            // }
+            let deleteMaterialDamagesByNotificationUpdate = await bd.deleteMaterialDamagesByNotificationUpdateQuery(requestBody.materialDamages.delete, notificationData).then((res) => res);
+            if(deleteMaterialDamagesByNotificationUpdate.error){ return { status: false, code: 500, message: deleteMaterialDamagesByNotificationUpdate.error }; }
+            if(deleteMaterialDamagesByNotificationUpdate.result.rowsAffected < 0){ return { status: false, code: 500, message: 'Server Internal Error.', hint: 'deleteMaterialDamagesByNotificationUpdate' }; }
+        }
+    }
     if(requestBody.thirdparties){
         if(requestBody.thirdparties.update && requestBody.thirdparties.update.length > 0){
             for(let i = 0; i < requestBody.thirdparties.update.length; i++){

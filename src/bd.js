@@ -10508,6 +10508,94 @@ module.exports = {
             return { error: err.message };
         }
     },
+    createMaterialDamagesByNotificationUpdateQuery: async(materialDamages, notificationData) => {
+        try{
+            let rowsAffected = 0;
+            let pool = await sql.connect(config);
+            for(let i = 0; i < materialDamages.length; i++){
+                let insert = await pool.request()
+                    .input('cnotificacion', sql.Int, notificationData.cnotificacion)
+                    .input('cdanomaterial', sql.Int, materialDamages[i].cdanomaterial)
+                    .input('xmaterial', sql.NVarChar, materialDamages[i].xmaterial)
+                    .input('cniveldano', sql.Int, materialDamages[i].cniveldano)
+                    .input('xobservacion', sql.NVarChar, materialDamages[i].xobservacion)
+                    .input('ctipodocidentidad', sql.Int, materialDamages[i].ctipodocidentidad)
+                    .input('xdocidentidad', sql.NVarChar, materialDamages[i].xdocidentidad)
+                    .input('xnombre', sql.NVarChar, materialDamages[i].xnombre)
+                    .input('xapellido', sql.NVarChar, materialDamages[i].xapellido)
+                    .input('cestado', sql.Int, materialDamages[i].cestado)
+                    .input('cciudad', sql.Int, materialDamages[i].cciudad)
+                    .input('xdireccion', sql.NVarChar, materialDamages[i].xdireccion)
+                    .input('xtelefonocelular', sql.NVarChar, materialDamages[i].xtelefonocelular)
+                    .input('xtelefonocasa', sql.NVarChar, materialDamages[i].xtelefonocasa ?  materialDamages[i].xtelefonocasa : null)
+                    .input('xemail', sql.NVarChar, materialDamages[i].xemail)
+                    .input('cusuariocreacion', sql.Int, notificationData.cusuariomodificacion)
+                    .input('fcreacion', sql.DateTime, new Date())
+                    .query('insert into EVDANOMATERIALNOTIFICACION (CNOTIFICACION, CDANOMATERIAL, XMATERIAL, CNIVELDANO, XOBSERVACION, CTIPODOCIDENTIDAD, XDOCIDENTIDAD, XNOMBRE, XAPELLIDO, CESTADO, CCIUDAD, XDIRECCION, XTELEFONOCELULAR, XTELEFONOCASA, XEMAIL, CUSUARIOCREACION, FCREACION) values (@cnotificacion, @cdanomaterial, @xmaterial, @cniveldano, @xobservacion, @ctipodocidentidad, @xdocidentidad, @xnombre, @xapellido, @cestado, @cciudad, @xdireccion, @xtelefonocelular, @xtelefonocasa, @xemail, @cusuariocreacion, @fcreacion)')
+                rowsAffected = rowsAffected + insert.rowsAffected;
+            }
+            //sql.close();
+            return { result: { rowsAffected: rowsAffected } };
+        }
+        catch(err){
+            console.log(err + ' || createMaterialDamagesByNotificationUpdateQuery');
+            return { error: err.message };
+        }
+    },
+    updateMaterialDamagesByNotificationUpdateQuery: async(materialDamages, notificationData) => {
+        try{
+            let rowsAffected = 0;
+            let pool = await sql.connect(config);
+            for(let i = 0; i < materialDamages.length; i++){
+                let update = await pool.request()
+                    .input('cnotificacion', sql.Int, notificationData.cnotificacion)
+                    .input('cdanomaterialnotificacion', sql.Int, materialDamages[i].cdanomaterialnotificacion)
+                    .input('cdanomaterial', sql.Int, materialDamages[i].cdanomaterial)
+                    .input('xmaterial', sql.NVarChar, materialDamages[i].xmaterial)
+                    .input('cniveldano', sql.Int, materialDamages[i].cniveldano)
+                    .input('xobservacion', sql.NVarChar, materialDamages[i].xobservacion)
+                    .input('ctipodocidentidad', sql.Int, materialDamages[i].ctipodocidentidad)
+                    .input('xdocidentidad', sql.NVarChar, materialDamages[i].xdocidentidad)
+                    .input('xnombre', sql.NVarChar, materialDamages[i].xnombre)
+                    .input('xapellido', sql.NVarChar, materialDamages[i].xapellido)
+                    .input('cestado', sql.Int, materialDamages[i].cestado)
+                    .input('cciudad', sql.Int, materialDamages[i].cciudad)
+                    .input('xdireccion', sql.NVarChar, materialDamages[i].xdireccion)
+                    .input('xtelefonocelular', sql.NVarChar, materialDamages[i].xtelefonocelular)
+                    .input('xtelefonocasa', sql.NVarChar, materialDamages[i].xtelefonocasa ?  materialDamages[i].xtelefonocasa : null)
+                    .input('xemail', sql.NVarChar, materialDamages[i].xemail)
+                    .input('cusuariomodificacion', sql.Int, notificationData.cusuariomodificacion)
+                    .input('fmodificacion', sql.DateTime, new Date())
+                    .query('update EVDANOMATERIALNOTIFICACION SET CNOTIFICACION = @cnotificacion, CDANOMATERIAL = @cdanomaterial, XMATERIAL = @xmaterial, CNIVELDANO = @cniveldano, XOBSERVACION = @xobservacion, CTIPODOCIDENTIDAD = ctipodocidentidad, XDOCIDENTIDAD = @xdocidentidad, XNOMBRE = @xnombre, XAPELLIDO = @xapellido, CESTADO = @cestado, CCIUDAD = @cciudad, XDIRECCION = @xdireccion, XTELEFONOCELULAR = @xtelefonocelular, XTELEFONOCASA = @xtelefonocasa, XEMAIL = @xemail, FMODIFICACION = @fmodificacion, CUSUARIOMODIFICACION = @cusuariomodificacion where CNOTIFICACION = @cnotificacion and CDANOMATERIALNOTIFICACION = @cdanomaterialnotificacion')
+                rowsAffected = rowsAffected + update.rowsAffected;
+            }
+            //sql.close();
+            return { result: { rowsAffected: rowsAffected } };
+        }
+        catch(err){
+            console.log(err + ' || updateMaterialDamagesByNotificationUpdateQuery');
+            return { error: err.message };
+        }
+    },
+    deleteMaterialDamagesByNotificationUpdateQuery: async(materialDamages, notificationData) => {
+        try{
+            let rowsAffected = 0;
+            let pool = await sql.connect(config);
+            for(let i = 0; i < materialDamages.length; i++){
+                let erase = await pool.request()
+                    .input('cnotificacion', sql.Int, notificationData.cnotificacion)
+                    .input('cdanomaterialnotificacion', sql.Int, materialDamages[i].cdanomaterialnotificacion)
+                    .query('delete from EVDANOMATERIALNOTIFICACION where CNOTIFICACION = @cnotificacion and CDANOMATERIALNOTIFICACION = @cdanomaterialnotificacion');
+                rowsAffected = rowsAffected + erase.rowsAffected;
+            }
+            sql.close();
+            return { result: { rowsAffected: rowsAffected } };
+        }
+        catch(err){
+            console.log(err + ' || deleteMaterialDamagesByNotificationUpdateQuery');
+            return { error: err.message };
+        }
+    },
     updateThirdpartiesByNotificationUpdateQuery: async(thirdparties, notificationData) => {
         try{
             let rowsAffected = 0;
