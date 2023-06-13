@@ -10140,6 +10140,7 @@ module.exports = {
                         let insert = await pool.request()
                             .input('cnotificacion', sql.Int, result.recordset[0].CNOTIFICACION)
                             .input('cdanomaterial', sql.Int, notificationData.materialDamages[i].cdanomaterial)
+                            .input('xmaterial', sql.NVarChar, notificationData.materialDamages[i].xmaterial)
                             .input('cniveldano', sql.Int, notificationData.materialDamages[i].cniveldano)
                             .input('xobservacion', sql.NVarChar, notificationData.materialDamages[i].xobservacion)
                             .input('ctipodocidentidad', sql.Int, notificationData.materialDamages[i].ctipodocidentidad)
@@ -10154,7 +10155,7 @@ module.exports = {
                             .input('xemail', sql.NVarChar, notificationData.materialDamages[i].xemail)
                             .input('cusuariocreacion', sql.Int, notificationData.cusuariocreacion)
                             .input('fcreacion', sql.DateTime, new Date())
-                            .query('insert into EVDANOMATERIALNOTIFICACION (CNOTIFICACION, CDANOMATERIAL, CNIVELDANO, XOBSERVACION, CTIPODOCIDENTIDAD, XDOCIDENTIDAD, XNOMBRE, XAPELLIDO, CESTADO, CCIUDAD, XDIRECCION, XTELEFONOCELULAR, XTELEFONOCASA, XEMAIL, CUSUARIOCREACION, FCREACION) values (@cnotificacion, @cdanomaterial, @cniveldano, @xobservacion, @ctipodocidentidad, @xdocidentidad, @xnombre, @xapellido, @cestado, @cciudad, @xdireccion, @xtelefonocelular, @xtelefonocasa, @xemail, @cusuariocreacion, @fcreacion)')
+                            .query('insert into EVDANOMATERIALNOTIFICACION (CNOTIFICACION, CDANOMATERIAL, XMATERIAL, CNIVELDANO, XOBSERVACION, CTIPODOCIDENTIDAD, XDOCIDENTIDAD, XNOMBRE, XAPELLIDO, CESTADO, CCIUDAD, XDIRECCION, XTELEFONOCELULAR, XTELEFONOCASA, XEMAIL, CUSUARIOCREACION, FCREACION) values (@cnotificacion, @cdanomaterial, @xmaterial, @cniveldano, @xobservacion, @ctipodocidentidad, @xdocidentidad, @xnombre, @xapellido, @cestado, @cciudad, @xdireccion, @xtelefonocelular, @xtelefonocasa, @xemail, @cusuariocreacion, @fcreacion)')
                     }
                 }
                 if(notificationData.serviceOrder){
@@ -10174,6 +10175,7 @@ module.exports = {
                 return { result: result };
             }
         }catch(err){
+            console.log(err.message);
             return { error: err.message };
         }
     },

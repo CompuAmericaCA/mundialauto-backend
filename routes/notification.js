@@ -355,7 +355,8 @@ const operationCreateNotification = async (authHeader, requestBody) => {
     if(requestBody.materialDamages){
         materialDamages = requestBody.materialDamages;
         for(let i = 0; i < materialDamages.length; i++){
-            if(!helper.validateRequestObj(materialDamages[i], ['cdanomaterial', 'cniveldano', 'xobservacion', 'ctipodocidentidad', 'xdocidentidad', 'xnombre', 'xapellido', 'xtelefonocelular', 'xemail', 'cestado', 'cciudad', 'xdireccion'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
+            // if(!helper.validateRequestObj(materialDamages[i], ['cdanomaterial', 'cniveldano', 'xobservacion', 'ctipodocidentidad', 'xdocidentidad', 'xnombre', 'xapellido', 'xtelefonocelular', 'xemail', 'cestado', 'cciudad', 'xdireccion'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
+            materialDamages[i].xmaterial = helper.encrypt(materialDamages[i].xmaterial.toUpperCase());
             materialDamages[i].xobservacion = helper.encrypt(materialDamages[i].xobservacion.toUpperCase());
             materialDamages[i].xdocidentidad = helper.encrypt(materialDamages[i].xdocidentidad);
             materialDamages[i].xnombre = helper.encrypt(materialDamages[i].xnombre.toUpperCase());
@@ -616,6 +617,7 @@ const operationDetailNotification = async(authHeader, requestBody) => {
                     cdanomaterialnotificacion: getNotificationMaterialDamagesData.result.recordset[i].CDANOMATERIALNOTIFICACION,
                     cdanomaterial: getNotificationMaterialDamagesData.result.recordset[i].CDANOMATERIAL,
                     xdanomaterial: getNotificationMaterialDamagesData.result.recordset[i].XDANOMATERIAL,
+                    xmaterial: getNotificationMaterialDamagesData.result.recordset[i].XMATERIAL,
                     cniveldano: getNotificationMaterialDamagesData.result.recordset[i].CNIVELDANO,
                     xniveldano: getNotificationMaterialDamagesData.result.recordset[i].XNIVELDANO,
                     xobservacion: getNotificationMaterialDamagesData.result.recordset[i].XOBSERVACION,
