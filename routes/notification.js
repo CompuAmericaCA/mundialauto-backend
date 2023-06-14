@@ -677,10 +677,8 @@ const operationDetailNotification = async(authHeader, requestBody) => {
         }
         let thirdpartyVehicles = [];
         let getNotificationThirdpartyVehiclesData = await bd.getNotificationThirdpartyVehiclesDataQuery(notificationData.cnotificacion).then((res) => res);
-        // console.log(res + " || getNotificationThirdpartyVehiclesData");
         if(getNotificationThirdpartyVehiclesData.error){ return { status: false, code: 500, message: getNotificationThirdpartyVehiclesData.error }; }
         if(getNotificationThirdpartyVehiclesData.result.rowsAffected > 0){
-            // console.log("***pasó por aquí***" + getNotificationThirdpartyVehiclesData);
             for(let i = 0; i < getNotificationThirdpartyVehiclesData.result.recordset.length; i++){
                 let replacements = [];
                 let getReplacementsThirdpartyVehicleData = await bd.getReplacementsThirdpartyVehicleDataQuery(getNotificationThirdpartyVehiclesData.result.recordset[i].CVEHICULOTERCERONOTIFICACION).then((res) => res);
