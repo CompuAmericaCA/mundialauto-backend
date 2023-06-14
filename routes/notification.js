@@ -677,8 +677,10 @@ const operationDetailNotification = async(authHeader, requestBody) => {
         }
         let thirdpartyVehicles = [];
         let getNotificationThirdpartyVehiclesData = await bd.getNotificationThirdpartyVehiclesDataQuery(notificationData.cnotificacion).then((res) => res);
+        // console.log(res + " || getNotificationThirdpartyVehiclesData");
         if(getNotificationThirdpartyVehiclesData.error){ return { status: false, code: 500, message: getNotificationThirdpartyVehiclesData.error }; }
         if(getNotificationThirdpartyVehiclesData.result.rowsAffected > 0){
+            // console.log("***pasó por aquí***" + getNotificationThirdpartyVehiclesData);
             for(let i = 0; i < getNotificationThirdpartyVehiclesData.result.recordset.length; i++){
                 let replacements = [];
                 let getReplacementsThirdpartyVehicleData = await bd.getReplacementsThirdpartyVehicleDataQuery(getNotificationThirdpartyVehiclesData.result.recordset[i].CVEHICULOTERCERONOTIFICACION).then((res) => res);
@@ -989,6 +991,29 @@ const operationUpdateNotification = async(authHeader, requestBody) => {
             if(deleteReplacementsByNotificationUpdate.result.rowsAffected < 0){ return { status: false, code: 500, message: 'Server Internal Error.', hint: 'deleteReplacementsByNotificationUpdate' }; }
         }
     }
+    if(requestBody.thirdparties){
+        if(requestBody.thirdparties.update && requestBody.thirdparties.update.length > 0){
+            for(let i = 0; i < requestBody.thirdparties.update.length; i++){
+                if(requestBody.thirdparties.update[i].tracingsResult){
+                    if(requestBody.thirdparties.update[i].tracingsResult.create && requestBody.thirdparties.update[i].tracingsResult.create.length > 0){
+                        for(let j = 0; j < requestBody.thirdparties.update[i].tracingsResult.create.length; j++){
+                            if(!helper.validateRequestObj(requestBody.thirdparties.update[i].tracingsResult.create[j], ['ctiposeguimiento', 'cmotivoseguimiento', 'fseguimientotercero', 'bcerrado'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
+                            requestBody.thirdparties.update[i].tracingsResult.create[j].xobservacion = requestBody.thirdparties.update[i].tracingsResult.create[j].xobservacion ? helper.encrypt(requestBody.thirdparties.update[i].tracingsResult.create[j].xobservacion.toUpperCase()) : undefined;
+                        }
+                    }
+                    if(requestBody.thirdparties.update[i].tracingsResult.update && requestBody.thirdparties.update[i].tracingsResult.update.length > 0){
+                        for(let j = 0; j < requestBody.thirdparties.update[i].tracingsResult.update.length; j++){
+                            if(!helper.validateRequestObj(requestBody.thirdparties.update[i].tracingsResult.update[j], ['cseguimientotercero', 'ctiposeguimiento', 'cmotivoseguimiento', 'fseguimientotercero', 'bcerrado'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
+                            requestBody.thirdparties.update[i].tracingsResult.update[j].xobservacion = requestBody.thirdparties.update[i].tracingsResult.update[j].xobservacion ? helper.encrypt(requestBody.thirdparties.update[i].tracingsResult.update[j].xobservacion.toUpperCase()) : undefined;
+                        }
+                    }
+                }
+            }
+            let updateThirdpartiesByNotificationUpdate = await bd.updateThirdpartiesByNotificationUpdateQuery(requestBody.thirdparties.update, notificationData).then((res) => res);
+            if(updateThirdpartiesByNotificationUpdate.error){ return { status: false, code: 500, message: updateThirdpartiesByNotificationUpdate.error }; }
+            if(updateThirdpartiesByNotificationUpdate.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Thirdparty not found.' }; }
+        }
+    }
     if(requestBody.materialDamages){
         if(requestBody.materialDamages.create && requestBody.materialDamages.create.length > 0){
             // for(let i = 0; i < requestBody.materialDamages.create.length; i++){
@@ -1015,27 +1040,21 @@ const operationUpdateNotification = async(authHeader, requestBody) => {
             if(deleteMaterialDamagesByNotificationUpdate.result.rowsAffected < 0){ return { status: false, code: 500, message: 'Server Internal Error.', hint: 'deleteMaterialDamagesByNotificationUpdate' }; }
         }
     }
-    if(requestBody.thirdparties){
-        if(requestBody.thirdparties.update && requestBody.thirdparties.update.length > 0){
-            for(let i = 0; i < requestBody.thirdparties.update.length; i++){
-                if(requestBody.thirdparties.update[i].tracingsResult){
-                    if(requestBody.thirdparties.update[i].tracingsResult.create && requestBody.thirdparties.update[i].tracingsResult.create.length > 0){
-                        for(let j = 0; j < requestBody.thirdparties.update[i].tracingsResult.create.length; j++){
-                            if(!helper.validateRequestObj(requestBody.thirdparties.update[i].tracingsResult.create[j], ['ctiposeguimiento', 'cmotivoseguimiento', 'fseguimientotercero', 'bcerrado'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
-                            requestBody.thirdparties.update[i].tracingsResult.create[j].xobservacion = requestBody.thirdparties.update[i].tracingsResult.create[j].xobservacion ? helper.encrypt(requestBody.thirdparties.update[i].tracingsResult.create[j].xobservacion.toUpperCase()) : undefined;
-                        }
-                    }
-                    if(requestBody.thirdparties.update[i].tracingsResult.update && requestBody.thirdparties.update[i].tracingsResult.update.length > 0){
-                        for(let j = 0; j < requestBody.thirdparties.update[i].tracingsResult.update.length; j++){
-                            if(!helper.validateRequestObj(requestBody.thirdparties.update[i].tracingsResult.update[j], ['cseguimientotercero', 'ctiposeguimiento', 'cmotivoseguimiento', 'fseguimientotercero', 'bcerrado'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
-                            requestBody.thirdparties.update[i].tracingsResult.update[j].xobservacion = requestBody.thirdparties.update[i].tracingsResult.update[j].xobservacion ? helper.encrypt(requestBody.thirdparties.update[i].tracingsResult.update[j].xobservacion.toUpperCase()) : undefined;
-                        }
-                    }
-                }
-            }
-            let updateThirdpartiesByNotificationUpdate = await bd.updateThirdpartiesByNotificationUpdateQuery(requestBody.thirdparties.update, notificationData).then((res) => res);
-            if(updateThirdpartiesByNotificationUpdate.error){ return { status: false, code: 500, message: updateThirdpartiesByNotificationUpdate.error }; }
-            if(updateThirdpartiesByNotificationUpdate.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Thirdparty not found.' }; }
+    if(requestBody.thirdPartyVehicles){
+        if(requestBody.thirdPartyVehicles.create && requestBody.thirdPartyVehicles.create.length > 0){
+            let createThirdPartyVehiclesByNotificationUpdate = await bd.createThirdPartyVehiclesByNotificationUpdateQuery(requestBody.thirdPartyVehicles.create, notificationData).then((res) => res);
+            if(createThirdPartyVehiclesByNotificationUpdate.error){ return { status: false, code: 500, message: createThirdPartyVehiclesByNotificationUpdate.error }; }
+            if(createThirdPartyVehiclesByNotificationUpdate.result.rowsAffected < 0){ return { status: false, code: 500, message: 'Server Internal Error.', hint: 'createThirdPartyVehiclesByNotificationUpdate' }; }
+        } 
+        if(requestBody.thirdPartyVehicles.update && requestBody.thirdPartyVehicles.update.length > 0){
+            let updateThirdPartyVehiclesByNotificationUpdate = await bd.updateThirdPartyVehiclesByNotificationUpdateQuery(requestBody.thirdPartyVehicles.update, notificationData).then((res) => res);
+            if(updateThirdPartyVehiclesByNotificationUpdate.error){ return { status: false, code: 500, message: updateThirdPartyVehiclesByNotificationUpdate.error }; }
+            if(updateThirdPartyVehiclesByNotificationUpdate.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Replacement not found.' }; }
+        }
+        if(requestBody.thirdPartyVehicles.delete && requestBody.thirdPartyVehicles.delete.length){
+            let deleteThirdPartyVehiclesByNotificationUpdate = await bd.deleteThirdPartyVehiclesByNotificationUpdateQuery(requestBody.thirdPartyVehicles.delete, notificationData).then((res) => res);
+            if(deleteThirdPartyVehiclesByNotificationUpdate.error){ return { status: false, code: 500, message: deleteThirdPartyVehiclesByNotificationUpdate.error }; }
+            if(deleteThirdPartyVehiclesByNotificationUpdate.result.rowsAffected < 0){ return { status: false, code: 500, message: 'Server Internal Error.', hint: 'deleteThirdPartyVehiclesByNotificationUpdate' }; }
         }
     }
     if(requestBody.providers){

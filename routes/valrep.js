@@ -2313,7 +2313,8 @@ const operationValrepVersion = async(authHeader, requestBody) => {
     for(let i = 0; i < query.result.recordset.length; i++){
         jsonArray.push({ cversion: query.result.recordset[i].CVERSION, 
             xversion: query.result.recordset[i].XVERSION + '-' + query.result.recordset[i].CANO, 
-            bactivo: query.result.recordset[i].BACTIVO, cano: query.result.recordset[i].CANO, 
+            bactivo: query.result.recordset[i].BACTIVO, 
+            cano: query.result.recordset[i].CANO, 
             control: i, 
             npasajero: query.result.recordset[i].NPASAJERO,
             xtransmision: query.result.recordset[i].XTRANSMISION  });
