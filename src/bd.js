@@ -10647,8 +10647,6 @@ module.exports = {
             let rowsAffected = 0;
             let pool = await sql.connect(config);
             for(let i = 0; i < thirdpartyVehicles.length; i++){
-                // console.log(thirdpartyVehicles);
-                // console.log(notificationData);
                 let insert = await pool.request()
                     .input('cnotificacion', sql.Int, notificationData.cnotificacion)
                     .input('ctipodocidentidadconductor', sql.Int, thirdpartyVehicles[i].ctipodocidentidadconductor)
@@ -10706,9 +10704,10 @@ module.exports = {
         try{
             let rowsAffected = 0;
             let pool = await sql.connect(config);
-            for(let i = 0; i < notificationData.thirdpartyVehicles.length; i++){
-                let insert = await pool.request()
-                    .input('cnotificacion', sql.Int, result.recordset[0].CNOTIFICACION)
+            for(let i = 0; i < thirdpartyVehicles.length; i++){
+                // console.log(thirdpartyVehicles);
+                let update = await pool.request()
+                    .input('cnotificacion', sql.Int, notificationData.cnotificacion)
                     .input('cvehiculoterceronotificacion', sql.Int, thirdpartyVehicles[i].cvehiculoterceronotificacion)
                     .input('ctipodocidentidadconductor', sql.Int, thirdpartyVehicles[i].ctipodocidentidadconductor)
                     .input('xdocidentidadconductor', sql.NVarChar, thirdpartyVehicles[i].xdocidentidadconductor)
@@ -10742,7 +10741,8 @@ module.exports = {
                 if(thirdpartyVehicles[i].replacements){
                     for(let j = 0; j < thirdpartyVehicles[i].replacements.length; j++){
                         let subInsert = await pool.request()
-                            .input('cvehiculoterceronotificacion', sql.Int, insert.recordset[0].CVEHICULOTERCERONOTIFICACION)
+                            // .input('cvehiculoterceronotificacion', sql.Int, update.recordset[0].CVEHICULOTERCERONOTIFICACION)
+                            .input('cvehiculoterceronotificacion', sql.Int, thirdpartyVehicles[i].cvehiculoterceronotificacion)
                             .input('crepuesto', sql.Int, thirdpartyVehicles[i].replacements[j].crepuesto)
                             .input('ctiporepuesto', sql.Int, thirdpartyVehicles[i].replacements[j].ctiporepuesto)
                             .input('ncantidad', sql.Int, thirdpartyVehicles[i].replacements[j].ncantidad)
@@ -10769,7 +10769,7 @@ module.exports = {
                 let erase = await pool.request()
                     .input('cnotificacion', sql.Int, notificationData.cnotificacion)
                     .input('cvehiculoterceronotificacion', sql.Int, thirdpartyVehicles[i].cvehiculoterceronotificacion)
-                    .query('delete from EVDANOMATERIALNOTIFICACION WHERE CNOTIFICACION = @cnotificacion and CVEHICULOTERCERONOTIFICACION = @cvehiculoterceronotificacion');
+                    .query('delete from EVVEHICULOTERCERONOTIFICACION WHERE CNOTIFICACION = @cnotificacion and CVEHICULOTERCERONOTIFICACION = @cvehiculoterceronotificacion');
                 rowsAffected = rowsAffected + erase.rowsAffected;
             }
             sql.close();
