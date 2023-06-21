@@ -7356,7 +7356,7 @@ module.exports = {
                     .input('ctipovehiculo', sql.Int, vehicleTypes[i].ctipovehiculo)
                     .input('ctipovehiculoregistrotasa', sql.Int, vehicleTypes[i].ctipovehiculoregistrotasa)
                     .input('miniciointervalo', sql.Numeric(11, 2), vehicleTypes[i].miniciointervalo)
-                    .input('mfinalintervalo', sql.Numeric(11, 02), vehicleTypes[i].mfinalintervalo)
+                    .input('mfinalintervalo', sql.Numeric(11, 2), vehicleTypes[i].mfinalintervalo)
                     .input('ptasa', sql.Numeric(5, 2), vehicleTypes[i].ptasa)
                     .input('cusuariomodificacion', sql.Int, feesRegisterData.cusuariomodificacion)
                     .input('fmodificacion', sql.DateTime, new Date())
