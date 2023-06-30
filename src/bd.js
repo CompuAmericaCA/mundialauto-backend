@@ -6311,6 +6311,18 @@ module.exports = {
             return { error: err.message };
         }
     },
+    providerEventValrepQuery: async(cproveedor) => {
+        try{
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .input('cproveedor', sql.Int, cproveedor)
+                .query('select * from VWBUSCARPROVEEDORXSERVICIO WHERE CPROVEEDOR = @cproveedor');
+            //sql.close();
+            return { result: result };
+        }catch(err){
+            return { error: err.message };
+        }
+    },
     getModulesByProcessDataQuery: async(cproceso) => {
         try{
             let pool = await sql.connect(config);

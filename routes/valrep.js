@@ -1510,6 +1510,36 @@ const operationValrepProvider = async(authHeader, requestBody) => {
     return { status: true, list: jsonArray }
 }
 
+router.route('/provider-event').post((req, res) => {
+    if(!req.header('Authorization')){ 
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
+        return;
+    }else{
+        operationValrepProviderEvent(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){ 
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationValrepProviderEvent' } });
+        });
+    }
+});
+
+const operationValrepProviderEvent = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    //if(!helper.validateRequestObj(requestBody, ['cproveedor'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
+    let cproveedor = requestBody.cproveedor ? requestBody.cproveedor : undefined;
+    let query = await bd.providerEventValrepQuery(cproveedor).then((res) => res);
+    if(query.error){ return { status: false, code: 500, message: query.error }; }
+    let jsonArray = [];
+    for(let i = 0; i < query.result.recordset.length; i++){
+        jsonArray.push({ cproveedor: query.result.recordset[i].CPROVEEDOR, xnombre: query.result.recordset[i].XNOMBRE });
+    }
+    return { status: true, list: jsonArray }
+}
+
 router.route('/civil-status').post((req, res) => {
     if(!req.header('Authorization')){ 
         res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
