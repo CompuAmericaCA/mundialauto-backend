@@ -355,7 +355,8 @@ const operationCreateNotification = async (authHeader, requestBody) => {
     if(requestBody.materialDamages){
         materialDamages = requestBody.materialDamages;
         for(let i = 0; i < materialDamages.length; i++){
-            if(!helper.validateRequestObj(materialDamages[i], ['cdanomaterial', 'cniveldano', 'xobservacion', 'ctipodocidentidad', 'xdocidentidad', 'xnombre', 'xapellido', 'xtelefonocelular', 'xemail', 'cestado', 'cciudad', 'xdireccion'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
+            // if(!helper.validateRequestObj(materialDamages[i], ['cdanomaterial', 'cniveldano', 'xobservacion', 'ctipodocidentidad', 'xdocidentidad', 'xnombre', 'xapellido', 'xtelefonocelular', 'xemail', 'cestado', 'cciudad', 'xdireccion'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
+            materialDamages[i].xmaterial = helper.encrypt(materialDamages[i].xmaterial.toUpperCase());
             materialDamages[i].xobservacion = helper.encrypt(materialDamages[i].xobservacion.toUpperCase());
             materialDamages[i].xdocidentidad = helper.encrypt(materialDamages[i].xdocidentidad);
             materialDamages[i].xnombre = helper.encrypt(materialDamages[i].xnombre.toUpperCase());
@@ -616,6 +617,7 @@ const operationDetailNotification = async(authHeader, requestBody) => {
                     cdanomaterialnotificacion: getNotificationMaterialDamagesData.result.recordset[i].CDANOMATERIALNOTIFICACION,
                     cdanomaterial: getNotificationMaterialDamagesData.result.recordset[i].CDANOMATERIAL,
                     xdanomaterial: getNotificationMaterialDamagesData.result.recordset[i].XDANOMATERIAL,
+                    xmaterial: getNotificationMaterialDamagesData.result.recordset[i].XMATERIAL,
                     cniveldano: getNotificationMaterialDamagesData.result.recordset[i].CNIVELDANO,
                     xniveldano: getNotificationMaterialDamagesData.result.recordset[i].XNIVELDANO,
                     xobservacion: getNotificationMaterialDamagesData.result.recordset[i].XOBSERVACION,
@@ -1008,6 +1010,49 @@ const operationUpdateNotification = async(authHeader, requestBody) => {
             let updateThirdpartiesByNotificationUpdate = await bd.updateThirdpartiesByNotificationUpdateQuery(requestBody.thirdparties.update, notificationData).then((res) => res);
             if(updateThirdpartiesByNotificationUpdate.error){ return { status: false, code: 500, message: updateThirdpartiesByNotificationUpdate.error }; }
             if(updateThirdpartiesByNotificationUpdate.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Thirdparty not found.' }; }
+        }
+    }
+    if(requestBody.materialDamages){
+        if(requestBody.materialDamages.create && requestBody.materialDamages.create.length > 0){
+            // for(let i = 0; i < requestBody.materialDamages.create.length; i++){
+            //     if(!helper.validateRequestObj(requestBody.materialDamages.create[i], ['crepuesto', 'ctiporepuesto', 'ncantidad', 'cniveldano'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
+            // }
+            let createMaterialDamagesByNotificationUpdate = await bd.createMaterialDamagesByNotificationUpdateQuery(requestBody.materialDamages.create, notificationData).then((res) => res);
+            if(createMaterialDamagesByNotificationUpdate.error){ return { status: false, code: 500, message: createMaterialDamagesByNotificationUpdate.error }; }
+            if(createMaterialDamagesByNotificationUpdate.result.rowsAffected < 0){ return { status: false, code: 500, message: 'Server Internal Error.', hint: 'createMaterialDamagesByNotificationUpdate' }; }
+        } 
+        if(requestBody.materialDamages.update && requestBody.materialDamages.update.length > 0){
+            // for(let i = 0; i < requestBody.materialDamages.update.length; i++){
+            //     if(!helper.validateRequestObj(requestBody.materialDamages.update[i], ['crepuesto', 'ctiporepuesto', 'ncantidad', 'cniveldano'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
+            // }
+            let updateMaterialDamagesByNotificationUpdate = await bd.updateMaterialDamagesByNotificationUpdateQuery(requestBody.materialDamages.update, notificationData).then((res) => res);
+            if(updateMaterialDamagesByNotificationUpdate.error){ return { status: false, code: 500, message: updateMaterialDamagesByNotificationUpdate.error }; }
+            if(updateMaterialDamagesByNotificationUpdate.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Replacement not found.' }; }
+        }
+        if(requestBody.materialDamages.delete && requestBody.materialDamages.delete.length){
+            // for(let i = 0; i < requestBody.materialDamages.delete.length; i++){
+            //     if(!helper.validateRequestObj(requestBody.materialDamages.delete[i], ['crepuesto'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
+            // }
+            let deleteMaterialDamagesByNotificationUpdate = await bd.deleteMaterialDamagesByNotificationUpdateQuery(requestBody.materialDamages.delete, notificationData).then((res) => res);
+            if(deleteMaterialDamagesByNotificationUpdate.error){ return { status: false, code: 500, message: deleteMaterialDamagesByNotificationUpdate.error }; }
+            if(deleteMaterialDamagesByNotificationUpdate.result.rowsAffected < 0){ return { status: false, code: 500, message: 'Server Internal Error.', hint: 'deleteMaterialDamagesByNotificationUpdate' }; }
+        }
+    }
+    if(requestBody.thirdPartyVehicles){
+        if(requestBody.thirdPartyVehicles.create && requestBody.thirdPartyVehicles.create.length > 0){
+            let createThirdPartyVehiclesByNotificationUpdate = await bd.createThirdPartyVehiclesByNotificationUpdateQuery(requestBody.thirdPartyVehicles.create, notificationData).then((res) => res);
+            if(createThirdPartyVehiclesByNotificationUpdate.error){ return { status: false, code: 500, message: createThirdPartyVehiclesByNotificationUpdate.error }; }
+            if(createThirdPartyVehiclesByNotificationUpdate.result.rowsAffected < 0){ return { status: false, code: 500, message: 'Server Internal Error.', hint: 'createThirdPartyVehiclesByNotificationUpdate' }; }
+        } 
+        if(requestBody.thirdPartyVehicles.update && requestBody.thirdPartyVehicles.update.length > 0){
+            let updateThirdPartyVehiclesByNotificationUpdate = await bd.updateThirdPartyVehiclesByNotificationUpdateQuery(requestBody.thirdPartyVehicles.update, notificationData).then((res) => res);
+            if(updateThirdPartyVehiclesByNotificationUpdate.error){ return { status: false, code: 500, message: updateThirdPartyVehiclesByNotificationUpdate.error }; }
+            if(updateThirdPartyVehiclesByNotificationUpdate.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Replacement not found.' }; }
+        }
+        if(requestBody.thirdPartyVehicles.delete && requestBody.thirdPartyVehicles.delete.length){
+            let deleteThirdPartyVehiclesByNotificationUpdate = await bd.deleteThirdPartyVehiclesByNotificationUpdateQuery(requestBody.thirdPartyVehicles.delete, notificationData).then((res) => res);
+            if(deleteThirdPartyVehiclesByNotificationUpdate.error){ return { status: false, code: 500, message: deleteThirdPartyVehiclesByNotificationUpdate.error }; }
+            if(deleteThirdPartyVehiclesByNotificationUpdate.result.rowsAffected < 0){ return { status: false, code: 500, message: 'Server Internal Error.', hint: 'deleteThirdPartyVehiclesByNotificationUpdate' }; }
         }
     }
     if(requestBody.providers){
