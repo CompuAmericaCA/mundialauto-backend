@@ -416,6 +416,7 @@ const operationCreateNotification = async (authHeader, requestBody) => {
         ccontratoflota: requestBody.ccontratoflota,
         ctiponotificacion: requestBody.ctiponotificacion,
         crecaudo: requestBody.crecaudo,
+        typecollections: requestBody.typecollections,
         ccausasiniestro: requestBody.ccausasiniestro,
         xnombre: requestBody.xnombre.toUpperCase(),
         xapellido: requestBody.xapellido.toUpperCase(),

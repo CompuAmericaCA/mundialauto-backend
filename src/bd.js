@@ -9999,6 +9999,7 @@ module.exports = {
         }
     },
     createNotificationQuery: async(notificationData) => {
+        console.log(notificationData);
         try{
             let pool = await sql.connect(config);
             let result = await pool.request()
@@ -10090,6 +10091,18 @@ module.exports = {
                                     .query('insert into EVREPUESTOVEHICULOTERCERO (CVEHICULOTERCERONOTIFICACION, CREPUESTO, CTIPOREPUESTO, NCANTIDAD, CNIVELDANO, CUSUARIOCREACION, FCREACION) values (@cvehiculoterceronotificacion, @crepuesto, @ctiporepuesto, @ncantidad, @cniveldano, @cusuariocreacion, @fcreacion)')
                             }
                         }
+                    }
+                }
+                if(notificationData.typecollections.length > 0){
+                    console.log(notificationData.typecollections + "aaaaaaaaaaaaa");
+                    for(let i = 0; i < notificationData.typecollections.length; i++){
+                        console.log(notificationData.typecollections[i] + "eeeeeeeeeeeeee");
+                        let insert = await pool.request()
+                            .input('cnotificacion', sql.Int, result.recordset[0].CNOTIFICACION)
+                            .input('ctiporecaudo', sql.Int, notificationData.typecollections[i])
+                            .input('cusuariocreacion', sql.Int, notificationData.cusuariocreacion)
+                            .input('fcreacion', sql.DateTime, new Date())
+                            .query('insert into EVTIPORECAUDONOTIFICACION (CNOTIFICACION, CTIPORECAUDO, CUSUARIOCREACION, FCREACION) values (@cnotificacion, @ctiporecaudo, @cusuariocreacion, @fcreacion)')
                     }
                 }
                 if(notificationData.notes){
@@ -10187,7 +10200,7 @@ module.exports = {
                 return { result: result };
             }
         }catch(err){
-            console.log(err.message);
+            console.log(err + "\nerrrrrrrroooooooorrrrrrrrrrr");
             return { error: err.message };
         }
     },
