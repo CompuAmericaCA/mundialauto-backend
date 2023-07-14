@@ -1009,7 +1009,33 @@ const operationUpdateNotification = async(authHeader, requestBody) => {
             }
             let updateThirdpartiesByNotificationUpdate = await bd.updateThirdpartiesByNotificationUpdateQuery(requestBody.thirdparties.update, notificationData).then((res) => res);
             if(updateThirdpartiesByNotificationUpdate.error){ return { status: false, code: 500, message: updateThirdpartiesByNotificationUpdate.error }; }
-            if(updateThirdpartiesByNotificationUpdate.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Thirdparty not found.' }; }
+        }
+        let createThirdpartiesList = [];
+        let createThirdpartiesTracingsList = [];
+        if(requestBody.thirdparties.create){
+            for(let i = 0; i < requestBody.thirdparties.create.length; i++){
+                createThirdpartiesList.push({
+                    ctipodocidentidad: requestBody.thirdparties.create[i].ctipodocidentidad,
+                    xdocidentidad: requestBody.thirdparties.create[i].xdocidentidad,
+                    xnombre: requestBody.thirdparties.create[i].xnombre,
+                    xapellido: requestBody.thirdparties.create[i].xapellido,
+                    xtelefonocelular: requestBody.thirdparties.create[i].xtelefonocelular,
+                    xtelefonocasa: requestBody.thirdparties.create[i].xtelefonocasa,
+                    xemail: requestBody.thirdparties.create[i].xemail,
+                    xobservacion: requestBody.thirdparties.create[i].xobservacion
+                })
+                for(let j = 0; j < requestBody.thirdparties.create[i].tracings.length; j++){
+                    createThirdpartiesTracingsList.push({
+                        ctiposeguimiento: requestBody.thirdparties.create[i].tracings[j].ctiposeguimiento,
+                        cmotivoseguimiento: requestBody.thirdparties.create[i].tracings[j].cmotivoseguimiento,
+                        fseguimientotercero: requestBody.thirdparties.create[i].tracings[j].fseguimientotercero,
+                        bcerrado: requestBody.thirdparties.create[i].tracings[j].bcerrado,
+                        xobservacion: requestBody.thirdparties.create[i].tracings[j].xobservacion,
+                    })
+                }
+            }
+            let createThirdpartiesByNotificationUpdate = await bd.createThirdpartiesByNotificationUpdateQuery(createThirdpartiesList, createThirdpartiesTracingsList, notificationData).then((res) => res);
+            if(createThirdpartiesByNotificationUpdate.error){ return { status: false, code: 500, message: createThirdpartiesByNotificationUpdate.error }; }
         }
     }
     if(requestBody.materialDamages){
