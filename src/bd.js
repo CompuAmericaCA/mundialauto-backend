@@ -13816,5 +13816,48 @@ updateRatesPlanRcvQuery: async(dataPlanRcv, updateRatesList) => {
         return { error: err.message };
     }
 },
+createThirdpartiesByNotificationUpdateQuery: async(createThirdpartiesList, createThirdpartiesTracingsList, notificationData) => {
+    try{
+        let rowsAffected = 0;
+        let pool = await sql.connect(config);
+        for(let i = 0; i < createThirdpartiesList.length; i++){
+            let result = await pool.request()
+            .input('cnotificacion', sql.Int, notificationData.cnotificacion)
+            .input('ctipodocidentidad', sql.Int, createThirdpartiesList[i].ctipodocidentidad)
+            .input('xdocidentidad', sql.NVarChar, createThirdpartiesList[i].xdocidentidad)
+            .input('xnombre', sql.NVarChar, createThirdpartiesList[i].xnombre)
+            .input('xapellido', sql.NVarChar, createThirdpartiesList[i].xapellido)
+            .input('xtelefonocelular', sql.NVarChar, createThirdpartiesList[i].xtelefonocelular)
+            .input('xtelefonocasa', sql.NVarChar, createThirdpartiesList[i].xtelefonocasa ?  createThirdpartiesList[i].xtelefonocasa : null)
+            .input('xemail', sql.NVarChar, createThirdpartiesList[i].xemail)
+            .input('xobservacion', sql.NVarChar, createThirdpartiesList[i].xobservacion)
+            .input('cusuariocreacion', sql.Int, notificationData.cusuariocreacion)
+            .input('fcreacion', sql.DateTime, new Date())
+            .query('insert into EVTERCERONOTIFICACION (CNOTIFICACION, CTIPODOCIDENTIDAD, XDOCIDENTIDAD, XNOMBRE, XAPELLIDO, XTELEFONOCELULAR, XTELEFONOCASA, XEMAIL, XOBSERVACION, CUSUARIOCREACION, FCREACION) output inserted.CTERCERONOTIFICACION values (@cnotificacion, @ctipodocidentidad, @xdocidentidad, @xnombre, @xapellido, @xtelefonocelular, @xtelefonocasa, @xemail, @xobservacion, @cusuariocreacion, @fcreacion)')
+            rowsAffected = rowsAffected + result.rowsAffected;
+
+            if(result.rowsAffected > 0 && createThirdpartiesTracingsList){
+                console.log('hola')
+                for(let j = 0; j < createThirdpartiesTracingsList.length; j++){
+                    let resultTracing = await pool.request()
+                    .input('cterceronotificacion', sql.Int, result.recordset[0].CTERCERONOTIFICACION)
+                    .input('ctiposeguimiento', sql.Int, createThirdpartiesTracingsList[j].ctiposeguimiento)
+                    .input('cmotivoseguimiento', sql.Int, createThirdpartiesTracingsList[j].cmotivoseguimiento)
+                    .input('fseguimientotercero', sql.DateTime, createThirdpartiesTracingsList[j].fseguimientotercero)
+                    .input('xobservacion', sql.NVarChar, createThirdpartiesTracingsList[j].xobservacion)
+                    .input('bcerrado', sql.Bit, createThirdpartiesTracingsList[j].bcerrado)
+                    .input('cusuariocreacion', sql.Int, notificationData.cusuariocreacion)
+                    .input('fcreacion', sql.DateTime, new Date())
+                    .query('insert into EVSEGUIMIENTOTERCERO (CTERCERONOTIFICACION, CTIPOSEGUIMIENTO, CMOTIVOSEGUIMIENTO, FSEGUIMIENTOTERCERO, XOBSERVACION, BCERRADO, CUSUARIOCREACION, FCREACION) values (@cterceronotificacion, @ctiposeguimiento, @cmotivoseguimiento, @fseguimientotercero, @xobservacion, @bcerrado, @cusuariocreacion, @fcreacion)')
+                }
+                // rowsAffected = rowsAffected + resultTracing.rowsAffected;
+            }
+        }
+        return { result: { rowsAffected: rowsAffected } };
+    }catch(err){
+        console.log(err.message)
+        return { error: err.message };
+    }
+},
 }
 
