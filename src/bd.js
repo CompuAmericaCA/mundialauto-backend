@@ -9999,7 +9999,6 @@ module.exports = {
         }
     },
     createNotificationQuery: async(notificationData) => {
-        console.log(notificationData);
         try{
             let pool = await sql.connect(config);
             let result = await pool.request()
@@ -10093,10 +10092,8 @@ module.exports = {
                         }
                     }
                 }
-                if(notificationData.typecollections.length > 0){
-                    console.log(notificationData.typecollections + "aaaaaaaaaaaaa");
+                if(notificationData.typecollections){
                     for(let i = 0; i < notificationData.typecollections.length; i++){
-                        console.log(notificationData.typecollections[i] + "eeeeeeeeeeeeee");
                         let insert = await pool.request()
                             .input('cnotificacion', sql.Int, result.recordset[0].CNOTIFICACION)
                             .input('ctiporecaudo', sql.Int, notificationData.typecollections[i])
