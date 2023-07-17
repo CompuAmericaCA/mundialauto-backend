@@ -11007,6 +11007,8 @@ module.exports = {
         try{
             let rowsAffected = 0;
             let pool = await sql.connect(config);
+            console.log(providers);
+            console.log(providers[0].replacements);
             for(let i = 0; i < providers.length; i++){
                 let insert = await pool.request()
                     .input('cnotificacion', sql.Int, notificationData.cnotificacion)
@@ -11031,7 +11033,7 @@ module.exports = {
                     }
                 }
             }
-            //sql.close();
+            sql.close();
             return { result: { rowsAffected: rowsAffected } };
         }
         catch(err){
@@ -13840,18 +13842,27 @@ updateRatesPlanRcvQuery: async(dataPlanRcv, updateRatesList) => {
         return { error: err.message };
     }
 },
-searchQuoteRequestNotificationQuery: async(cproveedor, searchData) => {
+searchQuoteRequestNotificationQuery: async( searchData) => {
+    // console.log(cproveedor);
     try{
+        // let rowsAffected = 0;
         let query = `select * from EVCOTIZACIONNOTIFICACION where CPROVEEDOR = @cproveedor${ searchData.fcreacion ? " and datediff(day, FCREACION, @fcreacion) = 0" : '' }`;
+        console.log(`SELECT * FROM WVCOTIZACIONNOTIFICACION WHERE CNOTIFICACION = @cnotificacion${ searchData.fcreacion ? " and datediff(day, FCREACION, @fcreacion) = 0" : '' }`);
         let pool = await sql.connect(config);
-        for(let i = 0; i < cproveedor.length; i++){
+        // for(let i = 0; i < cproveedor.length; i++){
             let result = await pool.request()
-            .input('cproveedor', sql.Int, cproveedor[i].cproveedor)
+            .input('cnotificacion', sql.Int, searchData.cnotificacion)
             .input('fcreacion', sql.DateTime, searchData.fcreacion ? searchData.fcreacion : '01/01/2000')
-            .query(query);
-        //sql.close();
+            .query(`SELECT * FROM EVCOTIZACIONNOTIFICACION WHERE CNOTIFICACION = @cnotificacion${ searchData.fcreacion ? " and datediff(day, FCREACION, @fcreacion) = 0" : '' }`);
+            // rowsAffected = rowsAffected + result.rowsAffected;
+        // sql.close();
+        // console.log({ result: { rowsAffected: rowsAffected } });
+        // return { result: { rowsAffected: rowsAffected } };
+            // console.log(JSON.stringify(result))
+            // console.log("dsadsadadas");
+        // }
+        // console.log(result + "\n2");
         return { result: result };
-        }
     }catch(err){
         return { error: err.message };
     }
@@ -13896,6 +13907,8 @@ getReplacementsProviderNotificationDataQuery: async(ccotizacion) => {
     }
 },
 updateQuoteRequestNotificationQuery: async(quotesProviders) => {
+    console.log(quotesProviders[0].cproveedor + "\n↑updateQuoteRequestNotificationQuery↑");
+    console.log(quotesProviders[0].ccotizacion + "\n↑updateQuoteRequestNotificationQuery↑");
     try{
         let rowsAffected = 0;
         let pool = await sql.connect(config);
@@ -13912,7 +13925,8 @@ updateQuoteRequestNotificationQuery: async(quotesProviders) => {
             .query('update EVCOTIZACIONNOTIFICACION set MTOTALCOTIZACION = @mtotalcotizacion, BCERRADA = @bcerrada, CUSUARIOMODIFICACION = @cusuariomodificacion, FMODIFICACION = @fmodificacion, BACEPTACION = @baceptacion, CMONEDA = @cmoneda where CCOTIZACION = @ccotizacion and CPROVEEDOR = @cproveedor');
             rowsAffected = rowsAffected + update.rowsAffected;
         }
-        //sql.close();
+        sql.close();
+        console.log({ result: { rowsAffected: rowsAffected } });
         return { result: { rowsAffected: rowsAffected } };
     }catch(err){
         return { error: err.message };

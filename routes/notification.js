@@ -799,6 +799,7 @@ const operationDetailNotification = async(authHeader, requestBody) => {
                             mtotalrepuesto: getReplacementsQuoteData.result.recordset[i].MTOTALREPUESTO ? getReplacementsQuoteData.result.recordset[i].MTOTALREPUESTO : undefined
                         }
                         replacements.push(replacement);
+                        // console.log(replacements);
                     }
                 }
                 let quote = {
@@ -818,6 +819,7 @@ const operationDetailNotification = async(authHeader, requestBody) => {
                 quotes.push(quote);
             }
         }
+        // console.log(quotes);
         let tracings = [];
         let getNotificationTracingsData = await bd.getNotificationTracingsDataQuery(notificationData.cnotificacion).then((res) => res);
         if(getNotificationTracingsData.error){ return { status: false, code: 500, message: getNotificationTracingsData.error }; }
@@ -945,7 +947,8 @@ const operationUpdateNotification = async(authHeader, requestBody) => {
         cpais: requestBody.cpais,
         ccompania: requestBody.ccompania,
         cnotificacion: requestBody.cnotificacion,
-        cusuariomodificacion: requestBody.cusuariomodificacion
+        cusuariomodificacion: requestBody.cusuariomodificacion,
+        quotesProviders: requestBody.quotesProviders,
     }
     if(requestBody.notes){
         if(requestBody.notes.create && requestBody.notes.create.length > 0){
@@ -1131,7 +1134,6 @@ const operationUpdateNotification = async(authHeader, requestBody) => {
 
 
     let serviceOrderCreateList = [];
-    
     if(requestBody.serviceOrder){
         if(requestBody.serviceOrder.create && requestBody.serviceOrder.create.length > 0){
             for(let i = 0; i < requestBody.serviceOrder.create.length; i++){
@@ -1207,6 +1209,7 @@ const operationUpdateNotification = async(authHeader, requestBody) => {
     }
     let quotesProviders = [];
     if(notificationData.quotesProviders){
+        console.log(notificationData.quotesProviders[0] + "\n↑notificationData.quotesProviders↑");
         for(let i = 0; i < notificationData.quotesProviders.length; i++ ){
             quotesProviders.push({
                 cproveedor: notificationData.quotesProviders[i].cproveedor,
@@ -1392,19 +1395,21 @@ router.route('/search-quote-request').post((req, res) => {
 });
 
 const operationSearchQuoteRequest = async(authHeader, requestBody) => {
-    console.log(requestBody.cproveedor + "\nfdafdfafd");
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    // console.log(requestBody);
     let searchData = {
-        cproveedor: requestBody.cproveedor,
+        cnotificacion: requestBody.cnotificacion,
         fcreacion: requestBody.fcreacion ? requestBody.fcreacion : undefined
     };
-    let cproveedor = [];
-    for(let i = 0; i < searchData.cproveedor.length; i++){
-        cproveedor.push({
-            cproveedor: searchData.cproveedor[i].cproveedor
-        })
-    }
-    let searchQuoteRequest = await bd.searchQuoteRequestNotificationQuery(cproveedor, searchData).then((res) => res);
+    // let cproveedor = [];
+    // for(let i = 0; i < searchData.listProviders.length; i++){
+    //     cproveedor.push({
+    //         cproveedor: searchData.listProviders[i].cproveedor
+    //     })
+    // }
+    // console.log(searchData);
+    // let searchQuoteRequest = await bd.searchQuoteRequestNotificationQuery(cproveedor, searchData).then((res) => res);
+    let searchQuoteRequest = await bd.searchQuoteRequestNotificationQuery(searchData).then((res) => res);
     if(searchQuoteRequest.error){ return  { status: false, code: 500, message: searchQuoteRequest.error }; }
     if(searchQuoteRequest.result.rowsAffected > 0){
         let jsonList = [];
