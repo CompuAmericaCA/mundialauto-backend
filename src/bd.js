@@ -11007,8 +11007,6 @@ module.exports = {
         try{
             let rowsAffected = 0;
             let pool = await sql.connect(config);
-            console.log(providers);
-            console.log(providers[0].replacements);
             for(let i = 0; i < providers.length; i++){
                 let insert = await pool.request()
                     .input('cnotificacion', sql.Int, notificationData.cnotificacion)
@@ -13907,8 +13905,6 @@ getReplacementsProviderNotificationDataQuery: async(ccotizacion) => {
     }
 },
 updateQuoteRequestNotificationQuery: async(quotesProviders) => {
-    console.log(quotesProviders[0].cproveedor + "\n↑updateQuoteRequestNotificationQuery↑");
-    console.log(quotesProviders[0].ccotizacion + "\n↑updateQuoteRequestNotificationQuery↑");
     try{
         let rowsAffected = 0;
         let pool = await sql.connect(config);
@@ -13925,8 +13921,7 @@ updateQuoteRequestNotificationQuery: async(quotesProviders) => {
             .query('update EVCOTIZACIONNOTIFICACION set MTOTALCOTIZACION = @mtotalcotizacion, BCERRADA = @bcerrada, CUSUARIOMODIFICACION = @cusuariomodificacion, FMODIFICACION = @fmodificacion, BACEPTACION = @baceptacion, CMONEDA = @cmoneda where CCOTIZACION = @ccotizacion and CPROVEEDOR = @cproveedor');
             rowsAffected = rowsAffected + update.rowsAffected;
         }
-        sql.close();
-        console.log({ result: { rowsAffected: rowsAffected } });
+        // sql.close();
         return { result: { rowsAffected: rowsAffected } };
     }catch(err){
         return { error: err.message };

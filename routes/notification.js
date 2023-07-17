@@ -291,7 +291,7 @@ const operationSearchProvider = async(authHeader, requestBody) => {
                     xtelefonoproveedor: getProvidersByServicesData.result.recordset[i].XTELEFONO,
                 });
             }
-            console.log(jsonList)
+            // console.log(jsonList)
             return { status: true, list: jsonList };
         }else{ return { status: false, code: 404, message: 'Provider not found.' }; }
     }else{ return { status: false, code: 404, message: 'Notification Type Services not found.' }; }
@@ -941,6 +941,8 @@ router.route('/update').post((req, res) => {
 });
 
 const operationUpdateNotification = async(authHeader, requestBody) => {
+    // console.log(requestBody);
+    console.log(JSON.stringify(requestBody));
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
     if(!helper.validateRequestObj(requestBody, ['cpais', 'ccompania', 'cnotificacion', 'cusuariomodificacion'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
     let notificationData = {
@@ -1208,8 +1210,8 @@ const operationUpdateNotification = async(authHeader, requestBody) => {
       }
     }
     let quotesProviders = [];
-    if(notificationData.quotesProviders){
-        console.log(notificationData.quotesProviders[0] + "\n↑notificationData.quotesProviders↑");
+    if(notificationData.quotesProviders.length > 0){
+        console.log(JSON.stringify(notificationData.quotesProviders));
         for(let i = 0; i < notificationData.quotesProviders.length; i++ ){
             quotesProviders.push({
                 cproveedor: notificationData.quotesProviders[i].cproveedor,
