@@ -941,8 +941,6 @@ router.route('/update').post((req, res) => {
 });
 
 const operationUpdateNotification = async(authHeader, requestBody) => {
-    // console.log(requestBody);
-    console.log(JSON.stringify(requestBody));
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
     if(!helper.validateRequestObj(requestBody, ['cpais', 'ccompania', 'cnotificacion', 'cusuariomodificacion'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
     let notificationData = {
@@ -952,7 +950,9 @@ const operationUpdateNotification = async(authHeader, requestBody) => {
         cusuariomodificacion: requestBody.cusuariomodificacion,
         quotesProviders: requestBody.quotesProviders,
     }
+    console.log("***----***");
     if(requestBody.notes){
+        console.log(JSON.stringify(requestBody.notes));
         if(requestBody.notes.create && requestBody.notes.create.length > 0){
             for(let i = 0; i < requestBody.notes.create.length; i++){
                 if(!helper.validateRequestObj(requestBody.notes.create[i], ['xnotanotificacion', 'xrutaarchivo'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
@@ -980,6 +980,7 @@ const operationUpdateNotification = async(authHeader, requestBody) => {
             if(deleteNotesByNotificationUpdate.result.rowsAffected < 0){ return { status: false, code: 500, message: 'Server Internal Error.', hint: 'deleteNotesByNotificationUpdate' }; }
         }
     }
+    console.log("***++++++++***");
     if(requestBody.replacements){
         if(requestBody.replacements.create && requestBody.replacements.create.length > 0){
             for(let i = 0; i < requestBody.replacements.create.length; i++){
