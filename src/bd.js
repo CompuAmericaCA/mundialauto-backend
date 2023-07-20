@@ -4944,6 +4944,7 @@ module.exports = {
                 .input('cimpuesto', sql.Int, cimpuesto)
                 .query('select * from CNIMPUESTO WHERE CIMPUESTO = @cimpuesto');
             //sql.close();
+            console.log(result)
             return { result: result };
         }catch(err){
             return { error: err.message };
@@ -10819,10 +10820,11 @@ module.exports = {
                     .input('xmensaje', sql.NVarChar, serviceOrderCreateList[i].xmensaje)
                     .input('xrutaarchivo', sql.NVarChar, serviceOrderCreateList[i].xrutaarchivo)
                     .input('ccotizacion', sql.Int, serviceOrderCreateList[i].ccotizacion)
+                    .input('migtf', sql.Numeric(5, 2), serviceOrderCreateList[i].migtf ? serviceOrderCreateList[i].migtf: undefined)
                     .input('cestatusgeneral', sql.Int, 13)
                     .input('ccausaanulacion', sql.Int, serviceOrderCreateList[i].ccausaanulacion)
                     .input('fcreacion', sql.DateTime, new Date())
-                    .query('insert into EVORDENSERVICIO (CSERVICIO, FCREACION, CNOTIFICACION, XOBSERVACION, CSERVICIOADICIONAL, CCOTIZACION, XDANOS, XFECHA, FAJUSTE, XDESDE, XHACIA, MMONTO, MMONTOTOTAL, CMONEDA, CIMPUESTO, PIMPUESTO, MMONTOTOTALIVA, XMENSAJE, XRUTAARCHIVO, CPROVEEDOR, CCOMPANIA, CPAIS, CESTATUSGENERAL, CCAUSAANULACION, BACTIVO) values (@cservicio, @fcreacion, @cnotificacion, @xobservacion, @cservicioadicional, @ccotizacion, @xdanos, @xfecha, @fajuste, @xdesde, @xhacia, @mmonto, @mmontototal, @cmoneda, @cimpuesto, @pimpuesto, @mmontototaliva, @xmensaje, @xrutaarchivo, @cproveedor, @ccompania, @cpais, @cestatusgeneral, @ccausaanulacion, 1)')
+                    .query('insert into EVORDENSERVICIO (CSERVICIO, FCREACION, CNOTIFICACION, XOBSERVACION, CSERVICIOADICIONAL, CCOTIZACION, XDANOS, XFECHA, FAJUSTE, XDESDE, XHACIA, MMONTO, MMONTOTOTAL, CMONEDA, CIMPUESTO, PIMPUESTO, MMONTOTOTALIVA, XMENSAJE, XRUTAARCHIVO, CPROVEEDOR, CCOMPANIA, CPAIS, CESTATUSGENERAL, CCAUSAANULACION, BACTIVO, MIGTF) values (@cservicio, @fcreacion, @cnotificacion, @xobservacion, @cservicioadicional, @ccotizacion, @xdanos, @xfecha, @fajuste, @xdesde, @xhacia, @mmonto, @mmontototal, @cmoneda, @cimpuesto, @pimpuesto, @mmontototaliva, @xmensaje, @xrutaarchivo, @cproveedor, @ccompania, @cpais, @cestatusgeneral, @ccausaanulacion, 1, @migtf)')
                 rowsAffected = rowsAffected + insert.rowsAffected;
             }
             //sql.close();
@@ -13837,7 +13839,6 @@ createThirdpartiesByNotificationUpdateQuery: async(createThirdpartiesList, creat
             rowsAffected = rowsAffected + result.rowsAffected;
 
             if(result.rowsAffected > 0 && createThirdpartiesTracingsList){
-                console.log('hola')
                 for(let j = 0; j < createThirdpartiesTracingsList.length; j++){
                     let resultTracing = await pool.request()
                     .input('cterceronotificacion', sql.Int, result.recordset[0].CTERCERONOTIFICACION)
@@ -13856,6 +13857,97 @@ createThirdpartiesByNotificationUpdateQuery: async(createThirdpartiesList, creat
         return { result: { rowsAffected: rowsAffected } };
     }catch(err){
         console.log(err.message)
+        return { error: err.message };
+    }
+},
+searchQuoteRequestNotificationQuery: async (providerList) => {
+    try {
+      let pool = await sql.connect(config);
+      let resultados = [];
+      for (let i = 0; i < providerList.length; i++) {
+        let result = await pool.request()
+          .input('cproveedor', sql.Int, providerList[i].cproveedor)
+          .query('select * from EVCOTIZACIONNOTIFICACION where CPROVEEDOR = @cproveedor');
+        resultados.push(result);
+      }
+      return { result: resultados };
+    } catch (err) {
+      return { error: err.message };
+    }
+  },
+
+  getQuoteRequestNotificationDataQuery: async(cproveedor, quoteRequestData) => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+            .input('ccotizacion', sql.Int, quoteRequestData.ccotizacion)
+            .input('cproveedor', sql.Int, cproveedor)
+            .query('select * from VWBUSCARPROVEEDORXNOTIFICACIONDATA where CCOTIZACION = @ccotizacion and CPROVEEDOR = @cproveedor');
+        //sql.close();
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+},
+getReplacementsProviderNotificationDataQuery: async(ccotizacion) => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+            .input('ccotizacion', sql.Int, ccotizacion)
+            .query('select * from VWBUSCARREPUESTOXCOTIZACIONDATA where CCOTIZACION = @ccotizacion');
+        //sql.close();
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+},
+updateQuoteRequestNotificationQuery: async(quotesProviders) => {
+    try{
+        let rowsAffected = 0;
+        let pool = await sql.connect(config);
+        for(let i = 0; i < quotesProviders.length; i++){
+            let update = await pool.request()
+            .input('cproveedor', sql.Int, quotesProviders[i].cproveedor)
+            .input('ccotizacion', sql.Int, quotesProviders[i].ccotizacion)
+            .input('mtotalcotizacion', sql.Numeric(11, 2), quotesProviders[i].mtotalcotizacion ? quotesProviders[i].mtotalcotizacion : null)
+            .input('bcerrada', sql.Bit, quotesProviders[i].bcerrada)
+            .input('cusuariomodificacion', sql.Int, quotesProviders[i].cusuariomodificacion)
+            .input('baceptacion', sql.Bit, false)
+            .input('cmoneda', sql.Int, quotesProviders[i].cmoneda)
+            .input('migtf', sql.Numeric(5, 2), quotesProviders[i].migtf)
+            .input('fmodificacion', sql.DateTime, new Date())
+            .query('update EVCOTIZACIONNOTIFICACION set MTOTALCOTIZACION = @mtotalcotizacion, BCERRADA = @bcerrada, CUSUARIOMODIFICACION = @cusuariomodificacion, FMODIFICACION = @fmodificacion, BACEPTACION = @baceptacion, CMONEDA = @cmoneda, MIGTF = @migtf where CCOTIZACION = @ccotizacion and CPROVEEDOR = @cproveedor');
+            rowsAffected = rowsAffected + update.rowsAffected;
+        }
+        //sql.close();
+        return { result: { rowsAffected: rowsAffected } };
+    }catch(err){
+        return { error: err.message };
+    }
+},
+updateReplacementsByQuoteRequestNotificationUpdateQuery: async(quotesProviders) => {
+    try{
+        let rowsAffected = 0;
+        let pool = await sql.connect(config);
+        for(let i = 0; i < quotesProviders.length; i++){
+            let update = await pool.request()
+                .input('ccotizacion', sql.Int, quotesProviders[i].ccotizacion)
+                .input('crepuestocotizacion', sql.Int, quotesProviders[i].crepuestocotizacion)
+                .input('bdisponible', sql.Bit, quotesProviders[i].bdisponible)
+                .input('bdescuento', sql.Bit, quotesProviders[i].bdescuento)
+                .input('munitariorepuesto', sql.Numeric(11, 2), quotesProviders[i].munitariorepuesto ? quotesProviders[i].munitariorepuesto : null)
+                .input('mtotalrepuesto', sql.Numeric(11, 2), quotesProviders[i].mtotalrepuesto ? quotesProviders[i].mtotalrepuesto : null)
+                .input('cusuariomodificacion', sql.Int, quotesProviders[i].cusuariomodificacion)
+                .input('cmoneda', sql.Int, quotesProviders[i].cmoneda)
+                .input('migtf', sql.Numeric(5, 2), quotesProviders[i].migtf)
+                .input('fmodificacion', sql.DateTime, new Date())
+                .query('update EVREPUESTOCOTIZACION set BDISPONIBLE = @bdisponible, BDESCUENTO = @bdescuento, MUNITARIOREPUESTO = @munitariorepuesto, MTOTALREPUESTO = @mtotalrepuesto, CUSUARIOMODIFICACION = @cusuariomodificacion, FMODIFICACION = @fmodificacion, CMONEDA = @cmoneda, MIGTF = @migtf where CREPUESTOCOTIZACION = @crepuestocotizacion and CCOTIZACION = @ccotizacion');
+            rowsAffected = rowsAffected + update.rowsAffected;
+        }
+        //sql.close();
+        return { result: { rowsAffected: rowsAffected } };
+    }
+    catch(err){
         return { error: err.message };
     }
 },

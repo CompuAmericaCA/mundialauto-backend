@@ -327,9 +327,9 @@ const operationValrepNotificationServiceOrder = async(authHeader, requestBody) =
         }
 
         let nombres = query.result.recordset[0].XNOMBRE + ' ' + query.result.recordset[0].XAPELLIDO;
-        
+        let nombrespropietario
         if(query.result.recordset[0].XNOMBREPROPIETARIO == query.result.recordset[0].XAPELLIDOPROPIETARIO){
-            let nombrespropietario
+            
             nombrespropietario = query.result.recordset[0].XNOMBREPROPIETARIO
         }else{
             nombrespropietario = query.result.recordset[0].XNOMBREPROPIETARIO + ' ' + query.result.recordset[0].XAPELLIDOPROPIETARIO
@@ -384,6 +384,7 @@ const operationValrepNotificationServiceOrder = async(authHeader, requestBody) =
                          xestatusgeneral: query.result.recordset[0].XESTATUSGENERAL, 
                          ccausaanulacion: query.result.recordset[0].CCAUSAANULACION, 
                          xcausaanulacion: query.result.recordset[0].XCAUSAANULACION,
+                         migtf: query.result.recordset[0].MIGTF,
                          xauto: auto,
                          xnombres: nombres,
                          xnombresalternativos: nombresalternativos,
@@ -416,9 +417,9 @@ const operationValrepNotificationOrder = async(authHeader, requestBody) => {
     let cnotificacion = requestBody.cnotificacion;
     let query = await bd.notificationOrderDetailQuery(cnotificacion).then((res) => res);
     if(query.error){ return { status: false, code: 500, message: query.error }; }
-
+    let auto;
     if(query.result.recordset[0].XCOLOR){
-        let auto;
+        
         auto = query.result.recordset[0].XMARCA + ' ' + query.result.recordset[0].XMODELO + ' ' + query.result.recordset[0].XVERSION + ' ' + query.result.recordset[0].XCOLOR;
     }else{
         auto = query.result.recordset[0].XMARCA + ' ' + query.result.recordset[0].XMODELO + ' ' + query.result.recordset[0].XVERSION;
@@ -459,7 +460,7 @@ const operationValrepNotificationOrder = async(authHeader, requestBody) => {
                         xapellidopropietario: query.result.recordset[0].XAPELLIDOPROPIETARIO, 
                         xapellidopropietario: query.result.recordset[0].XAPELLIDOPROPIETARIO, 
                         xdocidentidad: query.result.recordset[0].XDOCIDENTIDADPROPIETARIO, 
-                        xtelefonocelular: query.result.recordset[0].XTELEFONOCELULAR, 
+                        xtelefonocelular: query.result.recordset[0].XTELEFONOCASA, 
                         xplaca: query.result.recordset[0].XPLACA, 
                         xcolor: query.result.recordset[0].XCOLOR, 
                         xmodelo: query.result.recordset[0].XMODELO, 
@@ -468,6 +469,7 @@ const operationValrepNotificationOrder = async(authHeader, requestBody) => {
                         xdocumentocliente: query.result.recordset[0].XDOCIDENTIDADCLIENTE, 
                         xdireccionfiscal: query.result.recordset[0].XDIRECCIONFISCAL, 
                         xtelefono: query.result.recordset[0].XTELEFONO,
+                        bactivo: query.result.recordset[0].BACTIVO,
                         xauto: auto,
                         xnombres: nombres,
                         xnombresalternativos: nombresalternativos,
