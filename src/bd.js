@@ -10807,7 +10807,7 @@ module.exports = {
                     .input('cservicioadicional', sql.Int, serviceOrderCreateList[i].cservicioadicional ? serviceOrderCreateList[i].cservicioadicional : undefined)
                     .input('xdanos', sql.NVarChar, serviceOrderCreateList[i].xdanos)
                     .input('xfecha', sql.NVarChar, serviceOrderCreateList[i].xfecha)
-                    .input('fajuste', sql.DateTime, serviceOrderCreateList[i].fajuste)
+                    .input('fajuste', sql.DateTime, serviceOrderCreateList[i].fajuste ? serviceOrderCreateList[i].fajuste: undefined)
                     .input('xdesde', sql.NVarChar, serviceOrderCreateList[i].xdesde)
                     .input('xhacia', sql.NVarChar, serviceOrderCreateList[i].xhacia)
                     .input('mmonto', sql.Numeric(18,2), serviceOrderCreateList[i].mmonto ? serviceOrderCreateList[i].mmonto: 0)
