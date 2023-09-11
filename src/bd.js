@@ -13951,5 +13951,65 @@ updateReplacementsByQuoteRequestNotificationUpdateQuery: async(quotesProviders) 
         return { error: err.message };
     }
 },
+propietaryValrepQuery: async(searchData) => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+        .input('cpais', sql.Int, searchData.cpais)
+        .input('ccompania', sql.Int, searchData.ccompania)
+        .query('select * from TRPROPIETARIO WHERE CPAIS = @cpais AND CCOMPANIA = @ccompania');
+        //sql.close();
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+},
+propietaryVehicleValrepQuery: async(searchData) => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+        .input('cpropietario', sql.Int, searchData.cpropietario)
+        .query('select * from VWBUSCARVEHICULOXPROPIETARIO WHERE CPROPIETARIO = @cpropietario');
+        //sql.close();
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+},
+searchInfoPropietaryQuery: async(searchData) => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+            .input('cpropietario', sql.Int, searchData.cpropietario)
+            .input('cvehiculopropietario', sql.Int, searchData.cvehiculopropietario)
+            .query('select * from VWBUSCARVEHICULOXPROPIETARIO where CVEHICULOPROPIETARIO = @cvehiculopropietario AND CPROPIETARIO = @cpropietario');
+        //sql.close();
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+},
+serviceFinancingValrepQuery: async() => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+        .query('select * from FNSERVICIOS');
+        //sql.close();
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+},
+replacementFinancingValrepQuery: async() => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+            .query('select CREPUESTO, XREPUESTO from MAREPUESTO');
+        //sql.close();
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+},
 }
 

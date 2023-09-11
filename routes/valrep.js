@@ -3295,4 +3295,147 @@ const operationValrepSearchService = async(authHeader, requestBody) => {
     return { status: true, list: jsonArray }
 }
 
+router.route('/propietary').post((req, res) => {
+    if(!req.header('Authorization')){ 
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
+        return;
+    }else{
+        operationValrepPropietary(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){ 
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationValrepPropietary' } });
+        });
+    }
+});
+
+const operationValrepPropietary = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let searchData = {
+        cpais: requestBody.cpais,
+        ccompania: requestBody.ccompania
+    };
+    let query = await bd.propietaryValrepQuery(searchData).then((res) => res);
+    if(query.error){ return { status: false, code: 500, message: query.error }; }
+    let jsonArray = [];
+    let propietario;
+    for(let i = 0; i < query.result.recordset.length; i++){
+        if(query.result.recordset[i].XNOMBRE && query.result.recordset[i].XAPELLIDO){
+            propietario = query.result.recordset[i].XNOMBRE + ' ' + query.result.recordset[i].XAPELLIDO;
+        }else{
+            propietario = query.result.recordset[i].XNOMBRE;
+        }
+        jsonArray.push({ 
+            cpropietario: query.result.recordset[i].CPROPIETARIO, 
+            xpropietario: propietario, 
+        });
+    }
+    return { status: true, list: jsonArray }
+}
+
+router.route('/vehicle').post((req, res) => {
+    if(!req.header('Authorization')){ 
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
+        return;
+    }else{
+        operationValrepPropietaryVehicle(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){ 
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationValrepPropietaryVehicle' } });
+        });
+    }
+});
+
+const operationValrepPropietaryVehicle = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let searchData = {
+        cpropietario: requestBody.cpropietario
+    };
+    let query = await bd.propietaryVehicleValrepQuery(searchData).then((res) => res);
+    if(query.error){ return { status: false, code: 500, message: query.error }; }
+    let jsonArray = [];
+    let vehiculo;
+    let modelo;
+    for(let i = 0; i < query.result.recordset.length; i++){
+        if(query.result.recordset[i].XMARCA && query.result.recordset[i].XMODELO && query.result.recordset[i].XVERSION ){
+            vehiculo = query.result.recordset[i].XMARCA + ' - ' + query.result.recordset[i].XPLACA;
+        }
+        jsonArray.push({ 
+            cvehiculopropietario: query.result.recordset[i].CVEHICULOPROPIETARIO, 
+            xvehiculo: vehiculo, 
+        });
+    }
+    return { status: true, list: jsonArray }
+}
+
+router.route('/service-financing').post((req, res) => {
+    if(!req.header('Authorization')){ 
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
+        return;
+    }else{
+        operationValrepServiceFinancing(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){ 
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationValrepServiceFinancing' } });
+        });
+    }
+});
+
+const operationValrepServiceFinancing = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+
+    let query = await bd.serviceFinancingValrepQuery().then((res) => res);
+    if(query.error){ return { status: false, code: 500, message: query.error }; }
+    let jsonArray = [];
+    for(let i = 0; i < query.result.recordset.length; i++){
+        jsonArray.push({ 
+            cservicio: query.result.recordset[i].CSERVICIO, 
+            xservicio: query.result.recordset[i].XSERVICIO, 
+        });
+    }
+    return { status: true, list: jsonArray }
+}
+
+router.route('/replacement-financing').post((req, res) => {
+    if(!req.header('Authorization')){ 
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
+        return;
+    }else{
+        operationValrepReplacementFinancing(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){ 
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationValrepReplacementFinancing' } });
+        });
+    }
+});
+
+const operationValrepReplacementFinancing = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let query = await bd.replacementFinancingValrepQuery().then((res) => res);
+    if(query.error){ return { status: false, code: 500, message: query.error }; }
+    let jsonArray = [];
+    for(let i = 0; i < query.result.recordset.length; i++){
+        jsonArray.push({ 
+            crepuesto: query.result.recordset[i].CREPUESTO, 
+            xrepuesto: query.result.recordset[i].XREPUESTO, 
+        });
+    }
+    return { status: true, list: jsonArray }
+}
+
 module.exports = router;
