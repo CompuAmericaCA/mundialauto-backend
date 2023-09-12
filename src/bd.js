@@ -14011,5 +14011,17 @@ replacementFinancingValrepQuery: async() => {
         return { error: err.message };
     }
 },
+searchProviderFinancingQuery: async(searchData) => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+            .input('cservicio', sql.Int, searchData.cservicio)
+            .query('select * from VWBUSCARPROVEEDORXSERVICIO where CSERVICIO = @cservicio');
+        //sql.close();
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+},
 }
 
