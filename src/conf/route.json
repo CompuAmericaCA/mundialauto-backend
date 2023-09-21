@@ -10,6 +10,11 @@
         "route": "/api/takers"
     },
     {
+        "name": "Financing Route",
+        "router": "../routes/financing",
+        "route": "/api/financing"
+    },
+    {
         "name": "Clauses Route",
         "router": "../routes/clauses",
         "route": "/api/clauses"
@@ -453,5 +458,10 @@
         "name": "Rates Route",
         "router": "../routes/rates",
         "route": "/api/rates"
+    },
+    {
+        "name": "Subscription Report Route",
+        "router": "../routes/subscription-report",
+        "route": "/api/subscription-report"
     }
 ]   

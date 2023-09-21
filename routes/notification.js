@@ -355,7 +355,8 @@ const operationCreateNotification = async (authHeader, requestBody) => {
     if(requestBody.materialDamages){
         materialDamages = requestBody.materialDamages;
         for(let i = 0; i < materialDamages.length; i++){
-            if(!helper.validateRequestObj(materialDamages[i], ['cdanomaterial', 'cniveldano', 'xobservacion', 'ctipodocidentidad', 'xdocidentidad', 'xnombre', 'xapellido', 'xtelefonocelular', 'xemail', 'cestado', 'cciudad', 'xdireccion'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
+            // if(!helper.validateRequestObj(materialDamages[i], ['cdanomaterial', 'cniveldano', 'xobservacion', 'ctipodocidentidad', 'xdocidentidad', 'xnombre', 'xapellido', 'xtelefonocelular', 'xemail', 'cestado', 'cciudad', 'xdireccion'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
+            materialDamages[i].xmaterial = helper.encrypt(materialDamages[i].xmaterial.toUpperCase());
             materialDamages[i].xobservacion = helper.encrypt(materialDamages[i].xobservacion.toUpperCase());
             materialDamages[i].xdocidentidad = helper.encrypt(materialDamages[i].xdocidentidad);
             materialDamages[i].xnombre = helper.encrypt(materialDamages[i].xnombre.toUpperCase());
@@ -616,6 +617,7 @@ const operationDetailNotification = async(authHeader, requestBody) => {
                     cdanomaterialnotificacion: getNotificationMaterialDamagesData.result.recordset[i].CDANOMATERIALNOTIFICACION,
                     cdanomaterial: getNotificationMaterialDamagesData.result.recordset[i].CDANOMATERIAL,
                     xdanomaterial: getNotificationMaterialDamagesData.result.recordset[i].XDANOMATERIAL,
+                    xmaterial: getNotificationMaterialDamagesData.result.recordset[i].XMATERIAL,
                     cniveldano: getNotificationMaterialDamagesData.result.recordset[i].CNIVELDANO,
                     xniveldano: getNotificationMaterialDamagesData.result.recordset[i].XNIVELDANO,
                     xobservacion: getNotificationMaterialDamagesData.result.recordset[i].XOBSERVACION,
@@ -799,6 +801,7 @@ const operationDetailNotification = async(authHeader, requestBody) => {
                     mtotal: getNotificationQuotesData.result.recordset[i].MTOTAL,
                     cimpuesto: getNotificationQuotesData.result.recordset[i].CIMPUESTO,
                     pimpuesto: getNotificationQuotesData.result.recordset[i].PIMPUESTO,
+                    migtf: getNotificationQuotesData.result.recordset[i].MIGTF,
                     replacements: replacements
                 }
                 quotes.push(quote);
@@ -831,6 +834,7 @@ const operationDetailNotification = async(authHeader, requestBody) => {
                     cnotificacion: getNotificationServiceOrderData.result.recordset[i].CNOTIFICACION,
                     corden: getNotificationServiceOrderData.result.recordset[i].CORDEN,
                     cservicio: getNotificationServiceOrderData.result.recordset[i].CSERVICIO,
+                    cservicioadicional: getNotificationServiceOrderData.result.recordset[i].CSERVICIOADICIONAL,
                     xservicio: getNotificationServiceOrderData.result.recordset[i].XSERVICIO,
                     xservicioadicional: getNotificationServiceOrderData.result.recordset[i].XSERVICIOADICIONAL,
                     xobservacion: getNotificationServiceOrderData.result.recordset[i].XOBSERVACION,
@@ -931,6 +935,7 @@ const operationUpdateNotification = async(authHeader, requestBody) => {
         cpais: requestBody.cpais,
         ccompania: requestBody.ccompania,
         cnotificacion: requestBody.cnotificacion,
+        quotesProviders: requestBody.quotesProviders,
         cusuariomodificacion: requestBody.cusuariomodificacion
     }
     if(requestBody.notes){
@@ -1007,7 +1012,76 @@ const operationUpdateNotification = async(authHeader, requestBody) => {
             }
             let updateThirdpartiesByNotificationUpdate = await bd.updateThirdpartiesByNotificationUpdateQuery(requestBody.thirdparties.update, notificationData).then((res) => res);
             if(updateThirdpartiesByNotificationUpdate.error){ return { status: false, code: 500, message: updateThirdpartiesByNotificationUpdate.error }; }
-            if(updateThirdpartiesByNotificationUpdate.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Thirdparty not found.' }; }
+        }
+        let createThirdpartiesList = [];
+        let createThirdpartiesTracingsList = [];
+        if(requestBody.thirdparties.create){
+            for(let i = 0; i < requestBody.thirdparties.create.length; i++){
+                createThirdpartiesList.push({
+                    ctipodocidentidad: requestBody.thirdparties.create[i].ctipodocidentidad,
+                    xdocidentidad: requestBody.thirdparties.create[i].xdocidentidad,
+                    xnombre: requestBody.thirdparties.create[i].xnombre,
+                    xapellido: requestBody.thirdparties.create[i].xapellido,
+                    xtelefonocelular: requestBody.thirdparties.create[i].xtelefonocelular,
+                    xtelefonocasa: requestBody.thirdparties.create[i].xtelefonocasa,
+                    xemail: requestBody.thirdparties.create[i].xemail,
+                    xobservacion: requestBody.thirdparties.create[i].xobservacion
+                })
+                for(let j = 0; j < requestBody.thirdparties.create[i].tracings.length; j++){
+                    createThirdpartiesTracingsList.push({
+                        ctiposeguimiento: requestBody.thirdparties.create[i].tracings[j].ctiposeguimiento,
+                        cmotivoseguimiento: requestBody.thirdparties.create[i].tracings[j].cmotivoseguimiento,
+                        fseguimientotercero: requestBody.thirdparties.create[i].tracings[j].fseguimientotercero,
+                        bcerrado: requestBody.thirdparties.create[i].tracings[j].bcerrado,
+                        xobservacion: requestBody.thirdparties.create[i].tracings[j].xobservacion,
+                    })
+                }
+            }
+            let createThirdpartiesByNotificationUpdate = await bd.createThirdpartiesByNotificationUpdateQuery(createThirdpartiesList, createThirdpartiesTracingsList, notificationData).then((res) => res);
+            if(createThirdpartiesByNotificationUpdate.error){ return { status: false, code: 500, message: createThirdpartiesByNotificationUpdate.error }; }
+        }
+    }
+    if(requestBody.materialDamages){
+        if(requestBody.materialDamages.create && requestBody.materialDamages.create.length > 0){
+            // for(let i = 0; i < requestBody.materialDamages.create.length; i++){
+            //     if(!helper.validateRequestObj(requestBody.materialDamages.create[i], ['crepuesto', 'ctiporepuesto', 'ncantidad', 'cniveldano'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
+            // }
+            let createMaterialDamagesByNotificationUpdate = await bd.createMaterialDamagesByNotificationUpdateQuery(requestBody.materialDamages.create, notificationData).then((res) => res);
+            if(createMaterialDamagesByNotificationUpdate.error){ return { status: false, code: 500, message: createMaterialDamagesByNotificationUpdate.error }; }
+            if(createMaterialDamagesByNotificationUpdate.result.rowsAffected < 0){ return { status: false, code: 500, message: 'Server Internal Error.', hint: 'createMaterialDamagesByNotificationUpdate' }; }
+        } 
+        if(requestBody.materialDamages.update && requestBody.materialDamages.update.length > 0){
+            // for(let i = 0; i < requestBody.materialDamages.update.length; i++){
+            //     if(!helper.validateRequestObj(requestBody.materialDamages.update[i], ['crepuesto', 'ctiporepuesto', 'ncantidad', 'cniveldano'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
+            // }
+            let updateMaterialDamagesByNotificationUpdate = await bd.updateMaterialDamagesByNotificationUpdateQuery(requestBody.materialDamages.update, notificationData).then((res) => res);
+            if(updateMaterialDamagesByNotificationUpdate.error){ return { status: false, code: 500, message: updateMaterialDamagesByNotificationUpdate.error }; }
+            if(updateMaterialDamagesByNotificationUpdate.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Replacement not found.' }; }
+        }
+        if(requestBody.materialDamages.delete && requestBody.materialDamages.delete.length){
+            // for(let i = 0; i < requestBody.materialDamages.delete.length; i++){
+            //     if(!helper.validateRequestObj(requestBody.materialDamages.delete[i], ['crepuesto'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
+            // }
+            let deleteMaterialDamagesByNotificationUpdate = await bd.deleteMaterialDamagesByNotificationUpdateQuery(requestBody.materialDamages.delete, notificationData).then((res) => res);
+            if(deleteMaterialDamagesByNotificationUpdate.error){ return { status: false, code: 500, message: deleteMaterialDamagesByNotificationUpdate.error }; }
+            if(deleteMaterialDamagesByNotificationUpdate.result.rowsAffected < 0){ return { status: false, code: 500, message: 'Server Internal Error.', hint: 'deleteMaterialDamagesByNotificationUpdate' }; }
+        }
+    }
+    if(requestBody.thirdPartyVehicles){
+        if(requestBody.thirdPartyVehicles.create && requestBody.thirdPartyVehicles.create.length > 0){
+            let createThirdPartyVehiclesByNotificationUpdate = await bd.createThirdPartyVehiclesByNotificationUpdateQuery(requestBody.thirdPartyVehicles.create, notificationData).then((res) => res);
+            if(createThirdPartyVehiclesByNotificationUpdate.error){ return { status: false, code: 500, message: createThirdPartyVehiclesByNotificationUpdate.error }; }
+            if(createThirdPartyVehiclesByNotificationUpdate.result.rowsAffected < 0){ return { status: false, code: 500, message: 'Server Internal Error.', hint: 'createThirdPartyVehiclesByNotificationUpdate' }; }
+        } 
+        if(requestBody.thirdPartyVehicles.update && requestBody.thirdPartyVehicles.update.length > 0){
+            let updateThirdPartyVehiclesByNotificationUpdate = await bd.updateThirdPartyVehiclesByNotificationUpdateQuery(requestBody.thirdPartyVehicles.update, notificationData).then((res) => res);
+            if(updateThirdPartyVehiclesByNotificationUpdate.error){ return { status: false, code: 500, message: updateThirdPartyVehiclesByNotificationUpdate.error }; }
+            if(updateThirdPartyVehiclesByNotificationUpdate.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Replacement not found.' }; }
+        }
+        if(requestBody.thirdPartyVehicles.delete && requestBody.thirdPartyVehicles.delete.length){
+            let deleteThirdPartyVehiclesByNotificationUpdate = await bd.deleteThirdPartyVehiclesByNotificationUpdateQuery(requestBody.thirdPartyVehicles.delete, notificationData).then((res) => res);
+            if(deleteThirdPartyVehiclesByNotificationUpdate.error){ return { status: false, code: 500, message: deleteThirdPartyVehiclesByNotificationUpdate.error }; }
+            if(deleteThirdPartyVehiclesByNotificationUpdate.result.rowsAffected < 0){ return { status: false, code: 500, message: 'Server Internal Error.', hint: 'deleteThirdPartyVehiclesByNotificationUpdate' }; }
         }
     }
     if(requestBody.providers){
@@ -1041,8 +1115,8 @@ const operationUpdateNotification = async(authHeader, requestBody) => {
                 if(!helper.validateRequestObj(requestBody.tracings.create[i], ['ctiposeguimiento', 'cmotivoseguimiento', "fseguimientonotificacion"])){ return { status: false, code: 400, message: 'Required params not found.' }; }
                 requestBody.tracings.create[i].xobservacion = requestBody.tracings.create[i].xobservacion ? helper.encrypt(requestBody.tracings.create[i].xobservacion.toUpperCase()) : undefined;
             }
-            let closeTracingsByNotificationUpdate = await bd.closeTracingsByNotificationUpdateQuery(notificationData).then((res) => res);
-            if(closeTracingsByNotificationUpdate.error){ return { status: false, code: 500, message: closeTracingsByNotificationUpdate.error }; }
+            // let closeTracingsByNotificationUpdate = await bd.closeTracingsByNotificationUpdateQuery(notificationData).then((res) => res);
+            // if(closeTracingsByNotificationUpdate.error){ return { status: false, code: 500, message: closeTracingsByNotificationUpdate.error }; }
             let createTracingsByNotificationUpdate = await bd.createTracingsByNotificationUpdateQuery(requestBody.tracings.create, notificationData).then((res) => res);
             if(createTracingsByNotificationUpdate.error){ return { status: false, code: 500, message: createTracingsByNotificationUpdate.error }; }
             if(createTracingsByNotificationUpdate.result.rowsAffected < 0){ return { status: false, code: 500, message: 'Server Internal Error.', hint: 'createTracingsByNotificationUpdate' }; }
@@ -1083,10 +1157,10 @@ const operationUpdateNotification = async(authHeader, requestBody) => {
 
                 serviceOrderCreateList.push({
                 cservicio: requestBody.serviceOrder.create[i].cservicio,
-                xobservacion: requestBody.serviceOrder.create[i].xobservacion.toUpperCase(),
+                xobservacion: requestBody.serviceOrder.create[i].xobservacion,
                 cservicioadicional: requestBody.serviceOrder.create[i].cservicioadicional,
                 xdanos: requestBody.serviceOrder.create[i].xdanos,
-                xfecha: requestBody.serviceOrder.create[i].xfecha.toUpperCase(),
+                xfecha: requestBody.serviceOrder.create[i].xfecha,
                 fajuste: requestBody.serviceOrder.create[i].fajuste,
                 xdesde: requestBody.serviceOrder.create[i].xdesde,
                 xhacia: requestBody.serviceOrder.create[i].xhacia,
@@ -1100,7 +1174,8 @@ const operationUpdateNotification = async(authHeader, requestBody) => {
                 bactivo: requestBody.serviceOrder.create[i].bactivo,
                 ccotizacion: requestBody.serviceOrder.create[i].ccotizacion,
                 cestatusgeneral: requestBody.serviceOrder.create[i].cestatusgeneral,
-                ccausaanulacion: requestBody.serviceOrder.create[i].ccausaanulacion
+                ccausaanulacion: requestBody.serviceOrder.create[i].ccausaanulacion,
+                migtf: requestBody.serviceOrder.create[i].migtf,
                 })
                 console.log(serviceOrderCreateList)
             }
@@ -1147,6 +1222,29 @@ const operationUpdateNotification = async(authHeader, requestBody) => {
           if(updateServiceOrderBySettlementUpdate.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Note not found.' }; }
         }
       }
+    }
+    let quotesProviders = [];
+    if(notificationData.quotesProviders){
+        for(let i = 0; i < notificationData.quotesProviders.length; i++ ){
+            quotesProviders.push({
+                cproveedor: notificationData.quotesProviders[i].cproveedor,
+                ccotizacion: notificationData.quotesProviders[i].ccotizacion,
+                crepuesto: notificationData.quotesProviders[i].crepuesto,
+                mtotalrepuesto: notificationData.quotesProviders[i].mtotalrepuesto,
+                crepuestocotizacion: notificationData.quotesProviders[i].crepuestocotizacion,
+                bdisponible: notificationData.quotesProviders[i].bdisponible,
+                bdescuento: notificationData.quotesProviders[i].bdescuento,
+                munitariorepuesto: notificationData.quotesProviders[i].munitariorepuesto,
+                bcerrada: notificationData.quotesProviders[i].bcerrada,
+                cmoneda: notificationData.quotesProviders[i].cmoneda,
+                mtotalcotizacion: notificationData.quotesProviders[i].mtotalcotizacion,
+                migtf: notificationData.quotesProviders[i].migtf,
+            })
+        }
+        let updateQuoteRequest = await bd.updateQuoteRequestNotificationQuery(quotesProviders, notificationData).then((res) => res);
+        if(updateQuoteRequest.error){ return { status: false, code: 500, message: updateQuoteRequest.error }; }
+        let updateReplacementsByQuoteRequestUpdate = await bd.updateReplacementsByQuoteRequestNotificationUpdateQuery(quotesProviders, notificationData).then((res) => res);
+        if(updateReplacementsByQuoteRequestUpdate.error){ return { status: false, code: 500, message: updateReplacementsByQuoteRequestUpdate.error }; }
     }
     return { status: true, cnotificacion: notificationData.cnotificacion };
 }
@@ -1293,6 +1391,132 @@ const operationServiceOrderFromSettlement = async(authHeader, requestBody) => {
     }
     console.log(jsonArray)
     return { status: true, list: jsonArray }
+}
+
+router.route('/search-quote-request').post((req, res) => {
+    if(!req.header('Authorization')){
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } });
+        return;
+    }else{
+        operationSearchQuoteRequest(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationSearchQuoteRequest' } });
+        });
+    }
+});
+
+const operationSearchQuoteRequest = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let searchData = {
+        cproveedor: requestBody.cproveedor,
+        fcreacion: requestBody.fcreacion ? requestBody.fcreacion : undefined
+    };
+    let providerList = [];
+    for(let i = 0; i < searchData.cproveedor.length; i++){
+        providerList.push({
+            cproveedor: searchData.cproveedor[i].cproveedor
+        })
+    }
+    let searchQuoteRequest = await bd.searchQuoteRequestNotificationQuery(providerList).then((res) => res);
+    if (searchQuoteRequest.error) {
+      return { status: false, code: 500, message: searchQuoteRequest.error };
+    }
+
+    let jsonList = [];
+    for (let i = 0; i < searchQuoteRequest.result.length; i++) {
+      let recordset = searchQuoteRequest.result[i].recordset;
+      if (recordset && recordset.length > 0) {
+        for (let j = 0; j < recordset.length; j++) {
+          jsonList.push({
+            ccotizacion: recordset[j].CCOTIZACION,
+            cproveedor: recordset[j].CPROVEEDOR,
+            fcreacion: recordset[j].FCREACION,
+            xobservacion: recordset[j].XOBSERVACION,
+            bcerrada: recordset[j].BCERRADA
+          });
+        }
+      }
+    }
+
+    if (jsonList.length > 0) {
+      return { status: true, list: jsonList };
+    } else {
+      return { status: false, code: 404, message: 'Quote Request not found.' };
+    }
+}
+
+router.route('/detail-quote-request').post((req, res) => {
+    if(!req.header('Authorization')){
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } });
+        return;
+    }else{
+        operationDetailQuoteRequest(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationDetailQuoteRequest' } });
+        });
+    }
+});
+
+const operationDetailQuoteRequest = async(authHeader, requestBody) => { 
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    //if(!helper.validateRequestObj(requestBody, ['ccotizacion', 'cproveedor'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
+    let quoteRequestData = {
+        cproveedor: requestBody.cproveedor,
+        ccotizacion: requestBody.ccotizacion
+    };
+    // let cproveedor = [];
+    // for(let i = 0; i < quoteRequestData.cproveedor.length; i++){
+    //     cproveedor.push({
+    //         cproveedor: quoteRequestData.cproveedor[i].cproveedor
+    //     })
+    // }
+    let getQuoteRequestData = await bd.getQuoteRequestNotificationDataQuery(quoteRequestData.cproveedor, quoteRequestData).then((res) => res);
+    if(getQuoteRequestData.error){ return { status: false, code: 500, message: getQuoteRequestData.error }; }
+    if(getQuoteRequestData.result.rowsAffected > 0){
+        let replacements = [];
+        let getQuoteRequestReplacementsData = await bd.getReplacementsProviderNotificationDataQuery(quoteRequestData.ccotizacion).then((res) => res);
+        if(getQuoteRequestReplacementsData.error){ return { status: false, code: 500, message: getQuoteRequestReplacementsData.error }; }
+        if(getQuoteRequestReplacementsData.result.rowsAffected > 0){
+            for(let i = 0; i < getQuoteRequestReplacementsData.result.recordset.length; i++){
+                let replacement = {
+                    crepuestocotizacion: getQuoteRequestReplacementsData.result.recordset[i].CREPUESTOCOTIZACION,
+                    crepuesto: getQuoteRequestReplacementsData.result.recordset[i].CREPUESTO,
+                    xrepuesto: getQuoteRequestReplacementsData.result.recordset[i].XREPUESTO,
+                    ctiporepuesto: getQuoteRequestReplacementsData.result.recordset[i].CTIPOREPUESTO,
+                    ncantidad: getQuoteRequestReplacementsData.result.recordset[i].NCANTIDAD,
+                    cniveldano: getQuoteRequestReplacementsData.result.recordset[i].CNIVELDANO,
+                    bdisponible: getQuoteRequestReplacementsData.result.recordset[i].BDISPONIBLE ? getQuoteRequestReplacementsData.result.recordset[i].BDISPONIBLE : undefined,
+                    munitariorepuesto: getQuoteRequestReplacementsData.result.recordset[i].MUNITARIOREPUESTO ? getQuoteRequestReplacementsData.result.recordset[i].MUNITARIOREPUESTO : undefined,
+                    bdescuento: getQuoteRequestReplacementsData.result.recordset[i].BDESCUENTO ? getQuoteRequestReplacementsData.result.recordset[i].BDESCUENTO : undefined,
+                    mtotalrepuesto: getQuoteRequestReplacementsData.result.recordset[i].MTOTALREPUESTO ? getQuoteRequestReplacementsData.result.recordset[i].MTOTALREPUESTO : undefined,
+                    cmoneda: getQuoteRequestReplacementsData.result.recordset[i].CMONEDA,
+                    xmoneda: getQuoteRequestReplacementsData.result.recordset[i].xmoneda
+                }
+                replacements.push(replacement);
+            }
+        }
+        return {
+            status: true,
+            ccotizacion: quoteRequestData.ccotizacion,
+            xobservacion: getQuoteRequestData.result.recordset[0].XOBSERVACION,
+            mtotalcotizacion: getQuoteRequestData.result.recordset[0].MTOTALCOTIZACION,
+            bcerrada: getQuoteRequestData.result.recordset[0].BCERRADA,
+            baceptacion: getQuoteRequestData.result.recordset[0].BACEPTACION,
+            cmoneda: getQuoteRequestData.result.recordset[0].CMONEDA,
+            xmoneda: getQuoteRequestData.result.recordset[0].xmoneda,
+            replacements: replacements
+        }
+    }else{ return { status: false, code: 404, message: 'Quote Request not found.' }; }
 }
 
 module.exports = router;

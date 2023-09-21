@@ -1510,6 +1510,36 @@ const operationValrepProvider = async(authHeader, requestBody) => {
     return { status: true, list: jsonArray }
 }
 
+router.route('/provider-event').post((req, res) => {
+    if(!req.header('Authorization')){ 
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
+        return;
+    }else{
+        operationValrepProviderEvent(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){ 
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationValrepProviderEvent' } });
+        });
+    }
+});
+
+const operationValrepProviderEvent = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    //if(!helper.validateRequestObj(requestBody, ['cproveedor'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
+    let cproveedor = requestBody.cproveedor ? requestBody.cproveedor : undefined;
+    let query = await bd.providerEventValrepQuery(cproveedor).then((res) => res);
+    if(query.error){ return { status: false, code: 500, message: query.error }; }
+    let jsonArray = [];
+    for(let i = 0; i < query.result.recordset.length; i++){
+        jsonArray.push({ cproveedor: query.result.recordset[i].CPROVEEDOR, xnombre: query.result.recordset[i].XNOMBRE });
+    }
+    return { status: true, list: jsonArray }
+}
+
 router.route('/civil-status').post((req, res) => {
     if(!req.header('Authorization')){ 
         res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
@@ -1633,7 +1663,7 @@ const operationValrepPlanRcvType = async(authHeader, requestBody) => {
     if(query.error){ return { status: false, code: 500, message: query.error }; }
     let jsonArray = [];
     for(let i = 0; i < query.result.recordset.length; i++){
-        jsonArray.push({ cplan_rc: query.result.recordset[i].CPLAN_RC, xplan_rc: query.result.recordset[i].XPLAN_RC, bactivo: query.result.recordset[i].BACTIVO });
+        jsonArray.push({ cplan_rc: query.result.recordset[i].CPLAN_RC, xplan_rc: query.result.recordset[i].XPLAN_RC, control: i });
     }
     return { status: true, list: jsonArray }
 }
@@ -1728,11 +1758,9 @@ const operationValrepCharge = async(authHeader, requestBody) => {
     let jsonArray = [];
 
     for(let i = 0; i < query.result.recordset.length; i++){
-        let dateFormat = new Date(query.result.recordset[i].FINGRESO);
-        let dd = dateFormat.getDate() + 1;
-        let mm = dateFormat.getMonth() + 1;
-        let yyyy = dateFormat.getFullYear();
-        let fingreso = dd + '/' + mm + '/' + yyyy;
+
+        dateFormat = query.result.recordset[i].FINGRESO.toISOString().substr(0,10).split("-");
+        let fingreso = dateFormat[2] + '/' + dateFormat[1] + '/' + dateFormat[0];
         jsonArray.push({ xcliente: query.result.recordset[i].XCLIENTE, ccliente: query.result.recordset[0].CCLIENTE, xpoliza: query.result.recordset[i].XPOLIZA, ccarga: query.result.recordset[i].CCARGA, fingreso: fingreso, xplaca: query.result.recordset[i].XPLACA });
     }
     return { status: true, list: jsonArray }
@@ -1800,17 +1828,13 @@ const operationValrepReceipt = async(authHeader, requestBody) => {
     if(query.error){ return { status: false, code: 500, message: query.error }; }
     let jsonArray = [];
     for(let i = 0; i < query.result.recordset.length; i++){
-        let dateFormatDesde = new Date(query.result.recordset[i].FDESDE_REC);
-        let ddDesde = dateFormatDesde.getDate() + 1;
-        let mmDesde = dateFormatDesde.getMonth() + 1;
-        let yyyyDesde = dateFormatDesde.getFullYear();
-        let fdesde_rec = ddDesde + '/' + mmDesde + '/' + yyyyDesde;
 
-        let dateFormatHasta = new Date(query.result.recordset[i].FHASTA_REC);
-        let ddHasta = dateFormatHasta.getDate() + 1;
-        let mmHasta = dateFormatHasta.getMonth() + 1;
-        let yyyyHasta = dateFormatHasta.getFullYear();
-        let fhasta_rec = ddHasta + '/' + mmHasta + '/' + yyyyHasta;
+        let dateFormatDesde = query.result.recordset[i].FDESDE_REC.toJSON().slice(0,10).split('-');
+        let fdesde_rec = dateFormatDesde[2] + '/' + dateFormatDesde[1] + '/' + dateFormatDesde[0];
+
+        let dateFormatHasta = query.result.recordset[i].FHASTA_REC.toJSON().slice(0,10).split('-');
+        let fhasta_rec = dateFormatHasta[2] + '/' + dateFormatHasta[1] + '/' + dateFormatHasta[0];
+        
         let xstatus = "";
         if(query.result.recordset[i].CESTATUSGENERAL == 3) {
             xstatus = "ANULADO";
@@ -2317,12 +2341,15 @@ const operationValrepVersion = async(authHeader, requestBody) => {
     if(query.error){ return { status: false, code: 500, message: query.error }; }
     let jsonArray = [];
     for(let i = 0; i < query.result.recordset.length; i++){
-        jsonArray.push({ cversion: query.result.recordset[i].CVERSION, 
+        jsonArray.push({ 
+            cversion: query.result.recordset[i].CVERSION, 
             xversion: query.result.recordset[i].XVERSION + '-' + query.result.recordset[i].CANO, 
-            bactivo: query.result.recordset[i].BACTIVO, cano: query.result.recordset[i].CANO, 
-            control: i, 
+            bactivo: query.result.recordset[i].BACTIVO, 
+            cano: query.result.recordset[i].CANO, 
             npasajero: query.result.recordset[i].NPASAJERO,
-            xtransmision: query.result.recordset[i].XTRANSMISION  });
+            xtransmision: query.result.recordset[i].XTRANSMISION,
+            control: i
+        });
     }
     return { status: true, list: jsonArray }
 }
@@ -3264,6 +3291,149 @@ const operationValrepSearchService = async(authHeader, requestBody) => {
     let jsonArray = [];
     for(let i = 0; i < query.result.recordset.length; i++){
         jsonArray.push({ cservicio: query.result.recordset[i].CSERVICIO, xservicio: query.result.recordset[i].XSERVICIO, bactivo: query.result.recordset[i].BACTIVO });
+    }
+    return { status: true, list: jsonArray }
+}
+
+router.route('/propietary').post((req, res) => {
+    if(!req.header('Authorization')){ 
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
+        return;
+    }else{
+        operationValrepPropietary(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){ 
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationValrepPropietary' } });
+        });
+    }
+});
+
+const operationValrepPropietary = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let searchData = {
+        cpais: requestBody.cpais,
+        ccompania: requestBody.ccompania
+    };
+    let query = await bd.propietaryValrepQuery(searchData).then((res) => res);
+    if(query.error){ return { status: false, code: 500, message: query.error }; }
+    let jsonArray = [];
+    let propietario;
+    for(let i = 0; i < query.result.recordset.length; i++){
+        if(query.result.recordset[i].XNOMBRE && query.result.recordset[i].XAPELLIDO){
+            propietario = query.result.recordset[i].XNOMBRE + ' ' + query.result.recordset[i].XAPELLIDO;
+        }else{
+            propietario = query.result.recordset[i].XNOMBRE;
+        }
+        jsonArray.push({ 
+            cpropietario: query.result.recordset[i].CPROPIETARIO, 
+            xpropietario: propietario, 
+        });
+    }
+    return { status: true, list: jsonArray }
+}
+
+router.route('/vehicle').post((req, res) => {
+    if(!req.header('Authorization')){ 
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
+        return;
+    }else{
+        operationValrepPropietaryVehicle(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){ 
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationValrepPropietaryVehicle' } });
+        });
+    }
+});
+
+const operationValrepPropietaryVehicle = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let searchData = {
+        cpropietario: requestBody.cpropietario
+    };
+    let query = await bd.propietaryVehicleValrepQuery(searchData).then((res) => res);
+    if(query.error){ return { status: false, code: 500, message: query.error }; }
+    let jsonArray = [];
+    let vehiculo;
+    let modelo;
+    for(let i = 0; i < query.result.recordset.length; i++){
+        if(query.result.recordset[i].XMARCA && query.result.recordset[i].XMODELO && query.result.recordset[i].XVERSION ){
+            vehiculo = query.result.recordset[i].XMARCA + ' - ' + 'PLACA: ' + query.result.recordset[i].XPLACA;
+        }
+        jsonArray.push({ 
+            cvehiculopropietario: query.result.recordset[i].CVEHICULOPROPIETARIO, 
+            xvehiculo: vehiculo, 
+        });
+    }
+    return { status: true, list: jsonArray }
+}
+
+router.route('/service-financing').post((req, res) => {
+    if(!req.header('Authorization')){ 
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
+        return;
+    }else{
+        operationValrepServiceFinancing(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){ 
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationValrepServiceFinancing' } });
+        });
+    }
+});
+
+const operationValrepServiceFinancing = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+
+    let query = await bd.serviceFinancingValrepQuery().then((res) => res);
+    if(query.error){ return { status: false, code: 500, message: query.error }; }
+    let jsonArray = [];
+    for(let i = 0; i < query.result.recordset.length; i++){
+        jsonArray.push({ 
+            cservicio: query.result.recordset[i].CSERVICIO, 
+            xservicio: query.result.recordset[i].XSERVICIO, 
+        });
+    }
+    return { status: true, list: jsonArray }
+}
+
+router.route('/replacement-financing').post((req, res) => {
+    if(!req.header('Authorization')){ 
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } })
+        return;
+    }else{
+        operationValrepReplacementFinancing(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){ 
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationValrepReplacementFinancing' } });
+        });
+    }
+});
+
+const operationValrepReplacementFinancing = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let query = await bd.replacementFinancingValrepQuery().then((res) => res);
+    if(query.error){ return { status: false, code: 500, message: query.error }; }
+    let jsonArray = [];
+    for(let i = 0; i < query.result.recordset.length; i++){
+        jsonArray.push({ 
+            crepuesto: query.result.recordset[i].CREPUESTO, 
+            xrepuesto: query.result.recordset[i].XREPUESTO, 
+        });
     }
     return { status: true, list: jsonArray }
 }

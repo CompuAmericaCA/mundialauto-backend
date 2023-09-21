@@ -14,7 +14,6 @@ router.route('/search').post((req, res) => {
             }
             res.json({ data: result });
         }).catch((err) => {
-            console.log(err.message)
             res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationSearchCollection' } });
         });
     }
@@ -27,6 +26,7 @@ const operationSearchCollection = async(authHeader, requestBody) => {
         xplaca: requestBody.xplaca ? requestBody.xplaca.toUpperCase() : undefined,
         ccorredor: requestBody.ccorredor ? requestBody.ccorredor: undefined
     }
+    console.log(searchData)
     let searchCollection = await bd.searchCollectionQuery(searchData).then((res) => res);
     if(searchCollection.error){ return { status: false, code: 500, message: searchCollection.error }; }
     if(searchCollection.result.rowsAffected > 0){
@@ -156,23 +156,21 @@ router.route('/update').post((req, res) => {
 const operationUpdateCollection = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
     let collectionDataList = {};
-
-        collectionDataList = {
-            crecibo: requestBody.crecibo,
-            ctipopago: requestBody.pago.ctipopago,
-            xreferencia: requestBody.pago.xreferencia,
-            fcobro: requestBody.pago.fcobro,
-            cbanco: requestBody.pago.cbanco,
-            mprima_pagada: requestBody.pago.mprima_pagada,
-            ccompania: requestBody.ccompania,
-            cpais: requestBody.cpais,
-            cestatusgeneral: 7,
-            xnota: requestBody.pago.xnota,
-            cbanco_destino: requestBody.pago.cbanco_destino,
-            mtasa_cambio: requestBody.pago.mtasa_cambio,
-            ftasa_cambio: requestBody.pago.ftasa_cambio,
-        }
-        console.log(collectionDataList)
+    collectionDataList = {
+        crecibo: requestBody.crecibo,
+        ctipopago: requestBody.pago.ctipopago,
+        xreferencia: requestBody.pago.xreferencia,
+        fcobro: requestBody.pago.fcobro,
+        cbanco: requestBody.pago.cbanco,
+        mprima_pagada: requestBody.pago.mprima_pagada,
+        ccompania: requestBody.ccompania,
+        cpais: requestBody.cpais,
+        cestatusgeneral: 7,
+        xnota: requestBody.pago.xnota,
+        cbanco_destino: requestBody.pago.cbanco_destino,
+        mtasa_cambio: requestBody.pago.mtasa_cambio,
+        ftasa_cambio: requestBody.pago.ftasa_cambio,
+    }
     let updateCollection = await bd.updateCollectionQuery(collectionDataList).then((res) => res);
     if(updateCollection.error){ return { status: false, code: 500, message: updateCollection.error }; }
     if(updateCollection.result.rowsAffected > 0){ return { status: true, crecibo: collectionDataList.crecibo }; }

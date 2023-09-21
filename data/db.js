@@ -278,6 +278,7 @@ module.exports = {
             //sql.close();
             return { result: result };
         }catch(err){
+            console.log(err.message)
             return { error: err.message };
         }
     },
@@ -570,12 +571,13 @@ module.exports = {
                 .input('cplan', sql.Int, planData.cplan)
                 .input('ctipoplan', sql.Int, planData.ctipoplan)
                 .input('xplan', sql.NVarChar, planData.xplan)
+                .input('mcosto', sql.Numeric(18, 2), planData.mcosto)
                 .input('bactivo', sql.Bit, planData.bactivo)
                 .input('parys', sql.Numeric(4, 2), planData.parys)
                 .input('paseguradora', sql.Numeric(4, 2), planData.paseguradora)
                 .input('cusuariomodificacion', sql.Int, planData.cusuariomodificacion)
                 .input('fmodificacion', sql.DateTime, new Date())
-                .query('update POPLAN set XPLAN = @xplan, CTIPOPLAN = @ctipoplan, BACTIVO = @bactivo,PARYS = @parys,PASEGURADORA = @paseguradora, CUSUARIOMODIFICACION = @cusuariomodificacion, FMODIFICACION = @fmodificacion where CPLAN = @cplan and CPAIS = @cpais and CCOMPANIA = @ccompania');
+                .query('update POPLAN set XPLAN = @xplan, CTIPOPLAN = @ctipoplan, BACTIVO = @bactivo,PARYS = @parys,PASEGURADORA = @paseguradora, CUSUARIOMODIFICACION = @cusuariomodificacion, FMODIFICACION = @fmodificacion, MCOSTO = @mcosto where CPLAN = @cplan and CPAIS = @cpais and CCOMPANIA = @ccompania');
             //sql.close();
             return { result: result };
         }catch(err){
@@ -2086,6 +2088,18 @@ module.exports = {
             let result = await pool.request()
                 .input('cproveedor', sql.Int, cproveedor)
                 .query('select * from VWBUSCARSERVICIOXPROVEEDORDATA where CPROVEEDOR = @cproveedor');
+            //sql.close();
+            return { result: result };
+        }catch(err){
+            return { error: err.message };
+        }
+    },
+    getProviderDocumentsDataQuery: async(cproveedor) => {
+        try{
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .input('cproveedor', sql.Int, cproveedor)
+                .query('select * from PRDOCUMENTOS where CPROVEEDOR = @cproveedor');
             //sql.close();
             return { result: result };
         }catch(err){
@@ -3614,6 +3628,51 @@ module.exports = {
             return { result: { rowsAffected: rowsAffected } };
         }
         catch(err){
+            return { error: err.message };
+        }
+    },
+    createDocumentsByProviderUpdateQuery: async(documentList, providerData) => {
+        try{
+            let rowsAffected = 0;
+            let pool = await sql.connect(config);
+            for(let i = 0; i < documentList.length; i++){
+                let insert = await pool.request()
+                    .input('cproveedor', sql.Int, providerData.cproveedor)
+                    .input('xruta', sql.NVarChar, documentList[i].xruta)
+                    .input('xobservacion', sql.NVarChar, documentList[i].xobservacion)
+                    .input('cusuariocreacion', sql.Int, providerData.cusuariocreacion)
+                    .input('fcreacion', sql.DateTime, new Date())
+                    .query('insert into PRDOCUMENTOS (CPROVEEDOR, XRUTA, XOBSERVACION, CUSUARIOCREACION, FCREACION) values (@cproveedor, @xruta, @xobservacion, @cusuariocreacion, @fcreacion)')
+                rowsAffected = rowsAffected + insert.rowsAffected;
+            }
+            //sql.close();
+            return { result: { rowsAffected: rowsAffected } };
+        }
+        catch(err){
+            console.log(err.message)
+            return { error: err.message };
+        }
+    },
+    updateDocumentsByProviderUpdateQuery: async(documentList, providerData) => {
+        try{
+            let rowsAffected = 0;
+            let pool = await sql.connect(config);
+            for(let i = 0; i < documentList.length; i++){
+                let update = await pool.request()
+                    .input('cproveedor', sql.Int, providerData.cproveedor)
+                    .input('id', sql.NVarChar, documentList[i].id)
+                    .input('xruta', sql.NVarChar, documentList[i].xruta)
+                    .input('xobservacion', sql.NVarChar, documentList[i].xobservacion)
+                    .input('cusuariomodificacion', sql.Int, providerData.cusuariomodificacion)
+                    .input('fmodificacion', sql.DateTime, new Date())
+                    .query('UPDATE PRDOCUMENTOS SET XRUTA = @xruta, XOBSERVACION = @xobservacion, CUSUARIOMODIFICACION = @cusuariomodificacion, FMODIFICACION = @fmodificacion WHERE CPROVEEDOR = @cproveedor AND ID = @id')
+                rowsAffected = rowsAffected + update.rowsAffected;
+            }
+            //sql.close();
+            return { result: { rowsAffected: rowsAffected } };
+        }
+        catch(err){
+            console.log(err.message)
             return { error: err.message };
         }
     },
