@@ -24,6 +24,7 @@ module.exports = {
             return { result: result };
         }
         catch(err){
+            console.log(err.message)
             return { error: err.message};
         }
     },
@@ -14016,7 +14017,8 @@ searchProviderFinancingQuery: async(searchData) => {
         let pool = await sql.connect(config);
         let result = await pool.request()
             .input('cservicio', sql.Int, searchData.cservicio)
-            .query('select * from VWBUSCARPROVEEDORXSERVICIO where CSERVICIO = @cservicio');
+            .input('cestado', sql.Int, searchData.cestado)
+            .query('select * from VWBUSCARPROVEEDORESXSERVICIOS where CSERVICIO = @cservicio AND CESTADO = @cestado');
         //sql.close();
         return { result: result };
     }catch(err){

@@ -3365,7 +3365,7 @@ const operationValrepPropietaryVehicle = async(authHeader, requestBody) => {
     let modelo;
     for(let i = 0; i < query.result.recordset.length; i++){
         if(query.result.recordset[i].XMARCA && query.result.recordset[i].XMODELO && query.result.recordset[i].XVERSION ){
-            vehiculo = query.result.recordset[i].XMARCA + ' - ' + query.result.recordset[i].XPLACA;
+            vehiculo = query.result.recordset[i].XMARCA + ' - ' + 'PLACA: ' + query.result.recordset[i].XPLACA;
         }
         jsonArray.push({ 
             cvehiculopropietario: query.result.recordset[i].CVEHICULOPROPIETARIO, 

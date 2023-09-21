@@ -60,7 +60,8 @@ router.route('/provider-financing').post((req, res) => {
 const operationSearchProvider = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
     let searchData = {
-        cservicio: requestBody.cservicio
+        cservicio: requestBody.cservicio,
+        cestado: requestBody.cestado,
     };
     let searchProvider = await bd.searchProviderFinancingQuery(searchData).then((res) => res);
     if(searchProvider.error){ return  { status: false, code: 500, message: searchProvider.error }; }
@@ -72,7 +73,7 @@ const operationSearchProvider = async(authHeader, requestBody) => {
                 xproveedor: searchProvider.result.recordset[i].XNOMBRE,
                 xtelefono: searchProvider.result.recordset[i].XTELEFONO,
                 cservicio: searchProvider.result.recordset[i].CSERVICIO,
-                xservicio: searchProvider.result.recordset[i].XSERVICIO
+                xservicio: searchProvider.result.recordset[i].XSERVICIO,
             })
         }
         return { status: true, list: jsonList };
