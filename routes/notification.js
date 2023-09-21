@@ -834,6 +834,7 @@ const operationDetailNotification = async(authHeader, requestBody) => {
                     cnotificacion: getNotificationServiceOrderData.result.recordset[i].CNOTIFICACION,
                     corden: getNotificationServiceOrderData.result.recordset[i].CORDEN,
                     cservicio: getNotificationServiceOrderData.result.recordset[i].CSERVICIO,
+                    cservicioadicional: getNotificationServiceOrderData.result.recordset[i].CSERVICIOADICIONAL,
                     xservicio: getNotificationServiceOrderData.result.recordset[i].XSERVICIO,
                     xservicioadicional: getNotificationServiceOrderData.result.recordset[i].XSERVICIOADICIONAL,
                     xobservacion: getNotificationServiceOrderData.result.recordset[i].XOBSERVACION,
@@ -1156,10 +1157,10 @@ const operationUpdateNotification = async(authHeader, requestBody) => {
 
                 serviceOrderCreateList.push({
                 cservicio: requestBody.serviceOrder.create[i].cservicio,
-                xobservacion: requestBody.serviceOrder.create[i].xobservacion.toUpperCase(),
+                xobservacion: requestBody.serviceOrder.create[i].xobservacion,
                 cservicioadicional: requestBody.serviceOrder.create[i].cservicioadicional,
                 xdanos: requestBody.serviceOrder.create[i].xdanos,
-                xfecha: requestBody.serviceOrder.create[i].xfecha.toUpperCase(),
+                xfecha: requestBody.serviceOrder.create[i].xfecha,
                 fajuste: requestBody.serviceOrder.create[i].fajuste,
                 xdesde: requestBody.serviceOrder.create[i].xdesde,
                 xhacia: requestBody.serviceOrder.create[i].xhacia,
