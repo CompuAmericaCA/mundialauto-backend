@@ -3322,11 +3322,14 @@ const operationValrepPropietary = async(authHeader, requestBody) => {
     if(query.error){ return { status: false, code: 500, message: query.error }; }
     let jsonArray = [];
     let propietario;
-    for(let i = 0; i < query.result.recordset.length; i++){
-        if(query.result.recordset[i].XNOMBRE && query.result.recordset[i].XAPELLIDO){
-            propietario = query.result.recordset[i].XNOMBRE + ' ' + query.result.recordset[i].XAPELLIDO;
-        }else{
-            propietario = query.result.recordset[i].XNOMBRE;
+    for (let i = 0; i < query.result.recordset.length; i++) {
+        let propietario = '';
+        if (query.result.recordset[i].XNOMBRE && query.result.recordset[i].XAPELLIDO) {
+            const nombre = query.result.recordset[i].XNOMBRE.charAt(0).toUpperCase() + query.result.recordset[i].XNOMBRE.slice(1).toLowerCase();
+            const apellido = query.result.recordset[i].XAPELLIDO.charAt(0).toUpperCase() + query.result.recordset[i].XAPELLIDO.slice(1).toLowerCase();
+            propietario = nombre + ' ' + apellido;
+        } else {
+            propietario = query.result.recordset[i].XNOMBRE.charAt(0).toUpperCase() + query.result.recordset[i].XNOMBRE.slice(1).toLowerCase();
         }
         jsonArray.push({ 
             cpropietario: query.result.recordset[i].CPROPIETARIO, 
