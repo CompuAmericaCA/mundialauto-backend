@@ -122,65 +122,80 @@ const operationPropietarySendExcel = async(authHeader, requestBody) => {
                 icedula: searchPropietary.result.recordset[i].ICEDULA,
             }
         }
-        sendEmailWithAttachment(propietaryObject);
+        const emailSent = await sendEmailWithAttachment(propietaryObject);
+        if (emailSent) {
+            return { status: true, code: 200 };
+          } else {
+            return { status: false, code: 500, message: 'Error al enviar el correo' };
+        }
     }
 }
 
 const sendEmailWithAttachment = async (propietaryObject) => {
-    try {
-      const transporter = nodemailer.createTransport({
-          service: 'Gmail',
-          auth: {
-            user: 'alenjhon9@gmail.com',
-            pass: 'nnvwygxnvdpjegbj'
-          }
-      });
-
-      const workbook = new ExcelJS.Workbook();
-      const worksheet = workbook.addWorksheet('Datos de Propietario');
+    return new Promise(async (resolve, reject) => {
+        try {
+            const transporter = nodemailer.createTransport({
+                service: 'Gmail',
+                auth: {
+                  user: 'alenjhon9@gmail.com',
+                  pass: 'nnvwygxnvdpjegbj'
+                }
+            });
       
-      worksheet.columns = [
-        { header: 'Código de Propietario', key: 'cpropietario' },
-        { header: 'Nombre', key: 'xnombre' },
-        { header: 'Apellido', key: 'xapellido' },
-        { header: 'Doc. Identidad', key: 'icedula' },
-        { header: 'Cédula', key: 'xdocidentidad' },
-        { header: 'Dirección', key: 'xdireccion' },
-        { header: 'Teléfono', key: 'xtelefono' },
-        { header: 'Correo', key: 'xcorreo' },
-        { header: 'Pais', key: 'xpais' },
-        { header: 'Estado', key: 'xestado' },
-        { header: 'Ciudad', key: 'xciudad' },
-      ];
-  
-      worksheet.addRow(propietaryObject);
-  
-      const buffer = await workbook.xlsx.writeBuffer();
-
-      const mailOptions = {
-        from: 'alenjhon9@gmail.com',
-        to: 'alenjhon9@gmail.com',
-        subject: 'Datos de Propietario',
-        text: 'Adjuntamos los datos del propietario en formato Excel.',
-        attachments: [
-          {
-            filename: 'propietario.xlsx',
-            content: buffer,
-          },
-        ],
-      };
-  
-      transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-          console.log('Error al enviar el correo electrónico:', error);
-        } else {
-          console.log('Correo electrónico enviado:', info.response);
-          return { status: true, code: 200 }
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Datos de Propietario');
+            
+            worksheet.columns = [
+              { header: 'Código de Propietario', key: 'cpropietario' },
+              { header: 'Nombre', key: 'xnombre' },
+              { header: 'Apellido', key: 'xapellido' },
+              { header: 'Doc. Identidad', key: 'icedula' },
+              { header: 'Cédula', key: 'xdocidentidad' },
+              { header: 'Dirección', key: 'xdireccion' },
+              { header: 'Teléfono', key: 'xtelefono' },
+              { header: 'Correo', key: 'xcorreo' },
+              { header: 'Pais', key: 'xpais' },
+              { header: 'Estado', key: 'xestado' },
+              { header: 'Ciudad', key: 'xciudad' },
+            ];
+        
+            worksheet.addRow(propietaryObject);
+        
+            const buffer = await workbook.xlsx.writeBuffer();
+      
+            const mailOptions = {
+              from: 'alenjhon9@gmail.com',
+              to: 'alenjhon9@gmail.com',
+              subject: 'Datos de Propietario',
+              text: 'Un cordial saludo.\n\n' +
+              `Nos complace informarle que los datos del propietario ${propietaryObject.xnombre} ${propietaryObject.xapellido} de La Mundial de Seguros han sido preparados para la apertura de una cuenta corriente en Bangente. Adjuntamos el archivo Excel con la información detallada.\n\n` +
+              'Si necesita alguna aclaración adicional o asistencia, no dude en ponerse en contacto con nuestro equipo de atención al cliente. Estamos aquí para brindarle el mejor servicio y apoyo.\n\n' +
+              'Agradecemos su confianza en nuestros servicios y esperamos que esta iniciativa sea el comienzo de una fructífera colaboración.\n\n' +
+              'Atentamente\n\n' + 
+              'La Mundial de Seguros',
+              attachments: [
+                {
+                  filename: 'Propietario La Mundial de Seguros.xlsx',
+                  content: buffer,
+                },
+              ],
+            };
+        
+            transporter.sendMail(mailOptions, async (error, info) => {
+              if (error) {
+                console.log('Error al enviar el correo electrónico:', error);
+                reject(error); // Rechazar la promesa en caso de error
+              } else {
+                console.log('Correo electrónico enviado:', info.response);
+                // Aquí notificamos al frontend que el correo se envió exitosamente
+                resolve(true); // Resolvemos la promesa en caso de éxito
+              }
+            });
+          } catch (error) {
+              console.error('Error al crear el archivo Excel:', error);
+              reject(error); // Rechazar la promesa en caso de error
         }
-      });
-    } catch (error) {
-      console.error('Error al crear el archivo Excel:', error);
-    }
+    })
   };
 
 module.exports = router;
