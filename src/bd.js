@@ -14025,5 +14025,17 @@ searchProviderFinancingQuery: async(searchData) => {
         return { error: err.message };
     }
 },
+searchPropietaryFromExcelQuery: async(cpropietario) => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+            .input('cpropietario', sql.Int, cpropietario)
+            .query('select * from VWBUSCARPROPIETARIOXCONTRATOFLOTADATA where CPROPIETARIO = @cpropietario');
+        //sql.close();
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+},
 }
 
