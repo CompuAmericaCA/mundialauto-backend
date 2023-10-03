@@ -82,6 +82,69 @@ const operationSearchProvider = async(authHeader, requestBody) => {
     }else{ return {status: false, code: 404, message: "No se encontraron proveedores para el servicio seleccionado"} }
 }
 
+router.route('/create-financing').post((req, res) => {
+    if(!req.header('Authorization')){
+        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } });
+        return;
+    }else{
+        operationCreateFinancing(req.header('Authorization'), req.body).then((result) => {
+            if(!result.status){
+                res.status(result.code).json({ data: result });
+                return;
+            }
+            res.json({ data: result });
+        }).catch((err) => {
+            console.log(err.message)
+            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationCreateFinancing' } });
+        });
+    }
+});
+
+const operationCreateFinancing = async(authHeader, requestBody) => {
+    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
+    let financing = {
+        cpropietario: requestBody.cpropietario,
+        xvehiculo: requestBody.xvehiculo,
+        cvehiculopropietario: requestBody.cvehiculopropietario,
+        mmonto_cartera: requestBody.mmonto_cartera,
+        cestado: requestBody.cestado,
+        cservicio: requestBody.cservicio,
+        cusuario: requestBody.cusuario,
+    };
+    let cfinanciamiento = 0;
+    let createFinancing = await bd.createFinancingQuery(financing).then((res) => res);
+    if(createFinancing.error){ return  { status: false, code: 500, message: createFinancing.error }; }
+    if(createFinancing.result.rowsAffected > 0){
+        let searchCodeFinancing = await bd.searchCodeFinancingQuery().then((res) => res);
+        if(searchCodeFinancing.result.rowsAffected > 0){
+            cfinanciamiento = searchCodeFinancing.result.recordset[0].CFINANCIAMIENTO
+            if(requestBody.proveedores){
+                let insertProviderFinancing = await bd.insertProviderFinancingQuery(cfinanciamiento, requestBody.proveedores, financing).then((res) => res);
+                if(insertProviderFinancing.error){ return  { status: false, code: 500, message: insertProviderFinancing.error }; }
+            }
+            if (requestBody.financiamiento) {
+                for (let i = 0; i < requestBody.financiamiento.length; i++) {
+                    const fechaCuota = requestBody.financiamiento[i].fechaCuota;
+                    const partesFecha = fechaCuota.split('/');
+                    const fechaDatetime = new Date(
+                        partesFecha[2], 
+                        partesFecha[1] - 1, 
+                        partesFecha[0]
+                    );
+                    requestBody.financiamiento[i].fechaCuota = fechaDatetime;
+                    
+                    const xmonto_financiado = parseFloat(requestBody.financiamiento[i].xmonto_financiado);
+                    requestBody.financiamiento[i].xmonto_financiado = xmonto_financiado;
+                }
+
+                let insertFinancingCuotes = await bd.insertFinancingCuotesQuery(cfinanciamiento, requestBody.financiamiento, financing).then((res) => res);
+                if (insertFinancingCuotes.error) {return { status: false, code: 500, message: insertFinancingCuotes.error }}
+                return { status: true, code: 200, message: "El financiamiento ha sido exitosamente creado y registrado en el sistema. " };
+            }
+        }
+    }else{ return {status: false, code: 404, message: "No se encontraron proveedores para el servicio seleccionado"} }
+}
+
 router.route('/propietary-bangente').post((req, res) => {
     if(!req.header('Authorization')){
         res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } });
@@ -197,46 +260,5 @@ const sendEmailWithAttachment = async (propietaryObject) => {
         }
     })
   }
-
-  router.route('/create').post((req, res) => {
-    if(!req.header('Authorization')){
-        res.status(400).json({ data: { status: false, code: 400, message: 'Required authorization header not found.' } });
-        return;
-    }else{
-        operationCreateFinancing(req.header('Authorization'), req.body).then((result) => {
-            if(!result.status){
-                res.status(result.code).json({ data: result });
-                return;
-            }
-            res.json({ data: result });
-        }).catch((err) => {
-            console.log(err.message)
-            res.status(500).json({ data: { status: false, code: 500, message: err.message, hint: 'operationCreateFinancing' } });
-        });
-    }
-});
-
-const operationCreateFinancing = async(authHeader, requestBody) => {
-    if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
-    let searchData = {
-        cservicio: requestBody.cservicio,
-        cestado: requestBody.cestado,
-    };
-    let searchProvider = await bd.searchProviderFinancingQuery(searchData).then((res) => res);
-    if(searchProvider.error){ return  { status: false, code: 500, message: searchProvider.error }; }
-    if(searchProvider.result.rowsAffected > 0){
-        let jsonList = [];
-        for(let i = 0; i < searchProvider.result.recordset.length; i++){
-            jsonList.push({
-                cproveedor: searchProvider.result.recordset[i].CPROVEEDOR,
-                xproveedor: searchProvider.result.recordset[i].XNOMBRE,
-                xtelefono: searchProvider.result.recordset[i].XTELEFONO,
-                cservicio: searchProvider.result.recordset[i].CSERVICIO,
-                xservicio: searchProvider.result.recordset[i].XSERVICIO,
-            })
-        }
-        return { status: true, list: jsonList };
-    }else{ return {status: false, code: 404, message: "No se encontraron proveedores para el servicio seleccionado"} }
-}
 
 module.exports = router;
