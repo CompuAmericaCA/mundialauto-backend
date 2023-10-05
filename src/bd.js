@@ -14120,5 +14120,77 @@ insertFinancingCuotesQuery: async(cfinanciamiento, cuotes, financing) => {
         return { error: err.message };
     }
 },
+searchBeneficiaryFinancingQuery: async(searchData) => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+        .input('cpropietario', sql.Int, searchData.cpropietario)
+        .query(`WITH RankedRows AS (SELECT *, ROW_NUMBER() OVER (PARTITION BY XNOMBRE ORDER BY ncuotas DESC) AS RowNum FROM VWBUSCARFINANCIAMIENTOXCUOTAS) 
+        SELECT * FROM RankedRows 
+        WHERE RowNum = 1 ${ searchData.cpropietario ? ' and CPROPIETARIO = @cpropietario' : '' } 
+        AND CESTATUSGENERAL = 13 AND RIGHT(ncuotas, 1) = 3 
+        ORDER BY CFINANCIAMIENTO`);
+        //sql.close();
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+},
+beneficiaryFinancingValrepQuery: async() => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+        .query('select DISTINCT XNOMBRE, XAPELLIDO, CPROPIETARIO, CESTATUSGENERAL from VWBUSCARBENEFICIARIOXFINANCIAMIENTO WHERE CESTATUSGENERAL = 13');
+        //sql.close();
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+},
+detailFinancingQuery: async(searchData) => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+        .input('cfinanciamiento', sql.Int, searchData.cfinanciamiento)
+        .query('select * from VWBUSCARFINANCIAMIENTOXCUOTAS WHERE CFINANCIAMIENTO = @cfinanciamiento and CESTATUSGENERAL = 13');
+        //sql.close();
+        return { result: result };
+    }catch(err){
+        console.log(err.message)
+        return { error: err.message };
+    }
+},
+detailProviderFinancingQuery: async(searchData) => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+        .input('cfinanciamiento', sql.Int, searchData.cfinanciamiento)
+        .query('select * from VWBUSCARPROVEEDORESXFINANCIAMIENTO WHERE CFINANCIAMIENTO = @cfinanciamiento');
+        //sql.close();
+        return { result: result };
+    }catch(err){
+        console.log(err.message)
+        return { error: err.message };
+    }
+},
+updateCuotesFinancingQuery: async(searchData) => {
+    try{
+        let rowsAffected = 0;
+        let pool = await sql.connect(config);
+        let update = await pool.request()
+            .input('cfinanciamiento', sql.Int, searchData.cfinanciamiento)
+            .input('ncuota', sql.Int, searchData.ncuota)
+            .input('cestatusgeneral', sql.Int, 7)
+            .input('fpago', sql.DateTime, new Date())
+            .query('update FNCUOTAS set CESTATUSGENERAL = @cestatusgeneral, FPAGO = @fpago where CFINANCIAMIENTO = @cfinanciamiento and NCUOTAS = @ncuota');
+        rowsAffected = rowsAffected + update.rowsAffected;
+        //sql.close();
+        return { result: { rowsAffected: rowsAffected } };
+    }
+    catch(err){
+        console.log(err.message)
+        return { error: err.message };
+    }
+},
 }
 
