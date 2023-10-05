@@ -14037,5 +14037,160 @@ searchPropietaryFromExcelQuery: async(cpropietario) => {
         return { error: err.message };
     }
 },
+createFinancingQuery: async(financing) => {
+    try{
+        let rowsAffected = 0;
+        let pool = await sql.connect(config);
+        let insert = await pool.request()
+            .input('cpropietario', sql.Int, financing.cpropietario)
+            .input('xvehiculo', sql.NVarChar, financing.xvehiculo)
+            .input('cvehiculopropietario', sql.Int, financing.cvehiculopropietario)
+            .input('mmonto_cartera', sql.Numeric(18, 2), financing.mmonto_cartera)
+            .input('cusuariocreacion', sql.Int, financing.cusuario)
+            .input('fcreacion', sql.DateTime, new Date())
+            .query('INSERT INTO FNFINANCIAMIENTO (CPROPIETARIO, XVEHICULO, CVEHICULOPROPIETARIO, MMONTO_CARTERA, CUSUARIOCREACION, FCREACION) values (@cpropietario, @xvehiculo, @cvehiculopropietario, @mmonto_cartera, @cusuariocreacion, @fcreacion)')
+        rowsAffected = rowsAffected + insert.rowsAffected;
+        //sql.close();
+        return { result: { rowsAffected: rowsAffected } };
+    }
+    catch(err){
+        console.log(err.message)
+        return { error: err.message };
+    }
+},
+searchCodeFinancingQuery: async() => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+            .query('select MAX(CFINANCIAMIENTO) AS CFINANCIAMIENTO from FNFINANCIAMIENTO');
+        //sql.close();
+        return { result: result };
+    }catch(err){
+        console.log(err.message)
+        return { error: err.message };
+    }
+},
+insertProviderFinancingQuery: async(cfinanciamiento, providers, financing) => {
+    try{
+        let rowsAffected = 0;
+        let pool = await sql.connect(config);
+        for(let i = 0; i < providers.length; i++){
+            let insert = await pool.request()
+                .input('cfinanciamiento', sql.Int, cfinanciamiento)
+                .input('cproveedor', sql.Int, providers[i].cproveedor)
+                .input('cestado', sql.Int, financing.cestado.id)
+                .input('mprecio', sql.Numeric(18, 2), providers[i].monto)
+                .input('cservicio', sql.Int, financing.cservicio)
+                .input('crepuesto', sql.Int, providers[i].crepuesto)
+                .input('ncantidad', sql.Int, providers[i].cantidad)
+                .input('cusuariocreacion', sql.Int, financing.cusuario)
+                .input('fcreacion', sql.DateTime, new Date())
+                .query('INSERT INTO FNPROVEEDORES (CFINANCIAMIENTO, CPROVEEDOR, CESTADO, MPRECIO, CSERVICIO, CREPUESTO, NCANTIDAD, CUSUARIOCREACION, FCREACION) values (@cfinanciamiento, @cproveedor, @cestado, @mprecio, @cservicio, @crepuesto, @ncantidad, @cusuariocreacion, @fcreacion)')
+            rowsAffected = rowsAffected + insert.rowsAffected;
+        }
+        //sql.close();
+        return { result: { rowsAffected: rowsAffected } };
+    }
+    catch(err){
+        console.log(err.message)
+        return { error: err.message };
+    }
+},
+insertFinancingCuotesQuery: async(cfinanciamiento, cuotes, financing) => {
+    try{
+        let rowsAffected = 0;
+        let pool = await sql.connect(config);
+        for(let i = 0; i < cuotes.length; i++){
+            let insert = await pool.request()
+                .input('cfinanciamiento', sql.Int, cfinanciamiento)
+                .input('ncuotas', sql.Int, cuotes[i].ncuotas)
+                .input('fvencimiento', sql.DateTime, cuotes[i].fechaCuota)
+                .input('mmonto_cuota', sql.Numeric(18, 2), cuotes[i].xmonto_financiado)
+                .input('cestatusgeneral', sql.Int, 13)
+                .input('cusuariocreacion', sql.Int, financing.cusuario)
+                .input('fcreacion', sql.DateTime, new Date())
+                .query('INSERT INTO FNCUOTAS (CFINANCIAMIENTO, NCUOTAS, FVENCIMIENTO, MMONTO_CUOTA, CESTATUSGENERAL, CUSUARIOCREACION, FCREACION) values (@cfinanciamiento, @ncuotas, @fvencimiento, @mmonto_cuota, @cestatusgeneral, @cusuariocreacion, @fcreacion)')
+            rowsAffected = rowsAffected + insert.rowsAffected;
+        }
+        //sql.close();
+        return { result: { rowsAffected: rowsAffected } };
+    }
+    catch(err){
+        console.log(err.message)
+        return { error: err.message };
+    }
+},
+searchBeneficiaryFinancingQuery: async(searchData) => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+        .input('cpropietario', sql.Int, searchData.cpropietario)
+        .query(`WITH RankedRows AS (SELECT *, ROW_NUMBER() OVER (PARTITION BY XNOMBRE ORDER BY ncuotas DESC) AS RowNum FROM VWBUSCARFINANCIAMIENTOXCUOTAS) 
+        SELECT * FROM RankedRows 
+        WHERE RowNum = 1 ${ searchData.cpropietario ? ' and CPROPIETARIO = @cpropietario' : '' } 
+        AND CESTATUSGENERAL = 13 AND RIGHT(ncuotas, 1) = 3 
+        ORDER BY CFINANCIAMIENTO`);
+        //sql.close();
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+},
+beneficiaryFinancingValrepQuery: async() => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+        .query('select DISTINCT XNOMBRE, XAPELLIDO, CPROPIETARIO, CESTATUSGENERAL from VWBUSCARBENEFICIARIOXFINANCIAMIENTO WHERE CESTATUSGENERAL = 13');
+        //sql.close();
+        return { result: result };
+    }catch(err){
+        return { error: err.message };
+    }
+},
+detailFinancingQuery: async(searchData) => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+        .input('cfinanciamiento', sql.Int, searchData.cfinanciamiento)
+        .query('select * from VWBUSCARFINANCIAMIENTOXCUOTAS WHERE CFINANCIAMIENTO = @cfinanciamiento and CESTATUSGENERAL = 13');
+        //sql.close();
+        return { result: result };
+    }catch(err){
+        console.log(err.message)
+        return { error: err.message };
+    }
+},
+detailProviderFinancingQuery: async(searchData) => {
+    try{
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+        .input('cfinanciamiento', sql.Int, searchData.cfinanciamiento)
+        .query('select * from VWBUSCARPROVEEDORESXFINANCIAMIENTO WHERE CFINANCIAMIENTO = @cfinanciamiento');
+        //sql.close();
+        return { result: result };
+    }catch(err){
+        console.log(err.message)
+        return { error: err.message };
+    }
+},
+updateCuotesFinancingQuery: async(searchData) => {
+    try{
+        let rowsAffected = 0;
+        let pool = await sql.connect(config);
+        let update = await pool.request()
+            .input('cfinanciamiento', sql.Int, searchData.cfinanciamiento)
+            .input('ncuota', sql.Int, searchData.ncuota)
+            .input('cestatusgeneral', sql.Int, 7)
+            .input('fpago', sql.DateTime, new Date())
+            .query('update FNCUOTAS set CESTATUSGENERAL = @cestatusgeneral, FPAGO = @fpago where CFINANCIAMIENTO = @cfinanciamiento and NCUOTAS = @ncuota');
+        rowsAffected = rowsAffected + update.rowsAffected;
+        //sql.close();
+        return { result: { rowsAffected: rowsAffected } };
+    }
+    catch(err){
+        console.log(err.message)
+        return { error: err.message };
+    }
+},
 }
 
