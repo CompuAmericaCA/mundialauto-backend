@@ -182,10 +182,10 @@ const operationConfigurationDetailTax = async(authHeader, requestBody) => {
         cpais: requestBody.cpais,
         cimpuesto: requestBody.cimpuesto
     };
-    let getTaxData = await bd.getTaxDataQuery(taxData).then((res) => res);
+    let getTaxData = await bd.getTaxDataQuery(taxData.cimpuesto).then((res) => res);
     if(getTaxData.error){ return { status: false, code: 500, message: getTaxData.error }; }
     if(getTaxData.result.rowsAffected > 0){
-        getTaxConfigurationData = await bd.getTaxConfigurationDataQuery(taxData).then((res) => res);
+        getTaxConfigurationData = await bd.getTaxConfigurationDataQuery(taxData.cimpuesto).then((res) => res);
         if(getTaxConfigurationData.error){ return { status: false, code: 500, message: getTaxConfigurationData.error }; }
         if(getTaxConfigurationData.result.rowsAffected > 0){
             return {

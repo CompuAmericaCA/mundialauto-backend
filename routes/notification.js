@@ -814,6 +814,7 @@ const operationDetailNotification = async(authHeader, requestBody) => {
                     mtotal: getNotificationQuotesData.result.recordset[i].MTOTAL,
                     cimpuesto: getNotificationQuotesData.result.recordset[i].CIMPUESTO,
                     pimpuesto: getNotificationQuotesData.result.recordset[i].PIMPUESTO,
+                    migtf: getNotificationQuotesData.result.recordset[i].MIGTF,
                     replacements: replacements
                 }
                 quotes.push(quote);
@@ -847,6 +848,7 @@ const operationDetailNotification = async(authHeader, requestBody) => {
                     cnotificacion: getNotificationServiceOrderData.result.recordset[i].CNOTIFICACION,
                     corden: getNotificationServiceOrderData.result.recordset[i].CORDEN,
                     cservicio: getNotificationServiceOrderData.result.recordset[i].CSERVICIO,
+                    cservicioadicional: getNotificationServiceOrderData.result.recordset[i].CSERVICIOADICIONAL,
                     xservicio: getNotificationServiceOrderData.result.recordset[i].XSERVICIO,
                     xservicioadicional: getNotificationServiceOrderData.result.recordset[i].XSERVICIOADICIONAL,
                     xobservacion: getNotificationServiceOrderData.result.recordset[i].XOBSERVACION,
@@ -947,8 +949,8 @@ const operationUpdateNotification = async(authHeader, requestBody) => {
         cpais: requestBody.cpais,
         ccompania: requestBody.ccompania,
         cnotificacion: requestBody.cnotificacion,
-        cusuariomodificacion: requestBody.cusuariomodificacion,
         quotesProviders: requestBody.quotesProviders,
+        cusuariomodificacion: requestBody.cusuariomodificacion
     }
     console.log("***----***");
     if(requestBody.notes){
@@ -1027,7 +1029,33 @@ const operationUpdateNotification = async(authHeader, requestBody) => {
             }
             let updateThirdpartiesByNotificationUpdate = await bd.updateThirdpartiesByNotificationUpdateQuery(requestBody.thirdparties.update, notificationData).then((res) => res);
             if(updateThirdpartiesByNotificationUpdate.error){ return { status: false, code: 500, message: updateThirdpartiesByNotificationUpdate.error }; }
-            if(updateThirdpartiesByNotificationUpdate.result.rowsAffected < 0){ return { status: false, code: 404, message: 'Thirdparty not found.' }; }
+        }
+        let createThirdpartiesList = [];
+        let createThirdpartiesTracingsList = [];
+        if(requestBody.thirdparties.create){
+            for(let i = 0; i < requestBody.thirdparties.create.length; i++){
+                createThirdpartiesList.push({
+                    ctipodocidentidad: requestBody.thirdparties.create[i].ctipodocidentidad,
+                    xdocidentidad: requestBody.thirdparties.create[i].xdocidentidad,
+                    xnombre: requestBody.thirdparties.create[i].xnombre,
+                    xapellido: requestBody.thirdparties.create[i].xapellido,
+                    xtelefonocelular: requestBody.thirdparties.create[i].xtelefonocelular,
+                    xtelefonocasa: requestBody.thirdparties.create[i].xtelefonocasa,
+                    xemail: requestBody.thirdparties.create[i].xemail,
+                    xobservacion: requestBody.thirdparties.create[i].xobservacion
+                })
+                for(let j = 0; j < requestBody.thirdparties.create[i].tracings.length; j++){
+                    createThirdpartiesTracingsList.push({
+                        ctiposeguimiento: requestBody.thirdparties.create[i].tracings[j].ctiposeguimiento,
+                        cmotivoseguimiento: requestBody.thirdparties.create[i].tracings[j].cmotivoseguimiento,
+                        fseguimientotercero: requestBody.thirdparties.create[i].tracings[j].fseguimientotercero,
+                        bcerrado: requestBody.thirdparties.create[i].tracings[j].bcerrado,
+                        xobservacion: requestBody.thirdparties.create[i].tracings[j].xobservacion,
+                    })
+                }
+            }
+            let createThirdpartiesByNotificationUpdate = await bd.createThirdpartiesByNotificationUpdateQuery(createThirdpartiesList, createThirdpartiesTracingsList, notificationData).then((res) => res);
+            if(createThirdpartiesByNotificationUpdate.error){ return { status: false, code: 500, message: createThirdpartiesByNotificationUpdate.error }; }
         }
     }
     if(requestBody.materialDamages){
@@ -1104,8 +1132,8 @@ const operationUpdateNotification = async(authHeader, requestBody) => {
                 if(!helper.validateRequestObj(requestBody.tracings.create[i], ['ctiposeguimiento', 'cmotivoseguimiento', "fseguimientonotificacion"])){ return { status: false, code: 400, message: 'Required params not found.' }; }
                 requestBody.tracings.create[i].xobservacion = requestBody.tracings.create[i].xobservacion ? helper.encrypt(requestBody.tracings.create[i].xobservacion.toUpperCase()) : undefined;
             }
-            let closeTracingsByNotificationUpdate = await bd.closeTracingsByNotificationUpdateQuery(notificationData).then((res) => res);
-            if(closeTracingsByNotificationUpdate.error){ return { status: false, code: 500, message: closeTracingsByNotificationUpdate.error }; }
+            // let closeTracingsByNotificationUpdate = await bd.closeTracingsByNotificationUpdateQuery(notificationData).then((res) => res);
+            // if(closeTracingsByNotificationUpdate.error){ return { status: false, code: 500, message: closeTracingsByNotificationUpdate.error }; }
             let createTracingsByNotificationUpdate = await bd.createTracingsByNotificationUpdateQuery(requestBody.tracings.create, notificationData).then((res) => res);
             if(createTracingsByNotificationUpdate.error){ return { status: false, code: 500, message: createTracingsByNotificationUpdate.error }; }
             if(createTracingsByNotificationUpdate.result.rowsAffected < 0){ return { status: false, code: 500, message: 'Server Internal Error.', hint: 'createTracingsByNotificationUpdate' }; }
@@ -1145,10 +1173,10 @@ const operationUpdateNotification = async(authHeader, requestBody) => {
 
                 serviceOrderCreateList.push({
                 cservicio: requestBody.serviceOrder.create[i].cservicio,
-                xobservacion: requestBody.serviceOrder.create[i].xobservacion.toUpperCase(),
+                xobservacion: requestBody.serviceOrder.create[i].xobservacion,
                 cservicioadicional: requestBody.serviceOrder.create[i].cservicioadicional,
                 xdanos: requestBody.serviceOrder.create[i].xdanos,
-                xfecha: requestBody.serviceOrder.create[i].xfecha.toUpperCase(),
+                xfecha: requestBody.serviceOrder.create[i].xfecha,
                 fajuste: requestBody.serviceOrder.create[i].fajuste,
                 xdesde: requestBody.serviceOrder.create[i].xdesde,
                 xhacia: requestBody.serviceOrder.create[i].xhacia,
@@ -1162,7 +1190,8 @@ const operationUpdateNotification = async(authHeader, requestBody) => {
                 bactivo: requestBody.serviceOrder.create[i].bactivo,
                 ccotizacion: requestBody.serviceOrder.create[i].ccotizacion,
                 cestatusgeneral: requestBody.serviceOrder.create[i].cestatusgeneral,
-                ccausaanulacion: requestBody.serviceOrder.create[i].ccausaanulacion
+                ccausaanulacion: requestBody.serviceOrder.create[i].ccausaanulacion,
+                migtf: requestBody.serviceOrder.create[i].migtf,
                 })
                 console.log(serviceOrderCreateList)
             }
@@ -1211,8 +1240,7 @@ const operationUpdateNotification = async(authHeader, requestBody) => {
       }
     }
     let quotesProviders = [];
-    if(notificationData.quotesProviders.length > 0){
-        console.log(JSON.stringify(notificationData.quotesProviders));
+    if(notificationData.quotesProviders){
         for(let i = 0; i < notificationData.quotesProviders.length; i++ ){
             quotesProviders.push({
                 cproveedor: notificationData.quotesProviders[i].cproveedor,
@@ -1226,11 +1254,12 @@ const operationUpdateNotification = async(authHeader, requestBody) => {
                 bcerrada: notificationData.quotesProviders[i].bcerrada,
                 cmoneda: notificationData.quotesProviders[i].cmoneda,
                 mtotalcotizacion: notificationData.quotesProviders[i].mtotalcotizacion,
+                migtf: notificationData.quotesProviders[i].migtf,
             })
         }
-        let updateQuoteRequest = await bd.updateQuoteRequestNotificationQuery(quotesProviders).then((res) => res);
+        let updateQuoteRequest = await bd.updateQuoteRequestNotificationQuery(quotesProviders, notificationData).then((res) => res);
         if(updateQuoteRequest.error){ return { status: false, code: 500, message: updateQuoteRequest.error }; }
-        let updateReplacementsByQuoteRequestUpdate = await bd.updateReplacementsByQuoteRequestNotificationUpdateQuery(quotesProviders).then((res) => res);
+        let updateReplacementsByQuoteRequestUpdate = await bd.updateReplacementsByQuoteRequestNotificationUpdateQuery(quotesProviders, notificationData).then((res) => res);
         if(updateReplacementsByQuoteRequestUpdate.error){ return { status: false, code: 500, message: updateReplacementsByQuoteRequestUpdate.error }; }
     }
     return { status: true, cnotificacion: notificationData.cnotificacion };
@@ -1399,34 +1428,42 @@ router.route('/search-quote-request').post((req, res) => {
 
 const operationSearchQuoteRequest = async(authHeader, requestBody) => {
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
-    // console.log(requestBody);
     let searchData = {
-        cnotificacion: requestBody.cnotificacion,
+        cproveedor: requestBody.cproveedor,
         fcreacion: requestBody.fcreacion ? requestBody.fcreacion : undefined
     };
-    // let cproveedor = [];
-    // for(let i = 0; i < searchData.listProviders.length; i++){
-    //     cproveedor.push({
-    //         cproveedor: searchData.listProviders[i].cproveedor
-    //     })
-    // }
-    // console.log(searchData);
-    // let searchQuoteRequest = await bd.searchQuoteRequestNotificationQuery(cproveedor, searchData).then((res) => res);
-    let searchQuoteRequest = await bd.searchQuoteRequestNotificationQuery(searchData).then((res) => res);
-    if(searchQuoteRequest.error){ return  { status: false, code: 500, message: searchQuoteRequest.error }; }
-    if(searchQuoteRequest.result.rowsAffected > 0){
-        let jsonList = [];
-        for(let i = 0; i < searchQuoteRequest.result.recordset.length; i++){
-            jsonList.push({
-                ccotizacion: searchQuoteRequest.result.recordset[i].CCOTIZACION,
-                cproveedor: searchQuoteRequest.result.recordset[i].CPROVEEDOR,
-                fcreacion: searchQuoteRequest.result.recordset[i].FCREACION,
-                xobservacion: searchQuoteRequest.result.recordset[i].XOBSERVACION,
-                bcerrada: searchQuoteRequest.result.recordset[i].BCERRADA
-            });
+    let providerList = [];
+    for(let i = 0; i < searchData.cproveedor.length; i++){
+        providerList.push({
+            cproveedor: searchData.cproveedor[i].cproveedor
+        })
+    }
+    let searchQuoteRequest = await bd.searchQuoteRequestNotificationQuery(providerList).then((res) => res);
+    if (searchQuoteRequest.error) {
+      return { status: false, code: 500, message: searchQuoteRequest.error };
+    }
+
+    let jsonList = [];
+    for (let i = 0; i < searchQuoteRequest.result.length; i++) {
+      let recordset = searchQuoteRequest.result[i].recordset;
+      if (recordset && recordset.length > 0) {
+        for (let j = 0; j < recordset.length; j++) {
+          jsonList.push({
+            ccotizacion: recordset[j].CCOTIZACION,
+            cproveedor: recordset[j].CPROVEEDOR,
+            fcreacion: recordset[j].FCREACION,
+            xobservacion: recordset[j].XOBSERVACION,
+            bcerrada: recordset[j].BCERRADA
+          });
         }
-        return { status: true, list: jsonList };
-    }else{ return { status: false, code: 404, message: 'Quote Request not found.' }; }
+      }
+    }
+
+    if (jsonList.length > 0) {
+      return { status: true, list: jsonList };
+    } else {
+      return { status: false, code: 404, message: 'Quote Request not found.' };
+    }
 }
 
 router.route('/detail-quote-request').post((req, res) => {
