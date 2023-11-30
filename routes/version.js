@@ -117,6 +117,7 @@ router.route('/create').post((req, res) => {
 });
 
 const operationCreateVersion = async(authHeader, requestBody) => {
+    console.log(requestBody);
     if(!helper.validateAuthorizationToken(authHeader)){ return { status: false, code: 401, condition: 'token-expired', expired: true }; }
     if(!helper.validateRequestObj(requestBody, ['xversion', 'cmodelo', 'cmarca', 'bactivo', 'cpais'])){ return { status: false, code: 400, message: 'Required params not found.' }; }
     let versionData = {
@@ -172,6 +173,7 @@ const operationDetailVersion = async(authHeader, requestBody) => {
             status: true,
             cmodelo: getVersionData.result.recordset[0].CVERSION,
             xversion: getVersionData.result.recordset[0].XVERSION,
+            cano: getVersionData.result.recordset[0].CANO,
             xtransmision: getVersionData.result.recordset[0].XTRANSMISION,
             // xcilindrajemotor: getVersionData.result.recordset[0].XCILINDRAJEMOTOR,
             ctipovehiculo: getVersionData.result.recordset[0].CTIPOVEHICULO,
@@ -208,6 +210,7 @@ const operationUpdateVersion = async(authHeader, requestBody) => {
     let versionData = {
         cversion: requestBody.cversion  ? requestBody.cversion : undefined,
         xversion: requestBody.xversion.toUpperCase() ? requestBody.xversion : undefined,
+        cano: requestBody.cano ? requestBody.cano : undefined,
         xtransmision: requestBody.xtransmision ? requestBody.xtransmision : undefined,
       //  xcilindrajemotor: requestBody.xcilindrajemotor.toUpperCase() ? requestBody.xcilindrajemotor : undefined,
       //  ctipovehiculo: requestBody.ctipovehiculo ? requestBody.ctipovehiculo : undefined,
